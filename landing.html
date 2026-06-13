@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Greaz — Le mécanicien qui vient chez vous</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#1A3CFF; --blue2:#0F2ACC; --bluelt:#EEF1FF;
+  --ink:#0A0C1B; --ink2:#1C2040; --muted:#6B7280;
+  --line:rgba(255,255,255,.1); --surface:#F5F6FA;
+  --white:#FFFFFF; --green:#00C26F; --orange:#FF6B2C;
+  --r:8px; --r2:16px; --r3:24px;
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'DM Sans',sans-serif; background:var(--ink); color:var(--white); min-height:100vh; overflow-x:hidden; }
+
+/* NAV */
+nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:.9rem 2rem; display:flex; align-items:center; justify-content:space-between; background:rgba(10,12,27,.85); backdrop-filter:blur(16px); border-bottom:1px solid var(--line); }
+.logo { font-family:'Bricolage Grotesque',sans-serif; font-size:1.5rem; font-weight:800; letter-spacing:-.03em; }
+.logo span { color:var(--blue); }
+.nav-badge { font-size:11px; font-weight:600; padding:4px 12px; border-radius:20px; border:1px solid rgba(255,255,255,.2); color:rgba(255,255,255,.6); }
+
+/* HERO */
+.hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8rem 2rem 4rem; text-align:center; position:relative; overflow:hidden; }
+.hero-bg { position:absolute; inset:0; z-index:0; background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,60,255,.25) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(0,194,111,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(255,107,44,.08) 0%,transparent 60%); }
+.hero-grid { position:absolute; inset:0; z-index:0; opacity:.07; background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px); background-size:50px 50px; }
+.hero-content { position:relative; z-index:1; max-width:720px; }
+.hero-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(26,60,255,.15); border:1px solid rgba(26,60,255,.4); border-radius:40px; padding:6px 18px; font-size:13px; font-weight:500; color:rgba(255,255,255,.8); margin-bottom:2rem; animation:fadeUp .6s ease both; }
+.hero-dot { width:7px; height:7px; border-radius:50%; background:var(--blue); animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+h1 { font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.8rem,7vw,5rem); font-weight:800; line-height:1.05; letter-spacing:-.04em; margin-bottom:1.5rem; animation:fadeUp .6s .1s ease both; }
+h1 .hl { color:var(--blue); }
+h1 .hl2 { color:var(--green); }
+.hero-sub { font-size:1.05rem; color:rgba(255,255,255,.55); line-height:1.75; max-width:500px; margin:0 auto 3rem; animation:fadeUp .6s .2s ease both; }
+
+/* CTA */
+.cta-row { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; animation:fadeUp .6s .3s ease both; }
+.cta-card { flex:1; min-width:260px; max-width:340px; border-radius:var(--r3); padding:2rem; cursor:pointer; transition:all .25s cubic-bezier(.34,1.56,.64,1); position:relative; overflow:hidden; border:2px solid transparent; }
+.cta-card:hover { transform:translateY(-6px) scale(1.02); }
+.cta-card .cta-icon { font-size:2.5rem; margin-bottom:1rem; display:block; }
+.cta-card h3 { font-family:'Bricolage Grotesque',sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:.5rem; }
+.cta-card p { font-size:13px; line-height:1.65; opacity:.75; margin-bottom:1.5rem; }
+.cta-btn { display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:600; padding:10px 20px; border-radius:var(--r2); border:none; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+.cta-card-client { background:linear-gradient(135deg,#1A3CFF 0%,#0F2ACC 100%); border-color:rgba(255,255,255,.15); }
+.cta-card-client .cta-btn { background:white; color:var(--blue2); }
+.cta-card-client .cta-btn:hover { background:rgba(255,255,255,.9); }
+
+/* FEATURES */
+.features { padding:5rem 2rem; max-width:900px; margin:0 auto; }
+.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:3rem; }
+.feat-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:var(--r2); padding:1.5rem; }
+.feat-icon { font-size:1.6rem; margin-bottom:.75rem; }
+.feat-title { font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; margin-bottom:.4rem; }
+.feat-desc { font-size:13px; color:rgba(255,255,255,.5); line-height:1.65; }
+.section-label { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(26,60,255,.8); margin-bottom:.75rem; }
+.section-title { font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.8rem,4vw,2.5rem); font-weight:800; letter-spacing:-.03em; line-height:1.1; }
+
+/* SERVICES GRID */
+.services-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; }
+.service-pill { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:1rem; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500; }
+.service-pill span { font-size:1.2rem; }
+
+/* OVERLAY */
+.overlay { position:fixed; inset:0; background:rgba(5,7,20,.85); z-index:200; display:none; align-items:flex-end; justify-content:center; backdrop-filter:blur(8px); }
+.overlay.open { display:flex; }
+.drawer { background:var(--ink2); border-radius:28px 28px 0 0; width:100%; max-width:600px; max-height:92vh; overflow-y:auto; transform:translateY(100%); transition:transform .4s cubic-bezier(.32,.72,0,1); }
+.overlay.open .drawer { transform:translateY(0); }
+.drawer-handle { width:40px; height:4px; background:rgba(255,255,255,.2); border-radius:2px; margin:14px auto 0; }
+.drawer-header { padding:1.5rem 1.75rem 1rem; border-bottom:1px solid rgba(255,255,255,.07); display:flex; align-items:center; justify-content:space-between; }
+.drawer-title { font-family:'Bricolage Grotesque',sans-serif; font-size:1.2rem; font-weight:700; }
+.close-btn { width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.08); border:none; cursor:pointer; font-size:1rem; color:rgba(255,255,255,.6); display:flex; align-items:center; justify-content:center; }
+.drawer-body { padding:1.5rem 1.75rem 2.5rem; }
+
+/* FORMS */
+.form-section { margin-bottom:1.5rem; }
+.form-section-title { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4); margin-bottom:.75rem; padding-bottom:.5rem; border-bottom:1px solid rgba(255,255,255,.06); }
+.ff { margin-bottom:1rem; }
+.ff label { display:block; font-size:12px; font-weight:600; color:rgba(255,255,255,.5); margin-bottom:5px; }
+.ff input, .ff select, .ff textarea { width:100%; padding:11px 14px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.1); border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:14px; color:white; outline:none; transition:border-color .2s; }
+.ff input::placeholder, .ff textarea::placeholder { color:rgba(255,255,255,.3); }
+.ff select option { background:var(--ink2); }
+.ff input:focus, .ff select:focus, .ff textarea:focus { border-color:var(--blue); background:rgba(26,60,255,.08); }
+.ff textarea { resize:vertical; }
+.ff2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+/* PROBLEM GRID */
+.problem-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:.75rem; }
+.prob-btn { padding:12px 8px; border-radius:var(--r2); background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); cursor:pointer; text-align:center; transition:all .2s; }
+.prob-btn:hover { border-color:rgba(255,255,255,.25); }
+.prob-btn.sel { background:rgba(26,60,255,.2); border-color:var(--blue); }
+.prob-icon { font-size:1.4rem; display:block; margin-bottom:4px; }
+.prob-label { font-size:11px; font-weight:600; color:white; line-height:1.3; }
+
+/* URGENCY */
+.urgency-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.urg-btn { padding:12px 8px; border-radius:var(--r2); background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); cursor:pointer; text-align:center; transition:all .2s; }
+.urg-btn:hover { border-color:rgba(255,255,255,.25); }
+.urg-btn.sel { background:rgba(26,60,255,.2); border-color:var(--blue); }
+.urg-icon { font-size:1.4rem; display:block; margin-bottom:4px; }
+.urg-label { font-size:12px; font-weight:600; color:white; }
+.urg-sub { font-size:10px; color:rgba(255,255,255,.45); margin-top:2px; }
+.date-block { display:none; margin-top:1rem; }
+.date-block.show { display:block; }
+
+/* CONTACT */
+.contact-row { display:flex; gap:8px; margin-top:.5rem; }
+.contact-pill { flex:1; padding:9px; border-radius:var(--r); border:1.5px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); cursor:pointer; text-align:center; font-size:12px; font-weight:600; color:rgba(255,255,255,.7); transition:all .2s; }
+.contact-pill.sel { background:rgba(26,60,255,.2); border-color:var(--blue); color:white; }
+
+/* SUBMIT */
+.btn-submit { width:100%; padding:14px; border-radius:var(--r2); border:none; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; margin-top:1.5rem; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-submit.blue { background:var(--blue); color:white; }
+.btn-submit.blue:hover { background:var(--blue2); }
+.btn-submit:disabled { opacity:.6; cursor:not-allowed; }
+.spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.3); border-top-color:white; border-radius:50%; animation:sp .7s linear infinite; }
+@keyframes sp { to{transform:rotate(360deg);} }
+
+/* SUCCESS */
+.success-screen { text-align:center; padding:2.5rem 1rem; }
+.success-icon { font-size:4rem; margin-bottom:1rem; display:block; animation:pop .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes pop { from{transform:scale(0)} to{transform:scale(1)} }
+.success-title { font-family:'Bricolage Grotesque',sans-serif; font-size:1.4rem; font-weight:700; margin-bottom:.5rem; }
+.success-sub { font-size:14px; color:rgba(255,255,255,.55); line-height:1.75; max-width:340px; margin:0 auto 2rem; }
+.success-code { background:rgba(26,60,255,.2); border:1px solid rgba(26,60,255,.4); border-radius:var(--r2); padding:12px 20px; font-size:1.1rem; font-weight:700; color:var(--blue); letter-spacing:.1em; display:inline-block; margin-bottom:2rem; }
+
+/* ALERT */
+.alert-err { background:rgba(220,38,38,.1); border:1px solid rgba(220,38,38,.3); color:#fca5a5; padding:10px 14px; border-radius:var(--r); font-size:13px; margin-bottom:1rem; display:none; }
+
+/* FOOTER */
+footer { padding:3rem 2rem 2rem; border-top:1px solid rgba(255,255,255,.06); text-align:center; }
+footer .footer-logo { font-family:'Bricolage Grotesque',sans-serif; font-size:1.3rem; font-weight:800; margin-bottom:.5rem; }
+footer .footer-logo span { color:var(--blue); }
+footer p { font-size:12px; color:rgba(255,255,255,.3); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+@media(max-width:640px) {
+  .cta-card { max-width:100%; }
+  .feat-grid { grid-template-columns:1fr; }
+  .urgency-grid,.problem-grid { grid-template-columns:1fr 1fr; }
+  .ff2 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Gre<span>az</span></div>
+  <div class="nav-badge">🇨🇦 Québec · Service mobile</div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag"><span class="hero-dot"></span>Disponible maintenant dans votre secteur</div>
+    <h1>Votre mécanicien<br>vient <span class="hl">chez vous.</span><br><span class="hl2">En quelques clics.</span></h1>
+    <p class="hero-sub">Plus besoin de remorquage ni de garage. Voitures, motos, VR, bateaux — on se déplace pour vous.</p>
+    <div class="cta-row">
+      <div class="cta-card cta-card-client" onclick="openDrawer()">
+        <span class="cta-icon">🔧</span>
+        <h3>J'ai besoin d'un mécanicien</h3>
+        <p>Décrivez votre problème, choisissez votre urgence — on vous envoie une soumission gratuite.</p>
+        <div style="display:flex;justify-content:flex-start">
+          <button class="cta-btn">Commencer →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div style="text-align:center;margin-bottom:1rem">
+    <div class="section-label">Pourquoi Greaz</div>
+    <div class="section-title">Simple. Rapide. Chez vous.</div>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Service express</div><div class="feat-desc">Décrivez votre problème en 2 minutes. On vous envoie une soumission et on envoie un mécanicien.</div></div>
+    <div class="feat-card"><div class="feat-icon">📍</div><div class="feat-title">On vient chez vous</div><div class="feat-desc">Maison, bureau, stationnement. Pas de remorquage, pas de garage — on s'adapte à votre horaire.</div></div>
+    <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-title">100% certifié</div><div class="feat-desc">Chaque mécanicien est vérifié et approuvé par l'équipe Greaz avant sa première mission.</div></div>
+    <div class="feat-card"><div class="feat-icon">🚗</div><div class="feat-title">Tous véhicules</div><div class="feat-desc">Voitures, VUS, motos, vans, VR et bateaux. Si ça a un moteur, on peut s'en occuper.</div></div>
+    <div class="feat-card"><div class="feat-icon">💰</div><div class="feat-title">Soumission gratuite</div><div class="feat-desc">Vous recevez une soumission claire avant de confirmer. Aucune surprise, aucun engagement.</div></div>
+    <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Confirmation rapide</div><div class="feat-desc">SMS + courriel dès que votre mécanicien est assigné. Vous savez exactement qui vient et quand.</div></div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section style="padding:5rem 2rem;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.05)">
+  <div style="max-width:900px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:2.5rem">
+      <div class="section-label">Nos services</div>
+      <div class="section-title">Ce qu'on répare</div>
+      <p style="font-size:14px;color:rgba(255,255,255,.45);margin-top:.75rem">Soumission gratuite · Paiement par Interac · Mécanicien certifié</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-pill"><span>🔋</span> Batterie / boost</div>
+      <div class="service-pill"><span>🔩</span> Crevaison / pneu</div>
+      <div class="service-pill"><span>🛑</span> Freins</div>
+      <div class="service-pill"><span>🛢️</span> Vidange / huile</div>
+      <div class="service-pill"><span>💡</span> Lumières / phares</div>
+      <div class="service-pill"><span>⚙️</span> Check engine</div>
+      <div class="service-pill"><span>❄️</span> Climatisation</div>
+      <div class="service-pill"><span>🌧️</span> Essuie-glaces</div>
+      <div class="service-pill"><span>🔧</span> Autre problème</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Gre<span>az</span></div>
+  <p>© 2025 Greaz — Le mécanicien mobile au Québec</p>
+</footer>
+
+<!-- DRAWER -->
+<div class="overlay" id="overlay-client" onclick="if(event.target===this)closeDrawer()">
+  <div class="drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header">
+      <span class="drawer-title">🔧 Demande de service</span>
+      <button class="close-btn" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body" id="drawer-client-body"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyAbvCBM1J-LL5B5_v5rqjbGcM8geufmbxs",
+  authDomain:"greaz-4b00c.firebaseapp.com",
+  projectId:"greaz-4b00c",
+  storageBucket:"greaz-4b00c.firebasestorage.app",
+  messagingSenderId:"165170790975",
+  appId:"1:165170790975:web:38fe20428046e6328b6e8a"
+});
+var db = firebase.firestore();
+
+var _urgency = "";
+var _contact_pref = "both";
+var _selProblem = "";
+
+var PROBLEMS = [
+  {id:"battery", icon:"🔋", label:"Batterie / boost"},
+  {id:"flat",    icon:"🔩", label:"Crevaison / pneu"},
+  {id:"brakes",  icon:"🛑", label:"Freins"},
+  {id:"oil",     icon:"🛢️", label:"Vidange / huile"},
+  {id:"lights",  icon:"💡", label:"Lumières / phares"},
+  {id:"engine",  icon:"⚙️", label:"Check engine"},
+  {id:"ac",      icon:"❄️", label:"Climatisation"},
+  {id:"wiper",   icon:"🌧️", label:"Essuie-glaces"},
+  {id:"other",   icon:"🔧", label:"Autre problème"},
+];
+
+function openDrawer(){
+  renderForm();
+  document.getElementById("overlay-client").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeDrawer(){
+  document.getElementById("overlay-client").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function selProblem(id){
+  _selProblem = id;
+  document.querySelectorAll(".prob-btn").forEach(function(el){ el.classList.remove("sel"); });
+  var el = document.getElementById("prob-"+id);
+  if(el) el.classList.add("sel");
+}
+
+function selUrgency(val){
+  _urgency = val;
+  ["asap","24h","date"].forEach(function(u){ var el=document.getElementById("urg-"+u); if(el)el.classList.remove("sel"); });
+  var el = document.getElementById("urg-"+val);
+  if(el) el.classList.add("sel");
+  var db2 = document.getElementById("date-block");
+  if(db2){ if(val==="date") db2.classList.add("show"); else db2.classList.remove("show"); }
+}
+
+function selContact(val){
+  _contact_pref = val;
+  ["both","sms","email"].forEach(function(c){ var el=document.getElementById("cont-"+c); if(el)el.classList.remove("sel"); });
+  var el = document.getElementById("cont-"+val);
+  if(el) el.classList.add("sel");
+}
+
+function renderForm(){
+  _urgency = ""; _contact_pref = "both"; _selProblem = "";
+  var yearsOpts = "";
+  for(var y=2025;y>=2000;y--) yearsOpts += "<option>"+y+"</option>";
+
+  var probCards = PROBLEMS.map(function(p){
+    return '<div class="prob-btn" id="prob-'+p.id+'" onclick="selProblem(\''+p.id+'\')">'
+      +'<span class="prob-icon">'+p.icon+'</span>'
+      +'<div class="prob-label">'+p.label+'</div>'
+      +'</div>';
+  }).join("");
+
+  document.getElementById("drawer-client-body").innerHTML =
+    '<div class="alert-err" id="client-err"></div>'
+
+    +'<div class="form-section"><div class="form-section-title">Votre véhicule</div>'
+    +'<div class="ff2">'
+    +'<div class="ff"><label>Type de véhicule</label><select id="c_vtype"><option value="">— Choisir —</option><option>Voiture / VUS</option><option>Moto</option><option>Van / Minivan</option><option>VR / Motorisé</option><option>Bateau</option></select></div>'
+    +'<div class="ff"><label>Marque</label><select id="c_make"><option value="">— Marque —</option><option>Toyota</option><option>Honda</option><option>Ford</option><option>Chevrolet</option><option>BMW</option><option>Mercedes</option><option>Hyundai</option><option>Kia</option><option>Mazda</option><option>Subaru</option><option>Nissan</option><option>Autre</option></select></div>'
+    +'</div>'
+    +'<div class="ff2">'
+    +'<div class="ff"><label>Modèle</label><input type="text" id="c_model" placeholder="ex. Corolla"></div>'
+    +'<div class="ff"><label>Année</label><select id="c_year"><option value="">Année</option>'+yearsOpts+'</select></div>'
+    +'</div></div>'
+
+    +'<div class="form-section"><div class="form-section-title">Votre problème</div>'
+    +'<div class="problem-grid">'+probCards+'</div>'
+    +'<div class="ff"><label>Décrivez en détail (optionnel)</label><textarea id="c_desc" rows="2" placeholder="Ex : bruit au freinage gauche, voyant allumé..."></textarea></div>'
+    +'</div>'
+
+    +'<div class="form-section"><div class="form-section-title">Urgence</div>'
+    +'<div class="urgency-grid">'
+    +'<div class="urg-btn" id="urg-asap" onclick="selUrgency(\'asap\')"><span class="urg-icon">🚨</span><div class="urg-label">Dès que possible</div><div class="urg-sub">Quelques heures</div></div>'
+    +'<div class="urg-btn" id="urg-24h" onclick="selUrgency(\'24h\')"><span class="urg-icon">⏰</span><div class="urg-label">Sous 24h</div><div class="urg-sub">D\'ici demain</div></div>'
+    +'<div class="urg-btn" id="urg-date" onclick="selUrgency(\'date\')"><span class="urg-icon">📅</span><div class="urg-label">Je propose une date</div><div class="urg-sub">À mon rythme</div></div>'
+    +'</div>'
+    +'<div class="date-block" id="date-block"><div class="ff2">'
+    +'<div class="ff"><label>Date souhaitée</label><input type="date" id="c_date"></div>'
+    +'<div class="ff"><label>Heure souhaitée</label><input type="time" id="c_time" value="10:00"></div>'
+    +'</div></div></div>'
+
+    +'<div class="form-section"><div class="form-section-title">Vos informations</div>'
+    +'<div class="ff2">'
+    +'<div class="ff"><label>Prénom *</label><input type="text" id="c_prenom" placeholder="Jean"></div>'
+    +'<div class="ff"><label>Nom *</label><input type="text" id="c_nom" placeholder="Tremblay"></div>'
+    +'</div>'
+    +'<div class="ff2">'
+    +'<div class="ff"><label>Téléphone *</label><input type="tel" id="c_phone" placeholder="514-555-0100" oninput="validatePhone(this)"><div id="phone-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Numéro canadien invalide</div></div>'
+    +'<div class="ff"><label>Courriel *</label><input type="email" id="c_email" placeholder="jean@email.com" oninput="validateEmail(this)"><div id="email-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Courriel invalide</div></div>'
+    +'</div>'
+    +'<div class="ff"><label>Adresse d\'intervention *</label><input type="text" id="c_addr" placeholder="1234 Rue Principale, Montréal, QC H2X 1Y4"></div>'
+    +'</div>'
+
+    +'<div class="form-section"><div class="form-section-title">Comment vous répondre ?</div>'
+    +'<div class="contact-row">'
+    +'<div class="contact-pill sel" id="cont-both" onclick="selContact(\'both\')">📱 SMS + courriel</div>'
+    +'<div class="contact-pill" id="cont-sms" onclick="selContact(\'sms\')">💬 SMS seulement</div>'
+    +'<div class="contact-pill" id="cont-email" onclick="selContact(\'email\')">📧 Courriel seulement</div>'
+    +'</div></div>'
+
+    +'<button class="btn-submit blue" id="submit-btn" onclick="submitForm()">Envoyer ma demande →</button>';
+}
+
+function validatePhone(el){
+  var clean = el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var valid = /^[2-9]\d{2}[2-9]\d{6}$/.test(clean) && clean.length === 10;
+  el.style.borderColor = el.value.length > 3 ? (valid ? "#00C26F" : "#f87171") : "";
+  var errEl = document.getElementById("phone-err");
+  if(errEl) errEl.style.display = el.value.length > 3 && !valid ? "block" : "none";
+}
+
+function validateEmail(el){
+  var valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
+  el.style.borderColor = el.value.length > 3 ? (valid ? "#00C26F" : "#f87171") : "";
+  var errEl = document.getElementById("email-err");
+  if(errEl) errEl.style.display = el.value.length > 3 && !valid ? "block" : "none";
+}
+
+async function submitForm(){
+  var errEl = document.getElementById("client-err");
+  var btn   = document.getElementById("submit-btn");
+  errEl.style.display = "none";
+
+  var prenom = (document.getElementById("c_prenom").value||"").trim();
+  var nom    = (document.getElementById("c_nom").value||"").trim();
+  var phone  = (document.getElementById("c_phone").value||"").trim();
+  var email  = (document.getElementById("c_email").value||"").trim();
+  var addr   = (document.getElementById("c_addr").value||"").trim();
+
+  // Validation courriel
+  var emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+
+  // Validation téléphone canadien — accepte formats : 5141234567, 514-123-4567, (514) 123-4567, +15141234567, 514 123 4567
+  var phoneClean = phone.replace(/[\s\-\(\)\.]/g, "").replace(/^\+1/, "");
+  var phoneValid = /^[2-9]\d{2}[2-9]\d{6}$/.test(phoneClean) && phoneClean.length === 10;
+
+  if(!prenom || !phone || !email || !addr){
+    errEl.textContent = "Veuillez remplir tous les champs obligatoires (*).";
+    errEl.style.display = "block";
+    return;
+  }
+
+  if(!emailValid){
+    errEl.textContent = "L'adresse courriel est invalide. Ex : jean@gmail.com";
+    errEl.style.display = "block";
+    document.getElementById("c_email").style.borderColor = "#f87171";
+    return;
+  }
+
+  if(!phoneValid){
+    errEl.textContent = "Le numéro de téléphone doit être un numéro canadien valide à 10 chiffres. Ex : 514-555-0100";
+    errEl.style.display = "block";
+    document.getElementById("c_phone").style.borderColor = "#f87171";
+    return;
+  }
+
+  var date = document.getElementById("c_date").value||"";
+  var time = document.getElementById("c_time").value||"";
+  var urgLabel = _urgency==="asap" ? "Dès que possible"
+               : _urgency==="24h"  ? "Sous 24h"
+               : _urgency==="date" ? (date+" à "+time)
+               : "Non précisé";
+
+  var code = "GZ-" + Math.floor(Math.random()*90000+10000);
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Envoi en cours...';
+
+  try {
+    await db.collection("leads").add({
+      type:          "client",
+      client_name:   prenom+" "+nom,
+      client_phone:  phone,
+      client_email:  email,
+      address:       addr,
+      vehicle_type:  document.getElementById("c_vtype").value||"",
+      vehicle_make:  document.getElementById("c_make").value||"",
+      vehicle_model: document.getElementById("c_model").value||"",
+      vehicle_year:  document.getElementById("c_year").value||"",
+      problem:       _selProblem||"Non précisé",
+      description:   document.getElementById("c_desc").value||"",
+      urgency:       urgLabel,
+      contact_pref:  _contact_pref||"both",
+      booking_code:  code,
+      status:        "nouveau",
+      created_at:    firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    var contactLabel = _contact_pref==="sms" ? "SMS" : _contact_pref==="email" ? "courriel" : "SMS et courriel";
+    var urgReply = _urgency==="asap" ? "dans l'heure" : "sous 24h";
+
+    document.getElementById("drawer-client-body").innerHTML =
+      '<div class="success-screen">'
+      +'<span class="success-icon">✅</span>'
+      +'<div class="success-title">Demande reçue !</div>'
+      +'<p class="success-sub">L\'équipe Greaz va examiner votre demande et vous envoyer une <strong style="color:white">soumission gratuite</strong> '+urgReply+' par '+contactLabel+'.</p>'
+      +'<div class="success-code">'+code+'</div>'
+      +'<p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:2rem">Votre code de référence</p>'
+      +'<button onclick="closeDrawer()" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Compris ✓</button>'
+      +'</div>';
+
+  } catch(e){
+    console.error("Firestore:", e);
+    errEl.textContent = "Erreur : "+e.message;
+    errEl.style.display = "block";
+    btn.disabled = false;
+    btn.textContent = "Envoyer ma demande →";
+  }
+}
+</script>
+</body>
+</html>
