@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Greaz — Le mécanicien qui vient chez vous</title>
+<title>Greaz — La mécanique, réinventée</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -27,43 +27,77 @@ nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:.9rem 2rem; d
 .hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8rem 2rem 4rem; text-align:center; position:relative; overflow:hidden; }
 .hero-bg { position:absolute; inset:0; z-index:0; background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,60,255,.25) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(0,194,111,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(255,107,44,.08) 0%,transparent 60%); }
 .hero-grid { position:absolute; inset:0; z-index:0; opacity:.07; background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px); background-size:50px 50px; }
-.hero-content { position:relative; z-index:1; max-width:720px; }
+.hero-content { position:relative; z-index:1; max-width:820px; }
 .hero-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(26,60,255,.15); border:1px solid rgba(26,60,255,.4); border-radius:40px; padding:6px 18px; font-size:13px; font-weight:500; color:rgba(255,255,255,.8); margin-bottom:2rem; animation:fadeUp .6s ease both; }
-.hero-dot { width:7px; height:7px; border-radius:50%; background:var(--blue); animation:pulse 1.5s infinite; }
+.hero-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 1.5s infinite; box-shadow:0 0 6px var(--green); }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
-h1 { font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.8rem,7vw,5rem); font-weight:800; line-height:1.05; letter-spacing:-.04em; margin-bottom:1.5rem; animation:fadeUp .6s .1s ease both; }
-h1 .hl { color:var(--blue); }
+h1 { font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.6rem,6vw,4.5rem); font-weight:800; line-height:1.05; letter-spacing:-.04em; margin-bottom:1.5rem; animation:fadeUp .6s .1s ease both; }
+h1 .hl  { color:var(--blue); }
 h1 .hl2 { color:var(--green); }
-.hero-sub { font-size:1.05rem; color:rgba(255,255,255,.55); line-height:1.75; max-width:500px; margin:0 auto 3rem; animation:fadeUp .6s .2s ease both; }
+.hero-sub { font-size:1.05rem; color:rgba(255,255,255,.55); line-height:1.75; max-width:560px; margin:0 auto 3rem; animation:fadeUp .6s .2s ease both; }
 
-/* CTA */
-.cta-row { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; animation:fadeUp .6s .3s ease both; }
-.cta-card { flex:1; min-width:260px; max-width:340px; border-radius:var(--r3); padding:2rem; cursor:pointer; transition:all .25s cubic-bezier(.34,1.56,.64,1); position:relative; overflow:hidden; border:2px solid transparent; }
+/* CTA CARDS */
+.cta-row { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; animation:fadeUp .6s .3s ease both; }
+.cta-card { flex:1; min-width:220px; max-width:270px; border-radius:var(--r3); padding:1.75rem; cursor:pointer; transition:all .25s cubic-bezier(.34,1.56,.64,1); position:relative; overflow:hidden; border:2px solid transparent; }
 .cta-card:hover { transform:translateY(-6px) scale(1.02); }
-.cta-card .cta-icon { font-size:2.5rem; margin-bottom:1rem; display:block; }
-.cta-card h3 { font-family:'Bricolage Grotesque',sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:.5rem; }
-.cta-card p { font-size:13px; line-height:1.65; opacity:.75; margin-bottom:1.5rem; }
-.cta-btn { display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:600; padding:10px 20px; border-radius:var(--r2); border:none; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+.cta-card .cta-icon { font-size:2.2rem; margin-bottom:.875rem; display:block; }
+.cta-card h3 { font-family:'Bricolage Grotesque',sans-serif; font-size:1.15rem; font-weight:700; margin-bottom:.4rem; }
+.cta-card p { font-size:12.5px; line-height:1.6; opacity:.75; margin-bottom:1.25rem; }
+.cta-btn { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; padding:9px 18px; border-radius:var(--r2); border:none; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+
+/* Card couleurs */
 .cta-card-client { background:linear-gradient(135deg,#1A3CFF 0%,#0F2ACC 100%); border-color:rgba(255,255,255,.15); }
 .cta-card-client .cta-btn { background:white; color:var(--blue2); }
 .cta-card-client .cta-btn:hover { background:rgba(255,255,255,.9); }
 
+.cta-card-mec { background:linear-gradient(135deg,#0a1f12 0%,#051a0a 100%); border-color:rgba(0,194,111,.25); }
+.cta-card-mec .cta-btn { background:rgba(0,194,111,.15); color:var(--green); border:1px solid rgba(0,194,111,.35); }
+.cta-card-mec .cta-btn:hover { background:rgba(0,194,111,.25); }
+
+.cta-card-garage { background:linear-gradient(135deg,#1a1020 0%,#0d0818 100%); border-color:rgba(255,107,44,.2); }
+.cta-card-garage .cta-btn { background:rgba(255,107,44,.12); color:var(--orange); border:1px solid rgba(255,107,44,.3); }
+.cta-card-garage .cta-btn:hover { background:rgba(255,107,44,.22); }
+
+/* STATS BAND */
+.stats-band { background:rgba(255,255,255,.03); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:1.5rem 2rem; }
+.stats-inner { max-width:800px; margin:0 auto; display:flex; justify-content:center; gap:3rem; flex-wrap:wrap; }
+.stat-item { text-align:center; }
+.stat-num { font-family:'Bricolage Grotesque',sans-serif; font-size:1.8rem; font-weight:800; letter-spacing:-.03em; }
+.stat-num.blue { color:var(--blue); }
+.stat-num.green { color:var(--green); }
+.stat-num.orange { color:var(--orange); }
+.stat-label { font-size:12px; color:rgba(255,255,255,.45); margin-top:2px; }
+
+/* HOW IT WORKS */
+.how { padding:5rem 2rem; max-width:900px; margin:0 auto; }
+.steps-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2.5rem; position:relative; }
+.step-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:var(--r2); padding:1.5rem; position:relative; }
+.step-num { font-family:'Bricolage Grotesque',sans-serif; font-size:2.5rem; font-weight:800; opacity:.12; position:absolute; top:.75rem; right:1rem; }
+.step-icon { font-size:1.6rem; margin-bottom:.75rem; }
+.step-title { font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; margin-bottom:.4rem; }
+.step-desc { font-size:13px; color:rgba(255,255,255,.5); line-height:1.65; }
+
 /* FEATURES */
 .features { padding:5rem 2rem; max-width:900px; margin:0 auto; }
-.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:3rem; }
+.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2.5rem; }
 .feat-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:var(--r2); padding:1.5rem; }
 .feat-icon { font-size:1.6rem; margin-bottom:.75rem; }
 .feat-title { font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; margin-bottom:.4rem; }
 .feat-desc { font-size:13px; color:rgba(255,255,255,.5); line-height:1.65; }
-.section-label { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(26,60,255,.8); margin-bottom:.75rem; }
-.section-title { font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.8rem,4vw,2.5rem); font-weight:800; letter-spacing:-.03em; line-height:1.1; }
 
-/* SERVICES GRID */
-.services-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; }
+/* SERVICES */
+.services-section { padding:5rem 2rem; background:rgba(255,255,255,.02); border-top:1px solid var(--line); }
+.services-inner { max-width:900px; margin:0 auto; }
+.services-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:10px; margin-top:2.5rem; }
 .service-pill { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:1rem; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500; }
 .service-pill span { font-size:1.2rem; }
 
-/* OVERLAY */
+/* SECTION LABELS */
+.section-label { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(26,60,255,.8); margin-bottom:.75rem; }
+.section-title { font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.8rem,4vw,2.5rem); font-weight:800; letter-spacing:-.03em; line-height:1.1; }
+.section-sub { font-size:14px; color:rgba(255,255,255,.45); margin-top:.75rem; }
+
+/* OVERLAY / DRAWER */
 .overlay { position:fixed; inset:0; background:rgba(5,7,20,.85); z-index:200; display:none; align-items:flex-end; justify-content:center; backdrop-filter:blur(8px); }
 .overlay.open { display:flex; }
 .drawer { background:var(--ink2); border-radius:28px 28px 0 0; width:100%; max-width:600px; max-height:92vh; overflow-y:auto; transform:translateY(100%); transition:transform .4s cubic-bezier(.32,.72,0,1); }
@@ -79,7 +113,7 @@ h1 .hl2 { color:var(--green); }
 .form-section-title { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4); margin-bottom:.75rem; padding-bottom:.5rem; border-bottom:1px solid rgba(255,255,255,.06); }
 .ff { margin-bottom:1rem; }
 .ff label { display:block; font-size:12px; font-weight:600; color:rgba(255,255,255,.5); margin-bottom:5px; }
-.ff input, .ff select, .ff textarea { width:100%; padding:11px 14px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.1); border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:14px; color:white; outline:none; transition:border-color .2s; }
+.ff input, .ff select, .ff textarea { width:100%; padding:11px 14px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.1); border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:14px; color:white; outline:none; transition:border-color .2s; -webkit-appearance:none; appearance:none; }
 .ff input::placeholder, .ff textarea::placeholder { color:rgba(255,255,255,.3); }
 .ff select option { background:var(--ink2); }
 .ff input:focus, .ff select:focus, .ff textarea:focus { border-color:var(--blue); background:rgba(26,60,255,.08); }
@@ -112,8 +146,10 @@ h1 .hl2 { color:var(--green); }
 
 /* SUBMIT */
 .btn-submit { width:100%; padding:14px; border-radius:var(--r2); border:none; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; margin-top:1.5rem; display:flex; align-items:center; justify-content:center; gap:8px; }
-.btn-submit.blue { background:var(--blue); color:white; }
-.btn-submit.blue:hover { background:var(--blue2); }
+.btn-submit.blue  { background:var(--blue); color:white; }
+.btn-submit.green { background:var(--green); color:white; }
+.btn-submit.blue:hover  { background:var(--blue2); }
+.btn-submit.green:hover { background:#00a85e; }
 .btn-submit:disabled { opacity:.6; cursor:not-allowed; }
 .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.3); border-top-color:white; border-radius:50%; animation:sp .7s linear infinite; }
 @keyframes sp { to{transform:rotate(360deg);} }
@@ -131,17 +167,19 @@ h1 .hl2 { color:var(--green); }
 
 /* FOOTER */
 footer { padding:3rem 2rem 2rem; border-top:1px solid rgba(255,255,255,.06); text-align:center; }
-footer .footer-logo { font-family:'Bricolage Grotesque',sans-serif; font-size:1.3rem; font-weight:800; margin-bottom:.5rem; }
-footer .footer-logo span { color:var(--blue); }
+.footer-logo { font-family:'Bricolage Grotesque',sans-serif; font-size:1.3rem; font-weight:800; margin-bottom:.5rem; }
+.footer-logo span { color:var(--blue); }
 footer p { font-size:12px; color:rgba(255,255,255,.3); }
 
 @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
 @media(max-width:640px) {
+  .cta-row { flex-direction:column; align-items:center; }
   .cta-card { max-width:100%; }
-  .feat-grid { grid-template-columns:1fr; }
+  .feat-grid,.steps-row { grid-template-columns:1fr; }
   .urgency-grid,.problem-grid { grid-template-columns:1fr 1fr; }
   .ff2 { grid-template-columns:1fr; }
+  .stats-inner { gap:1.5rem; }
 }
 </style>
 </head>
@@ -149,52 +187,96 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
 
 <nav>
   <div class="logo">Gre<span>az</span></div>
-  <div class="nav-badge">🇨🇦 Québec · Service mobile</div>
+  <div class="nav-badge">🇨🇦 Québec · Plateforme auto</div>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
   <div class="hero-content">
-    <div class="hero-tag"><span class="hero-dot"></span>Disponible maintenant dans votre secteur</div>
-    <h1>Votre mécanicien<br>vient <span class="hl">chez vous.</span><br><span class="hl2">En quelques clics.</span></h1>
-    <p class="hero-sub">Plus besoin de remorquage ni de garage. Voitures, motos, VR, bateaux — on se déplace pour vous.</p>
+    <div class="hero-tag">
+      <span class="hero-dot"></span>
+      La plateforme automobile au Québec
+    </div>
+    <h1>La mécanique,<br><span class="hl">connectée.</span><br><span class="hl2">Réinventée.</span></h1>
+    <p class="hero-sub">Greaz met en ligne rapidement des mécaniciens indépendants et des garages avec leurs clients. Trouvez un pro, recevez une soumission, c'est réglé.</p>
+
     <div class="cta-row">
-      <div class="cta-card cta-card-client" onclick="openDrawer()">
+      <div class="cta-card cta-card-client" onclick="openDrawer('client')">
         <span class="cta-icon">🔧</span>
         <h3>J'ai besoin d'un mécanicien</h3>
-        <p>Décrivez votre problème, choisissez votre urgence — on vous envoie une soumission gratuite.</p>
+        <p>Décrivez votre problème — un pro qualifié vous répond avec une soumission gratuite.</p>
         <div style="display:flex;justify-content:flex-start">
           <button class="cta-btn">Commencer →</button>
         </div>
       </div>
+
+
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-band">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num blue">3 min</div><div class="stat-label">Pour recevoir une soumission</div></div>
+    <div class="stat-item"><div class="stat-num green">100%</div><div class="stat-label">Mécaniciens certifiés</div></div>
+    <div class="stat-item"><div class="stat-num orange">0$</div><div class="stat-label">Pour soumettre une demande</div></div>
+  </div>
+</div>
+
+<!-- COMMENT ÇA MARCHE -->
+<section class="how">
+  <div style="text-align:center">
+    <div class="section-label">Comment ça marche</div>
+    <div class="section-title">Simple en 3 étapes</div>
+  </div>
+  <div class="steps-row" style="margin-top:2.5rem">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-icon">📋</div>
+      <div class="step-title">Vous décrivez votre besoin</div>
+      <div class="step-desc">Type de véhicule, problème, urgence. Ça prend moins de 3 minutes.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div class="step-icon">💬</div>
+      <div class="step-title">On vous envoie une soumission</div>
+      <div class="step-desc">Notre équipe analyse votre demande et vous envoie un devis clair par SMS ou courriel.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div class="step-icon">✅</div>
+      <div class="step-title">Un pro arrive chez vous</div>
+      <div class="step-desc">Vous confirmez, on assigne le bon mécanicien ou garage. C'est réglé.</div>
     </div>
   </div>
 </section>
 
 <!-- FEATURES -->
 <section class="features">
-  <div style="text-align:center;margin-bottom:1rem">
+  <div style="text-align:center">
     <div class="section-label">Pourquoi Greaz</div>
-    <div class="section-title">Simple. Rapide. Chez vous.</div>
+    <div class="section-title">La plateforme qui change tout</div>
   </div>
   <div class="feat-grid">
-    <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Service express</div><div class="feat-desc">Décrivez votre problème en 2 minutes. On vous envoie une soumission et on envoie un mécanicien.</div></div>
-    <div class="feat-card"><div class="feat-icon">📍</div><div class="feat-title">On vient chez vous</div><div class="feat-desc">Maison, bureau, stationnement. Pas de remorquage, pas de garage — on s'adapte à votre horaire.</div></div>
-    <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-title">100% certifié</div><div class="feat-desc">Chaque mécanicien est vérifié et approuvé par l'équipe Greaz avant sa première mission.</div></div>
-    <div class="feat-card"><div class="feat-icon">🚗</div><div class="feat-title">Tous véhicules</div><div class="feat-desc">Voitures, VUS, motos, vans, VR et bateaux. Si ça a un moteur, on peut s'en occuper.</div></div>
-    <div class="feat-card"><div class="feat-icon">💰</div><div class="feat-title">Soumission gratuite</div><div class="feat-desc">Vous recevez une soumission claire avant de confirmer. Aucune surprise, aucun engagement.</div></div>
-    <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Confirmation rapide</div><div class="feat-desc">SMS + courriel dès que votre mécanicien est assigné. Vous savez exactement qui vient et quand.</div></div>
+    <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Réponse ultra-rapide</div><div class="feat-desc">Soumission gratuite en moins d'une heure. Mécanicien assigné le jour même si urgent.</div></div>
+    <div class="feat-card"><div class="feat-icon">📍</div><div class="feat-title">À domicile ou en garage</div><div class="feat-desc">Mécanicien mobile chez vous, ou prise en charge dans un garage partenaire près de vous.</div></div>
+    <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-title">Pros vérifiés</div><div class="feat-desc">Chaque mécanicien et garage est validé par l'équipe Greaz avant d'accéder à la plateforme.</div></div>
+    <div class="feat-card"><div class="feat-icon">🚗</div><div class="feat-title">Tous véhicules</div><div class="feat-desc">Voitures, VUS, motos, vans, VR et bateaux. Si ça a un moteur, on s'en occupe.</div></div>
+    <div class="feat-card"><div class="feat-icon">💰</div><div class="feat-title">Soumission gratuite</div><div class="feat-desc">Recevez un devis clair avant de confirmer. Aucune surprise, aucun engagement.</div></div>
+    <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Suivi en temps réel</div><div class="feat-desc">SMS + courriel à chaque étape. Vous savez exactement où en est votre demande.</div></div>
   </div>
 </section>
 
 <!-- SERVICES -->
-<section style="padding:5rem 2rem;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.05)">
-  <div style="max-width:900px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:2.5rem">
+<section class="services-section">
+  <div class="services-inner">
+    <div style="text-align:center">
       <div class="section-label">Nos services</div>
       <div class="section-title">Ce qu'on répare</div>
-      <p style="font-size:14px;color:rgba(255,255,255,.45);margin-top:.75rem">Soumission gratuite · Paiement par Interac · Mécanicien certifié</p>
+      <p class="section-sub">Soumission gratuite · Mécanicien certifié · Paiement Interac</p>
     </div>
     <div class="services-grid">
       <div class="service-pill"><span>🔋</span> Batterie / boost</div>
@@ -212,18 +294,31 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
 
 <footer>
   <div class="footer-logo">Gre<span>az</span></div>
-  <p>© 2025 Greaz — Le mécanicien mobile au Québec</p>
+  <p style="margin-bottom:.5rem">La plateforme automobile au Québec</p>
+  <p>© 2025 Greaz — Tous droits réservés</p>
 </footer>
 
-<!-- DRAWER -->
-<div class="overlay" id="overlay-client" onclick="if(event.target===this)closeDrawer()">
+<!-- DRAWER CLIENT -->
+<div class="overlay" id="overlay-client" onclick="if(event.target===this)closeDrawer('client')">
   <div class="drawer">
     <div class="drawer-handle"></div>
     <div class="drawer-header">
       <span class="drawer-title">🔧 Demande de service</span>
-      <button class="close-btn" onclick="closeDrawer()">✕</button>
+      <button class="close-btn" onclick="closeDrawer('client')">✕</button>
     </div>
     <div class="drawer-body" id="drawer-client-body"></div>
+  </div>
+</div>
+
+<!-- DRAWER GARAGE -->
+<div class="overlay" id="overlay-garage" onclick="if(event.target===this)closeDrawer('garage')">
+  <div class="drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header">
+      <span class="drawer-title">🏪 Inscrire mon garage</span>
+      <button class="close-btn" onclick="closeDrawer('garage')">✕</button>
+    </div>
+    <div class="drawer-body" id="drawer-garage-body"></div>
   </div>
 </div>
 
@@ -240,30 +335,28 @@ firebase.initializeApp({
 });
 var db = firebase.firestore();
 
-var _urgency = "";
-var _contact_pref = "both";
-var _selProblem = "";
+var _urgency = "", _contact_pref = "both", _selProblem = "";
 
 var PROBLEMS = [
-  {id:"battery", icon:"🔋", label:"Batterie / boost"},
-  {id:"flat",    icon:"🔩", label:"Crevaison / pneu"},
-  {id:"brakes",  icon:"🛑", label:"Freins"},
-  {id:"oil",     icon:"🛢️", label:"Vidange / huile"},
-  {id:"lights",  icon:"💡", label:"Lumières / phares"},
-  {id:"engine",  icon:"⚙️", label:"Check engine"},
-  {id:"ac",      icon:"❄️", label:"Climatisation"},
-  {id:"wiper",   icon:"🌧️", label:"Essuie-glaces"},
-  {id:"other",   icon:"🔧", label:"Autre problème"},
+  {id:"battery",icon:"🔋",label:"Batterie / boost"},
+  {id:"flat",   icon:"🔩",label:"Crevaison / pneu"},
+  {id:"brakes", icon:"🛑",label:"Freins"},
+  {id:"oil",    icon:"🛢️",label:"Vidange / huile"},
+  {id:"lights", icon:"💡",label:"Lumières / phares"},
+  {id:"engine", icon:"⚙️",label:"Check engine"},
+  {id:"ac",     icon:"❄️",label:"Climatisation"},
+  {id:"wiper",  icon:"🌧️",label:"Essuie-glaces"},
+  {id:"other",  icon:"🔧",label:"Autre problème"},
 ];
 
-function openDrawer(){
-  renderForm();
-  document.getElementById("overlay-client").classList.add("open");
+function openDrawer(type){
+  if(type==='client') renderClientForm();
+  else renderGarageForm();
+  document.getElementById("overlay-"+type).classList.add("open");
   document.body.style.overflow = "hidden";
 }
-
-function closeDrawer(){
-  document.getElementById("overlay-client").classList.remove("open");
+function closeDrawer(type){
+  document.getElementById("overlay-"+type).classList.remove("open");
   document.body.style.overflow = "";
 }
 
@@ -273,53 +366,65 @@ function selProblem(id){
   var el = document.getElementById("prob-"+id);
   if(el) el.classList.add("sel");
 }
-
 function selUrgency(val){
   _urgency = val;
   ["asap","24h","date"].forEach(function(u){ var el=document.getElementById("urg-"+u); if(el)el.classList.remove("sel"); });
-  var el = document.getElementById("urg-"+val);
-  if(el) el.classList.add("sel");
+  var el = document.getElementById("urg-"+val); if(el) el.classList.add("sel");
   var db2 = document.getElementById("date-block");
   if(db2){ if(val==="date") db2.classList.add("show"); else db2.classList.remove("show"); }
 }
-
 function selContact(val){
   _contact_pref = val;
   ["both","sms","email"].forEach(function(c){ var el=document.getElementById("cont-"+c); if(el)el.classList.remove("sel"); });
-  var el = document.getElementById("cont-"+val);
-  if(el) el.classList.add("sel");
+  var el = document.getElementById("cont-"+val); if(el) el.classList.add("sel");
 }
 
-function renderForm(){
-  _urgency = ""; _contact_pref = "both"; _selProblem = "";
-  var yearsOpts = "";
-  for(var y=2025;y>=2000;y--) yearsOpts += "<option>"+y+"</option>";
+function validatePhone(el){
+  var clean = el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var valid = /^[2-9]\d{2}[2-9]\d{6}$/.test(clean) && clean.length===10;
+  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
+  var e=document.getElementById("phone-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
+}
+function validateEmail(el){
+  var valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
+  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
+  var e=document.getElementById("email-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
+}
+function validatePhone2(el){
+  var clean = el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var valid = /^[2-9]\d{2}[2-9]\d{6}$/.test(clean) && clean.length===10;
+  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
+  var e=document.getElementById("gphone-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
+}
+function validateEmail2(el){
+  var valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
+  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
+  var e=document.getElementById("gemail-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
+}
 
+/* ── FORMULAIRE CLIENT ── */
+function renderClientForm(){
+  _urgency=""; _contact_pref="both"; _selProblem="";
+  var yearsOpts=""; for(var y=2025;y>=2000;y--) yearsOpts+="<option>"+y+"</option>";
   var probCards = PROBLEMS.map(function(p){
     return '<div class="prob-btn" id="prob-'+p.id+'" onclick="selProblem(\''+p.id+'\')">'
-      +'<span class="prob-icon">'+p.icon+'</span>'
-      +'<div class="prob-label">'+p.label+'</div>'
-      +'</div>';
+      +'<span class="prob-icon">'+p.icon+'</span><div class="prob-label">'+p.label+'</div></div>';
   }).join("");
 
   document.getElementById("drawer-client-body").innerHTML =
     '<div class="alert-err" id="client-err"></div>'
-
     +'<div class="form-section"><div class="form-section-title">Votre véhicule</div>'
     +'<div class="ff2">'
-    +'<div class="ff"><label>Type de véhicule</label><select id="c_vtype"><option value="">— Choisir —</option><option>Voiture / VUS</option><option>Moto</option><option>Van / Minivan</option><option>VR / Motorisé</option><option>Bateau</option></select></div>'
+    +'<div class="ff"><label>Type</label><select id="c_vtype"><option value="">— Choisir —</option><option>Voiture / VUS</option><option>Moto</option><option>Van / Minivan</option><option>VR / Motorisé</option><option>Bateau</option></select></div>'
     +'<div class="ff"><label>Marque</label><select id="c_make"><option value="">— Marque —</option><option>Toyota</option><option>Honda</option><option>Ford</option><option>Chevrolet</option><option>BMW</option><option>Mercedes</option><option>Hyundai</option><option>Kia</option><option>Mazda</option><option>Subaru</option><option>Nissan</option><option>Autre</option></select></div>'
     +'</div>'
     +'<div class="ff2">'
     +'<div class="ff"><label>Modèle</label><input type="text" id="c_model" placeholder="ex. Corolla"></div>'
     +'<div class="ff"><label>Année</label><select id="c_year"><option value="">Année</option>'+yearsOpts+'</select></div>'
     +'</div></div>'
-
     +'<div class="form-section"><div class="form-section-title">Votre problème</div>'
     +'<div class="problem-grid">'+probCards+'</div>'
-    +'<div class="ff"><label>Décrivez en détail (optionnel)</label><textarea id="c_desc" rows="2" placeholder="Ex : bruit au freinage gauche, voyant allumé..."></textarea></div>'
-    +'</div>'
-
+    +'<div class="ff"><label>Décrivez en détail (optionnel)</label><textarea id="c_desc" rows="2" placeholder="Ex : bruit au freinage, voyant allumé..."></textarea></div></div>'
     +'<div class="form-section"><div class="form-section-title">Urgence</div>'
     +'<div class="urgency-grid">'
     +'<div class="urg-btn" id="urg-asap" onclick="selUrgency(\'asap\')"><span class="urg-icon">🚨</span><div class="urg-label">Dès que possible</div><div class="urg-sub">Quelques heures</div></div>'
@@ -330,7 +435,6 @@ function renderForm(){
     +'<div class="ff"><label>Date souhaitée</label><input type="date" id="c_date"></div>'
     +'<div class="ff"><label>Heure souhaitée</label><input type="time" id="c_time" value="10:00"></div>'
     +'</div></div></div>'
-
     +'<div class="form-section"><div class="form-section-title">Vos informations</div>'
     +'<div class="ff2">'
     +'<div class="ff"><label>Prénom *</label><input type="text" id="c_prenom" placeholder="Jean"></div>'
@@ -342,121 +446,131 @@ function renderForm(){
     +'</div>'
     +'<div class="ff"><label>Adresse d\'intervention *</label><input type="text" id="c_addr" placeholder="1234 Rue Principale, Montréal, QC H2X 1Y4"></div>'
     +'</div>'
-
     +'<div class="form-section"><div class="form-section-title">Comment vous répondre ?</div>'
     +'<div class="contact-row">'
     +'<div class="contact-pill sel" id="cont-both" onclick="selContact(\'both\')">📱 SMS + courriel</div>'
     +'<div class="contact-pill" id="cont-sms" onclick="selContact(\'sms\')">💬 SMS seulement</div>'
     +'<div class="contact-pill" id="cont-email" onclick="selContact(\'email\')">📧 Courriel seulement</div>'
     +'</div></div>'
-
-    +'<button class="btn-submit blue" id="submit-btn" onclick="submitForm()">Envoyer ma demande →</button>';
+    +'<button class="btn-submit blue" id="client-submit-btn" onclick="submitClient()">Envoyer ma demande →</button>';
 }
 
-function validatePhone(el){
-  var clean = el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
-  var valid = /^[2-9]\d{2}[2-9]\d{6}$/.test(clean) && clean.length === 10;
-  el.style.borderColor = el.value.length > 3 ? (valid ? "#00C26F" : "#f87171") : "";
-  var errEl = document.getElementById("phone-err");
-  if(errEl) errEl.style.display = el.value.length > 3 && !valid ? "block" : "none";
+/* ── FORMULAIRE GARAGE ── */
+function renderGarageForm(){
+  document.getElementById("drawer-garage-body").innerHTML =
+    '<div class="alert-err" id="garage-err"></div>'
+    +'<div style="background:rgba(0,194,111,.08);border:1px solid rgba(0,194,111,.2);border-radius:var(--r2);padding:12px 14px;font-size:13px;color:rgba(0,194,111,.9);margin-bottom:1.5rem;line-height:1.6">'
+    +'🎯 Inscris ton garage sur Greaz et commence à recevoir des clients qualifiés rapidement.</div>'
+    +'<div class="form-section"><div class="form-section-title">Informations du garage</div>'
+    +'<div class="ff"><label>Nom du garage *</label><input type="text" id="g_nom" placeholder="Garage Tremblay Auto"></div>'
+    +'<div class="ff2">'
+    +'<div class="ff"><label>Téléphone *</label><input type="tel" id="g_phone" placeholder="514-555-0100" oninput="validatePhone2(this)"><div id="gphone-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Numéro canadien invalide</div></div>'
+    +'<div class="ff"><label>Courriel *</label><input type="email" id="g_email" placeholder="info@garage.com" oninput="validateEmail2(this)"><div id="gemail-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Courriel invalide</div></div>'
+    +'</div>'
+    +'<div class="ff"><label>Adresse complète *</label><input type="text" id="g_addr" placeholder="1234 Rue Principale, Montréal, QC H2X 1Y4"></div>'
+    +'</div>'
+    +'<div class="form-section"><div class="form-section-title">Votre garage</div>'
+    +'<div class="ff2">'
+    +'<div class="ff"><label>Nombre de baies</label><select id="g_baies"><option value="">Sélectionner...</option><option>1-2 baies</option><option>3-5 baies</option><option>6-10 baies</option><option>10+ baies</option></select></div>'
+    +'<div class="ff"><label>Années en activité</label><select id="g_exp"><option value="">Sélectionner...</option><option>Moins de 1 an</option><option>1 à 3 ans</option><option>3 à 5 ans</option><option>5 à 10 ans</option><option>Plus de 10 ans</option></select></div>'
+    +'</div>'
+    +'<div class="ff"><label>Services offerts (optionnel)</label><textarea id="g_services" rows="2" placeholder="Ex : freins, huile, suspension, électrique, pneus..."></textarea></div>'
+    +'</div>'
+    +'<button class="btn-submit green" id="garage-submit-btn" onclick="submitGarage()">Inscrire mon garage →</button>';
 }
 
-function validateEmail(el){
-  var valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
-  el.style.borderColor = el.value.length > 3 ? (valid ? "#00C26F" : "#f87171") : "";
-  var errEl = document.getElementById("email-err");
-  if(errEl) errEl.style.display = el.value.length > 3 && !valid ? "block" : "none";
-}
+/* ── SUBMIT CLIENT ── */
+async function submitClient(){
+  var errEl=document.getElementById("client-err"), btn=document.getElementById("client-submit-btn");
+  errEl.style.display="none";
+  var prenom=(document.getElementById("c_prenom").value||"").trim();
+  var nom=(document.getElementById("c_nom").value||"").trim();
+  var phone=(document.getElementById("c_phone").value||"").trim();
+  var email=(document.getElementById("c_email").value||"").trim();
+  var addr=(document.getElementById("c_addr").value||"").trim();
 
-async function submitForm(){
-  var errEl = document.getElementById("client-err");
-  var btn   = document.getElementById("submit-btn");
-  errEl.style.display = "none";
+  if(!prenom||!phone||!email||!addr){ errEl.textContent="Veuillez remplir tous les champs obligatoires (*)."; errEl.style.display="block"; return; }
 
-  var prenom = (document.getElementById("c_prenom").value||"").trim();
-  var nom    = (document.getElementById("c_nom").value||"").trim();
-  var phone  = (document.getElementById("c_phone").value||"").trim();
-  var email  = (document.getElementById("c_email").value||"").trim();
-  var addr   = (document.getElementById("c_addr").value||"").trim();
+  var emailValid=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  var phoneClean=phone.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var phoneValid=/^[2-9]\d{2}[2-9]\d{6}$/.test(phoneClean)&&phoneClean.length===10;
 
-  // Validation courriel
-  var emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  if(!emailValid){ errEl.textContent="L'adresse courriel est invalide. Ex : jean@gmail.com"; errEl.style.display="block"; document.getElementById("c_email").style.borderColor="#f87171"; return; }
+  if(!phoneValid){ errEl.textContent="Le numéro doit être un numéro canadien valide à 10 chiffres. Ex : 514-555-0100"; errEl.style.display="block"; document.getElementById("c_phone").style.borderColor="#f87171"; return; }
 
-  // Validation téléphone canadien — accepte formats : 5141234567, 514-123-4567, (514) 123-4567, +15141234567, 514 123 4567
-  var phoneClean = phone.replace(/[\s\-\(\)\.]/g, "").replace(/^\+1/, "");
-  var phoneValid = /^[2-9]\d{2}[2-9]\d{6}$/.test(phoneClean) && phoneClean.length === 10;
+  var date=document.getElementById("c_date").value||"";
+  var time=document.getElementById("c_time").value||"";
+  var urgLabel=_urgency==="asap"?"Dès que possible":_urgency==="24h"?"Sous 24h":_urgency==="date"?(date+" à "+time):"Non précisé";
+  var code="GZ-"+Math.floor(Math.random()*90000+10000);
 
-  if(!prenom || !phone || !email || !addr){
-    errEl.textContent = "Veuillez remplir tous les champs obligatoires (*).";
-    errEl.style.display = "block";
-    return;
-  }
-
-  if(!emailValid){
-    errEl.textContent = "L'adresse courriel est invalide. Ex : jean@gmail.com";
-    errEl.style.display = "block";
-    document.getElementById("c_email").style.borderColor = "#f87171";
-    return;
-  }
-
-  if(!phoneValid){
-    errEl.textContent = "Le numéro de téléphone doit être un numéro canadien valide à 10 chiffres. Ex : 514-555-0100";
-    errEl.style.display = "block";
-    document.getElementById("c_phone").style.borderColor = "#f87171";
-    return;
-  }
-
-  var date = document.getElementById("c_date").value||"";
-  var time = document.getElementById("c_time").value||"";
-  var urgLabel = _urgency==="asap" ? "Dès que possible"
-               : _urgency==="24h"  ? "Sous 24h"
-               : _urgency==="date" ? (date+" à "+time)
-               : "Non précisé";
-
-  var code = "GZ-" + Math.floor(Math.random()*90000+10000);
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Envoi en cours...';
-
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi en cours...';
   try {
     await db.collection("leads").add({
-      type:          "client",
-      client_name:   prenom+" "+nom,
-      client_phone:  phone,
-      client_email:  email,
-      address:       addr,
-      vehicle_type:  document.getElementById("c_vtype").value||"",
-      vehicle_make:  document.getElementById("c_make").value||"",
-      vehicle_model: document.getElementById("c_model").value||"",
-      vehicle_year:  document.getElementById("c_year").value||"",
-      problem:       _selProblem||"Non précisé",
-      description:   document.getElementById("c_desc").value||"",
-      urgency:       urgLabel,
-      contact_pref:  _contact_pref||"both",
-      booking_code:  code,
-      status:        "nouveau",
-      created_at:    firebase.firestore.FieldValue.serverTimestamp(),
+      type:"client", client_name:prenom+" "+nom, client_phone:phone, client_email:email, address:addr,
+      vehicle_type:document.getElementById("c_vtype").value||"",
+      vehicle_make:document.getElementById("c_make").value||"",
+      vehicle_model:document.getElementById("c_model").value||"",
+      vehicle_year:document.getElementById("c_year").value||"",
+      problem:_selProblem||"Non précisé",
+      description:document.getElementById("c_desc").value||"",
+      urgency:urgLabel, contact_pref:_contact_pref||"both",
+      booking_code:code, status:"nouveau",
+      created_at:firebase.firestore.FieldValue.serverTimestamp(),
     });
-
-    var contactLabel = _contact_pref==="sms" ? "SMS" : _contact_pref==="email" ? "courriel" : "SMS et courriel";
-    var urgReply = _urgency==="asap" ? "dans l'heure" : "sous 24h";
-
-    document.getElementById("drawer-client-body").innerHTML =
-      '<div class="success-screen">'
-      +'<span class="success-icon">✅</span>'
+    var contactLabel=_contact_pref==="sms"?"SMS":_contact_pref==="email"?"courriel":"SMS et courriel";
+    var urgReply=_urgency==="asap"?"dans l'heure":"sous 24h";
+    document.getElementById("drawer-client-body").innerHTML=
+      '<div class="success-screen"><span class="success-icon">✅</span>'
       +'<div class="success-title">Demande reçue !</div>'
-      +'<p class="success-sub">L\'équipe Greaz va examiner votre demande et vous envoyer une <strong style="color:white">soumission gratuite</strong> '+urgReply+' par '+contactLabel+'.</p>'
+      +'<p class="success-sub">L\'équipe Greaz va vous envoyer une <strong style="color:white">soumission gratuite</strong> '+urgReply+' par '+contactLabel+'.</p>'
       +'<div class="success-code">'+code+'</div>'
       +'<p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:2rem">Votre code de référence</p>'
-      +'<button onclick="closeDrawer()" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Compris ✓</button>'
+      +'<button onclick="closeDrawer(\'client\')" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Compris ✓</button>'
       +'</div>';
-
   } catch(e){
-    console.error("Firestore:", e);
-    errEl.textContent = "Erreur : "+e.message;
-    errEl.style.display = "block";
-    btn.disabled = false;
-    btn.textContent = "Envoyer ma demande →";
+    errEl.textContent="Erreur : "+e.message; errEl.style.display="block";
+    btn.disabled=false; btn.textContent="Envoyer ma demande →";
+  }
+}
+
+/* ── SUBMIT GARAGE ── */
+async function submitGarage(){
+  var errEl=document.getElementById("garage-err"), btn=document.getElementById("garage-submit-btn");
+  errEl.style.display="none";
+  var nom=(document.getElementById("g_nom").value||"").trim();
+  var phone=(document.getElementById("g_phone").value||"").trim();
+  var email=(document.getElementById("g_email").value||"").trim();
+  var addr=(document.getElementById("g_addr").value||"").trim();
+
+  if(!nom||!phone||!email||!addr){ errEl.textContent="Veuillez remplir tous les champs obligatoires (*)."; errEl.style.display="block"; return; }
+
+  var emailValid=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  var phoneClean=phone.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var phoneValid=/^[2-9]\d{2}[2-9]\d{6}$/.test(phoneClean)&&phoneClean.length===10;
+
+  if(!emailValid){ errEl.textContent="Courriel invalide."; errEl.style.display="block"; return; }
+  if(!phoneValid){ errEl.textContent="Numéro canadien invalide. Ex : 514-555-0100"; errEl.style.display="block"; return; }
+
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi en cours...';
+  try {
+    await db.collection("leads").add({
+      type:"garage", garage_name:nom, garage_phone:phone, garage_email:email, address:addr,
+      baies:document.getElementById("g_baies").value||"",
+      experience:document.getElementById("g_exp").value||"",
+      services:document.getElementById("g_services").value||"",
+      status:"nouveau",
+      created_at:firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    document.getElementById("drawer-garage-body").innerHTML=
+      '<div class="success-screen"><span class="success-icon">🎉</span>'
+      +'<div class="success-title">Inscription reçue !</div>'
+      +'<p class="success-sub">L\'équipe Greaz va vous contacter dans les <strong style="color:white">24-48h</strong> pour finaliser votre inscription sur la plateforme.</p>'
+      +'<p style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:2rem">📞 '+phone+'<br>📧 '+email+'</p>'
+      +'<button onclick="closeDrawer(\'garage\')" style="padding:12px 28px;background:var(--green);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer">Fermer ✓</button>'
+      +'</div>';
+  } catch(e){
+    errEl.textContent="Erreur : "+e.message; errEl.style.display="block";
+    btn.disabled=false; btn.textContent="Inscrire mon garage →";
   }
 }
 </script>
