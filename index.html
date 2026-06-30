@@ -212,7 +212,14 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
         </div>
       </div>
 
-
+      <div class="cta-card cta-card-mec" onclick="window.location.href='trouver.html'">
+        <span class="cta-icon">📇</span>
+        <h3>Trouver un pro</h3>
+        <p>Parcourez les mécaniciens et garages, leurs dispos, leurs avis — réservez un créneau direct.</p>
+        <div style="display:flex;justify-content:flex-start">
+          <button class="cta-btn">Voir l'annuaire →</button>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -324,6 +331,28 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+// EmailJS — notification automatique à contact@greaz.ca
+emailjs.init({ publicKey: "COLLE_TA_CLE_PUBLIQUE_ICI" });
+var EMAILJS_SERVICE_ID  = "service_h2f013c";
+var EMAILJS_TEMPLATE_ID = "template_moboyo8";
+
+function notifierNouvelleDemandeClient(data){
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    to_email:       "contact@greaz.ca",
+    type_demande:   "Nouveau client",
+    nom_client:      data.client_name,
+    telephone:       data.client_phone,
+    courriel:        data.client_email,
+    adresse:         data.address,
+    vehicule:        [data.vehicle_make, data.vehicle_model, data.vehicle_year].filter(Boolean).join(" "),
+    probleme:        data.problem,
+    urgence:         data.urgency,
+    code_reservation:data.booking_code,
+  }).catch(function(e){ console.log("EmailJS:", e); });
+}
+</script>
 <script>
 firebase.initializeApp({
   apiKey:"AIzaSyAbvCBM1J-LL5B5_v5rqjbGcM8geufmbxs",
@@ -505,7 +534,7 @@ async function submitClient(){
 
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi en cours...';
   try {
-    await db.collection("leads").add({
+    var leadData = {
       type:"client", client_name:prenom+" "+nom, client_phone:phone, client_email:email, address:addr,
       vehicle_type:document.getElementById("c_vtype").value||"",
       vehicle_make:document.getElementById("c_make").value||"",
@@ -516,7 +545,9 @@ async function submitClient(){
       urgency:urgLabel, contact_pref:_contact_pref||"both",
       booking_code:code, status:"nouveau",
       created_at:firebase.firestore.FieldValue.serverTimestamp(),
-    });
+    };
+    await db.collection("leads").add(leadData);
+    notifierNouvelleDemandeClient(leadData);
     var contactLabel=_contact_pref==="sms"?"SMS":_contact_pref==="email"?"courriel":"SMS et courriel";
     var urgReply=_urgency==="asap"?"dans l'heure":"sous 24h";
     document.getElementById("drawer-client-body").innerHTML=
