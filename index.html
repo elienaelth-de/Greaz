@@ -317,18 +317,6 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
   </div>
 </div>
 
-<!-- DRAWER GARAGE -->
-<div class="overlay" id="overlay-garage" onclick="if(event.target===this)closeDrawer('garage')">
-  <div class="drawer">
-    <div class="drawer-handle"></div>
-    <div class="drawer-header">
-      <span class="drawer-title">🏪 Inscrire mon garage</span>
-      <button class="close-btn" onclick="closeDrawer('garage')">✕</button>
-    </div>
-    <div class="drawer-body" id="drawer-garage-body"></div>
-  </div>
-</div>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -379,8 +367,7 @@ var PROBLEMS = [
 ];
 
 function openDrawer(type){
-  if(type==='client') renderClientForm();
-  else renderGarageForm();
+  renderClientForm();
   document.getElementById("overlay-"+type).classList.add("open");
   document.body.style.overflow = "hidden";
 }
@@ -418,17 +405,6 @@ function validateEmail(el){
   var valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
   el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
   var e=document.getElementById("email-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
-}
-function validatePhone2(el){
-  var clean = el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
-  var valid = /^[2-9]\d{2}[2-9]\d{6}$/.test(clean) && clean.length===10;
-  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
-  var e=document.getElementById("gphone-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
-}
-function validateEmail2(el){
-  var valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
-  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
-  var e=document.getElementById("gemail-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
 }
 
 /* ── FORMULAIRE CLIENT ── */
@@ -484,30 +460,6 @@ function renderClientForm(){
     +'<button class="btn-submit blue" id="client-submit-btn" onclick="submitClient()">Envoyer ma demande →</button>';
 }
 
-/* ── FORMULAIRE GARAGE ── */
-function renderGarageForm(){
-  document.getElementById("drawer-garage-body").innerHTML =
-    '<div class="alert-err" id="garage-err"></div>'
-    +'<div style="background:rgba(0,194,111,.08);border:1px solid rgba(0,194,111,.2);border-radius:var(--r2);padding:12px 14px;font-size:13px;color:rgba(0,194,111,.9);margin-bottom:1.5rem;line-height:1.6">'
-    +'🎯 Inscris ton garage sur Greaz et commence à recevoir des clients qualifiés rapidement.</div>'
-    +'<div class="form-section"><div class="form-section-title">Informations du garage</div>'
-    +'<div class="ff"><label>Nom du garage *</label><input type="text" id="g_nom" placeholder="Garage Tremblay Auto"></div>'
-    +'<div class="ff2">'
-    +'<div class="ff"><label>Téléphone *</label><input type="tel" id="g_phone" placeholder="514-555-0100" oninput="validatePhone2(this)"><div id="gphone-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Numéro canadien invalide</div></div>'
-    +'<div class="ff"><label>Courriel *</label><input type="email" id="g_email" placeholder="info@garage.com" oninput="validateEmail2(this)"><div id="gemail-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Courriel invalide</div></div>'
-    +'</div>'
-    +'<div class="ff"><label>Adresse complète *</label><input type="text" id="g_addr" placeholder="1234 Rue Principale, Montréal, QC H2X 1Y4"></div>'
-    +'</div>'
-    +'<div class="form-section"><div class="form-section-title">Votre garage</div>'
-    +'<div class="ff2">'
-    +'<div class="ff"><label>Nombre de baies</label><select id="g_baies"><option value="">Sélectionner...</option><option>1-2 baies</option><option>3-5 baies</option><option>6-10 baies</option><option>10+ baies</option></select></div>'
-    +'<div class="ff"><label>Années en activité</label><select id="g_exp"><option value="">Sélectionner...</option><option>Moins de 1 an</option><option>1 à 3 ans</option><option>3 à 5 ans</option><option>5 à 10 ans</option><option>Plus de 10 ans</option></select></div>'
-    +'</div>'
-    +'<div class="ff"><label>Services offerts (optionnel)</label><textarea id="g_services" rows="2" placeholder="Ex : freins, huile, suspension, électrique, pneus..."></textarea></div>'
-    +'</div>'
-    +'<button class="btn-submit green" id="garage-submit-btn" onclick="submitGarage()">Inscrire mon garage →</button>';
-}
-
 /* ── SUBMIT CLIENT ── */
 async function submitClient(){
   var errEl=document.getElementById("client-err"), btn=document.getElementById("client-submit-btn");
@@ -561,47 +513,6 @@ async function submitClient(){
   } catch(e){
     errEl.textContent="Erreur : "+e.message; errEl.style.display="block";
     btn.disabled=false; btn.textContent="Envoyer ma demande →";
-  }
-}
-
-/* ── SUBMIT GARAGE ── */
-async function submitGarage(){
-  var errEl=document.getElementById("garage-err"), btn=document.getElementById("garage-submit-btn");
-  errEl.style.display="none";
-  var nom=(document.getElementById("g_nom").value||"").trim();
-  var phone=(document.getElementById("g_phone").value||"").trim();
-  var email=(document.getElementById("g_email").value||"").trim();
-  var addr=(document.getElementById("g_addr").value||"").trim();
-
-  if(!nom||!phone||!email||!addr){ errEl.textContent="Veuillez remplir tous les champs obligatoires (*)."; errEl.style.display="block"; return; }
-
-  var emailValid=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
-  var phoneClean=phone.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
-  var phoneValid=/^[2-9]\d{2}[2-9]\d{6}$/.test(phoneClean)&&phoneClean.length===10;
-
-  if(!emailValid){ errEl.textContent="Courriel invalide."; errEl.style.display="block"; return; }
-  if(!phoneValid){ errEl.textContent="Numéro canadien invalide. Ex : 514-555-0100"; errEl.style.display="block"; return; }
-
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi en cours...';
-  try {
-    await db.collection("leads").add({
-      type:"garage", garage_name:nom, garage_phone:phone, garage_email:email, address:addr,
-      baies:document.getElementById("g_baies").value||"",
-      experience:document.getElementById("g_exp").value||"",
-      services:document.getElementById("g_services").value||"",
-      status:"nouveau",
-      created_at:firebase.firestore.FieldValue.serverTimestamp(),
-    });
-    document.getElementById("drawer-garage-body").innerHTML=
-      '<div class="success-screen"><span class="success-icon">🎉</span>'
-      +'<div class="success-title">Inscription reçue !</div>'
-      +'<p class="success-sub">L\'équipe Greaz va vous contacter dans les <strong style="color:white">24-48h</strong> pour finaliser votre inscription sur la plateforme.</p>'
-      +'<p style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:2rem">📞 '+phone+'<br>📧 '+email+'</p>'
-      +'<button onclick="closeDrawer(\'garage\')" style="padding:12px 28px;background:var(--green);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer">Fermer ✓</button>'
-      +'</div>';
-  } catch(e){
-    errEl.textContent="Erreur : "+e.message; errEl.style.display="block";
-    btn.disabled=false; btn.textContent="Inscrire mon garage →";
   }
 }
 </script>
