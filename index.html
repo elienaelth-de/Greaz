@@ -45,7 +45,6 @@ h1 .hl2 { color:var(--green); }
 .cta-card p { font-size:12.5px; line-height:1.6; opacity:.75; margin-bottom:1.25rem; }
 .cta-btn { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; padding:9px 18px; border-radius:var(--r2); border:none; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
 
-/* Card couleurs */
 .cta-card-client { background:linear-gradient(135deg,#1A3CFF 0%,#0F2ACC 100%); border-color:rgba(255,255,255,.15); }
 .cta-card-client .cta-btn { background:white; color:var(--blue2); }
 .cta-card-client .cta-btn:hover { background:rgba(255,255,255,.9); }
@@ -53,10 +52,6 @@ h1 .hl2 { color:var(--green); }
 .cta-card-mec { background:linear-gradient(135deg,#0a1f12 0%,#051a0a 100%); border-color:rgba(0,194,111,.25); }
 .cta-card-mec .cta-btn { background:rgba(0,194,111,.15); color:var(--green); border:1px solid rgba(0,194,111,.35); }
 .cta-card-mec .cta-btn:hover { background:rgba(0,194,111,.25); }
-
-.cta-card-garage { background:linear-gradient(135deg,#1a1020 0%,#0d0818 100%); border-color:rgba(255,107,44,.2); }
-.cta-card-garage .cta-btn { background:rgba(255,107,44,.12); color:var(--orange); border:1px solid rgba(255,107,44,.3); }
-.cta-card-garage .cta-btn:hover { background:rgba(255,107,44,.22); }
 
 /* STATS BAND */
 .stats-band { background:rgba(255,255,255,.03); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:1.5rem 2rem; }
@@ -97,6 +92,70 @@ h1 .hl2 { color:var(--green); }
 .section-title { font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.8rem,4vw,2.5rem); font-weight:800; letter-spacing:-.03em; line-height:1.1; }
 .section-sub { font-size:14px; color:rgba(255,255,255,.45); margin-top:.75rem; }
 
+/* ══════════ ANNUAIRE (intégré) ══════════ */
+.annuaire-section { padding:5rem 2rem 2rem; max-width:1000px; margin:0 auto; }
+.filters-wrap { margin:0 auto 1.5rem; position:sticky; top:64px; z-index:50; }
+.filters-bar { background:var(--ink2); border:1px solid var(--line); border-radius:var(--r2); padding:.875rem; display:flex; gap:8px; flex-wrap:wrap; }
+.filters-bar input, .filters-bar select { flex:1; min-width:130px; padding:9px 12px; background:rgba(255,255,255,.05); border:1.5px solid var(--line); border-radius:var(--r); color:white; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; -webkit-appearance:none; appearance:none; }
+.filters-bar select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M5 7L0 2h10z' fill='%23666'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:28px; }
+.filters-bar select option { background:#1C2040; }
+.filters-bar input::placeholder { color:rgba(255,255,255,.3); }
+.filters-bar input:focus, .filters-bar select:focus { border-color:var(--blue); }
+
+.results-count { font-size:12px; color:rgba(255,255,255,.4); margin-bottom:1rem; }
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+.pro-card { background:var(--ink2); border:1px solid var(--line); border-radius:var(--r2); padding:1.25rem; cursor:pointer; transition:all .2s; }
+.pro-card:hover { border-color:rgba(26,60,255,.35); transform:translateY(-2px); }
+.pro-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
+.pro-avatar { width:46px; height:46px; border-radius:50%; background:var(--bluelt); color:var(--blue2); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0; }
+.pro-avatar.garage { background:rgba(255,107,44,.15); color:var(--orange); }
+.pro-info { flex:1; min-width:0; }
+.pro-name { font-size:15px; font-weight:700; }
+.pro-meta { font-size:12px; color:rgba(255,255,255,.45); margin-top:2px; }
+.pro-type-badge { font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; display:inline-block; margin-top:6px; }
+.pro-type-badge.mec { background:rgba(26,60,255,.15); color:#93BBFD; }
+.pro-type-badge.garage { background:rgba(255,107,44,.15); color:var(--orange); }
+.pro-rating { font-size:12px; color:#FBBF24; margin-top:8px; }
+.pro-rating .count { color:rgba(255,255,255,.4); margin-left:4px; }
+.pro-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
+.pro-tag { font-size:10px; background:rgba(255,255,255,.05); border:1px solid var(--line); padding:3px 8px; border-radius:4px; color:rgba(255,255,255,.6); }
+.pro-empty { grid-column:1/-1; text-align:center; padding:4rem 1rem; color:rgba(255,255,255,.4); }
+.pro-empty-icon { font-size:2.5rem; margin-bottom:1rem; opacity:.5; }
+
+.profile-head { display:flex; align-items:center; gap:14px; margin-bottom:1.25rem; }
+.profile-avatar { width:60px; height:60px; border-radius:50%; background:var(--bluelt); color:var(--blue2); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; flex-shrink:0; }
+.profile-avatar.garage { background:rgba(255,107,44,.15); color:var(--orange); }
+.profile-bio { font-size:13px; color:rgba(255,255,255,.6); line-height:1.65; margin-bottom:1.25rem; }
+.profile-section-title { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4); margin-bottom:.75rem; padding-bottom:.5rem; border-bottom:1px solid rgba(255,255,255,.06); margin-top:1.5rem; }
+
+.avail-grid { display:grid; grid-template-columns:auto repeat(3,1fr); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; font-size:12px; }
+.avail-head { background:rgba(255,255,255,.03); padding:6px; text-align:center; font-size:9px; font-weight:700; color:rgba(255,255,255,.4); text-transform:uppercase; border-bottom:1px solid var(--line); }
+.avail-head:first-child { text-align:left; padding-left:10px; }
+.avail-day { padding:7px 10px; font-size:11px; color:rgba(255,255,255,.5); border-top:1px solid var(--line); }
+.avail-cell { padding:5px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
+.avail-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.1); }
+.avail-dot.on { background:var(--green); box-shadow:0 0 6px rgba(0,194,111,.5); }
+
+.review-item { background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:var(--r); padding:.875rem; margin-bottom:8px; }
+.review-stars { color:#FBBF24; font-size:13px; margin-bottom:4px; }
+.review-text { font-size:13px; color:rgba(255,255,255,.7); line-height:1.55; }
+.review-author { font-size:11px; color:rgba(255,255,255,.35); margin-top:6px; }
+.no-reviews { font-size:12.5px; color:rgba(255,255,255,.35); text-align:center; padding:1.5rem 0; }
+
+.btn-book { width:100%; padding:14px; border-radius:var(--r2); border:none; background:var(--blue); color:white; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:1.5rem; transition:all .2s; }
+.btn-book:hover { background:var(--blue2); }
+
+.slot-pick-row { display:flex; gap:8px; margin-top:6px; }
+.slot-pick-btn { flex:1; padding:10px 6px; border-radius:var(--r); background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); cursor:pointer; text-align:center; font-size:12px; color:white; transition:all .2s; }
+.slot-pick-btn:hover { border-color:rgba(255,255,255,.25); }
+.slot-pick-btn.sel { background:rgba(26,60,255,.2); border-color:var(--blue); }
+.slot-pick-btn:disabled { opacity:.25; cursor:not-allowed; }
+.slot-empty-msg { font-size:12px; color:#fca5a5; margin-top:8px; }
+
+.star-picker { display:flex; gap:8px; justify-content:center; margin:1.25rem 0; }
+.star-btn { font-size:2.2rem; background:none; border:none; cursor:pointer; color:rgba(255,255,255,.2); transition:color .15s; line-height:1; }
+.star-btn.active { color:#FBBF24; }
+
 /* OVERLAY / DRAWER */
 .overlay { position:fixed; inset:0; background:rgba(5,7,20,.85); z-index:200; display:none; align-items:flex-end; justify-content:center; backdrop-filter:blur(8px); }
 .overlay.open { display:flex; }
@@ -105,7 +164,7 @@ h1 .hl2 { color:var(--green); }
 .drawer-handle { width:40px; height:4px; background:rgba(255,255,255,.2); border-radius:2px; margin:14px auto 0; }
 .drawer-header { padding:1.5rem 1.75rem 1rem; border-bottom:1px solid rgba(255,255,255,.07); display:flex; align-items:center; justify-content:space-between; }
 .drawer-title { font-family:'Bricolage Grotesque',sans-serif; font-size:1.2rem; font-weight:700; }
-.close-btn { width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.08); border:none; cursor:pointer; font-size:1rem; color:rgba(255,255,255,.6); display:flex; align-items:center; justify-content:center; }
+.close-btn { width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.08); border:none; cursor:pointer; font-size:1rem; color:rgba(255,255,255,.6); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .drawer-body { padding:1.5rem 1.75rem 2.5rem; }
 
 /* FORMS */
@@ -212,7 +271,7 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
         </div>
       </div>
 
-      <div class="cta-card cta-card-mec" onclick="window.location.href='trouver.html'">
+      <div class="cta-card cta-card-mec" onclick="document.getElementById('annuaire').scrollIntoView({behavior:'smooth'})">
         <span class="cta-icon">📇</span>
         <h3>Trouver un pro</h3>
         <p>Parcourez les mécaniciens et garages, leurs dispos, leurs avis — réservez un créneau direct.</p>
@@ -221,6 +280,38 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ANNUAIRE INTÉGRÉ -->
+<section class="annuaire-section" id="annuaire">
+  <div style="text-align:center; margin-bottom:1.75rem">
+    <div class="section-label">Annuaire Greaz</div>
+    <div class="section-title">Trouve ton pro</div>
+    <p class="section-sub">Vois leurs disponibilités, réserve un créneau, consulte les avis d'autres clients.</p>
+  </div>
+
+  <div class="filters-wrap">
+    <div class="filters-bar">
+      <input type="text" id="search-input" placeholder="🔍 Nom, ville, service..." oninput="renderDirectory()">
+      <select id="filter-type" onchange="renderDirectory()">
+        <option value="">Tous les types</option>
+        <option value="mecanicien">🔧 Mécanicien</option>
+        <option value="garage">🏪 Garage</option>
+      </select>
+      <select id="filter-ville" onchange="renderDirectory()">
+        <option value="">Toutes les villes</option>
+        <option>Montréal</option><option>Laval</option><option>Longueuil</option>
+        <option>Québec</option><option>Gatineau</option><option>Sherbrooke</option>
+        <option>Saguenay</option><option>Lévis</option><option>Trois-Rivières</option>
+        <option>Terrebonne</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="results-count" id="results-count"></div>
+  <div class="cards-grid" id="cards-grid">
+    <div class="pro-empty"><div class="pro-empty-icon">⏳</div>Chargement de l'annuaire...</div>
   </div>
 </section>
 
@@ -302,10 +393,10 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
 <footer>
   <div class="footer-logo">Gre<span>az</span></div>
   <p style="margin-bottom:.5rem">La plateforme automobile au Québec</p>
-  <p>© 2025 Greaz — Tous droits réservés</p>
+  <p>© 2026 Greaz — Tous droits réservés</p>
 </footer>
 
-<!-- DRAWER CLIENT -->
+<!-- DRAWER CLIENT (soumission) -->
 <div class="overlay" id="overlay-client" onclick="if(event.target===this)closeDrawer('client')">
   <div class="drawer">
     <div class="drawer-handle"></div>
@@ -314,6 +405,42 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
       <button class="close-btn" onclick="closeDrawer('client')">✕</button>
     </div>
     <div class="drawer-body" id="drawer-client-body"></div>
+  </div>
+</div>
+
+<!-- DRAWER PROFIL -->
+<div class="overlay" id="overlay-profile" onclick="if(event.target===this)closeDrawer('profile')">
+  <div class="drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header">
+      <span class="drawer-title" id="profile-drawer-title">Profil</span>
+      <button class="close-btn" onclick="closeDrawer('profile')">✕</button>
+    </div>
+    <div class="drawer-body" id="profile-drawer-body"></div>
+  </div>
+</div>
+
+<!-- DRAWER RÉSERVATION -->
+<div class="overlay" id="overlay-booking" onclick="if(event.target===this)closeDrawer('booking')">
+  <div class="drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header">
+      <span class="drawer-title">📅 Demander un rendez-vous</span>
+      <button class="close-btn" onclick="closeDrawer('booking')">✕</button>
+    </div>
+    <div class="drawer-body" id="booking-drawer-body"></div>
+  </div>
+</div>
+
+<!-- DRAWER AVIS -->
+<div class="overlay" id="overlay-review" onclick="if(event.target===this)closeDrawer('review')">
+  <div class="drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header">
+      <span class="drawer-title">⭐ Laisser un avis</span>
+      <button class="close-btn" onclick="closeDrawer('review')">✕</button>
+    </div>
+    <div class="drawer-body" id="review-drawer-body"></div>
   </div>
 </div>
 
@@ -352,6 +479,7 @@ firebase.initializeApp({
 });
 var db = firebase.firestore();
 
+/* ── État partagé : formulaire SOUMISSION (client drawer) ── */
 var _urgency = "", _contact_pref = "both", _selProblem = "";
 
 var PROBLEMS = [
@@ -407,7 +535,7 @@ function validateEmail(el){
   var e=document.getElementById("email-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
 }
 
-/* ── FORMULAIRE CLIENT ── */
+/* ── FORMULAIRE CLIENT (soumission) ── */
 function renderClientForm(){
   _urgency=""; _contact_pref="both"; _selProblem="";
   var yearsOpts=""; for(var y=2025;y>=2000;y--) yearsOpts+="<option>"+y+"</option>";
@@ -460,7 +588,7 @@ function renderClientForm(){
     +'<button class="btn-submit blue" id="client-submit-btn" onclick="submitClient()">Envoyer ma demande →</button>';
 }
 
-/* ── SUBMIT CLIENT ── */
+/* ── SUBMIT CLIENT (soumission) ── */
 async function submitClient(){
   var errEl=document.getElementById("client-err"), btn=document.getElementById("client-submit-btn");
   errEl.style.display="none";
@@ -515,6 +643,430 @@ async function submitClient(){
     btn.disabled=false; btn.textContent="Envoyer ma demande →";
   }
 }
+
+/* ══════════ ANNUAIRE — état & logique ══════════ */
+var DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+var DOW_MAP = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+var SLOT_LABELS = { matin:'Matin (8h-12h)', aprem:'Après-midi (12h-17h)', soir:'Soir (17h-21h)' };
+
+var allPros = [];
+var currentProfile = null;
+var _bookingProblem = "";
+var selSlot = "";
+
+function parseSchedule(str){
+  var result = {};
+  DAYS.forEach(function(d){ result[d] = {matin:false,aprem:false,soir:false}; });
+  if(!str || str === 'Non précisé') return result;
+  String(str).split('|').forEach(function(chunk){
+    var parts = chunk.split(':');
+    if(parts.length < 2) return;
+    var day = parts[0].trim();
+    if(!result[day]) return;
+    var slots = parts.slice(1).join(':').split(',').map(function(s){return s.trim();});
+    slots.forEach(function(s){
+      if(s.indexOf('Matin')===0) result[day].matin = true;
+      if(s.indexOf('Après-midi')===0) result[day].aprem = true;
+      if(s.indexOf('Soir')===0) result[day].soir = true;
+    });
+  });
+  return result;
+}
+
+function starsHtml(avg){
+  var full = Math.round(avg||0);
+  var s = '';
+  for(var i=1;i<=5;i++){ s += i<=full ? '★' : '☆'; }
+  return s;
+}
+
+function loadDirectory(){
+  db.collection('mechanics_public').get().then(function(snap){
+    allPros = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
+      .filter(function(p){ return p.active !== false; });
+    renderDirectory();
+    checkReviewMode();
+  }).catch(function(e){
+    document.getElementById('cards-grid').innerHTML =
+      '<div class="pro-empty"><div class="pro-empty-icon">⚠️</div>Erreur de chargement : '+e.message+'</div>';
+  });
+}
+
+function renderDirectory(){
+  var search = (document.getElementById('search-input').value||'').toLowerCase().trim();
+  var typeFilter = document.getElementById('filter-type').value;
+  var villeFilter = document.getElementById('filter-ville').value;
+
+  var list = allPros.filter(function(p){
+    if(typeFilter && p.type !== typeFilter) return false;
+    if(villeFilter && p.city !== villeFilter) return false;
+    if(search){
+      var hay = ((p.name||'')+(p.city||'')+(p.services||'')+(p.vehicle_types||'')).toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('results-count').textContent =
+    list.length + ' professionnel' + (list.length!==1?'s':'') + ' disponible' + (list.length!==1?'s':'');
+
+  var grid = document.getElementById('cards-grid');
+  if(list.length === 0){
+    grid.innerHTML = '<div class="pro-empty"><div class="pro-empty-icon">🔧</div>'
+      + (allPros.length===0 ? "L'annuaire est encore vide — reviens bientôt !" : "Aucun résultat pour cette recherche.")
+      + '</div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(function(p){
+    var initials = (p.name||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+    var isGarage = p.type === 'garage';
+    var svcTags = (p.services||'').split(',').filter(Boolean).slice(0,3).map(function(s){
+      return '<span class="pro-tag">'+s.trim()+'</span>';
+    }).join('');
+
+    return '<div class="pro-card" onclick="openProfile(\''+p.id+'\')">'
+      +'<div class="pro-top">'
+      +'<div class="pro-avatar'+(isGarage?' garage':'')+'">'+initials+'</div>'
+      +'<div class="pro-info">'
+      +'<div class="pro-name">'+(p.name||'—')+'</div>'
+      +'<div class="pro-meta">📍 '+(p.city||'—')+(p.rayon?' · 🚗 '+p.rayon:'')+'</div>'
+      +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
+      +'</div></div>'
+      +'<div class="pro-rating" id="rating-'+p.id+'">···</div>'
+      +(svcTags ? '<div class="pro-tags">'+svcTags+'</div>' : '')
+      +'</div>';
+  }).join('');
+
+  list.forEach(function(p){ loadRatingSummary(p.id); });
+}
+
+function loadRatingSummary(mechanicId){
+  db.collection('reviews').where('mechanic_id','==',mechanicId).get().then(function(snap){
+    var el = document.getElementById('rating-'+mechanicId);
+    if(!el) return;
+    if(snap.empty){ el.innerHTML = '<span style="color:rgba(255,255,255,.3)">Pas encore d\'avis</span>'; return; }
+    var total = 0;
+    snap.forEach(function(d){ total += (d.data().rating||0); });
+    var avg = total / snap.size;
+    el.innerHTML = starsHtml(avg) + ' ' + avg.toFixed(1) + '<span class="count">(' + snap.size + ' avis)</span>';
+  }).catch(function(){});
+}
+
+/* ── PROFIL ── */
+function openProfile(id){
+  var p = allPros.find(function(x){ return x.id === id; });
+  if(!p) return;
+  currentProfile = p;
+
+  var isGarage = p.type === 'garage';
+  var initials = (p.name||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+  var sched = parseSchedule(p.schedule);
+  var vehTags = (p.vehicle_types||'').split(',').filter(Boolean).map(function(v){ return '<span class="pro-tag">'+v.trim()+'</span>'; }).join('');
+  var svcTags = (p.services||'').split(',').filter(Boolean).map(function(v){ return '<span class="pro-tag">'+v.trim()+'</span>'; }).join('');
+
+  var availRows = DAYS.map(function(d){
+    return '<div class="avail-day">'+d.slice(0,3)+'</div>'
+      + ['matin','aprem','soir'].map(function(s){
+          return '<div class="avail-cell"><div class="avail-dot'+(sched[d][s]?' on':'')+'"></div></div>';
+        }).join('');
+  }).join('');
+
+  document.getElementById('profile-drawer-title').textContent = p.name;
+  document.getElementById('profile-drawer-body').innerHTML =
+    '<div class="profile-head">'
+    +'<div class="profile-avatar'+(isGarage?' garage':'')+'">'+initials+'</div>'
+    +'<div><div style="font-size:17px;font-weight:700">'+p.name+'</div>'
+    +'<div style="font-size:12.5px;color:rgba(255,255,255,.5);margin-top:2px">📍 '+(p.city||'—')+(p.rayon?' · Rayon '+p.rayon:'')+'</div>'
+    +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'" style="margin-top:6px">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
+    +'</div></div>'
+    +(p.bio ? '<div class="profile-bio">"'+p.bio+'"</div>' : '')
+
+    +'<div id="rating-full-'+p.id+'" style="font-size:14px;color:#FBBF24;margin-bottom:.5rem">···</div>'
+
+    +(vehTags ? '<div class="profile-section-title">Véhicules acceptés</div><div class="pro-tags">'+vehTags+'</div>' : '')
+    +(svcTags ? '<div class="profile-section-title">Services offerts</div><div class="pro-tags">'+svcTags+'</div>' : '')
+
+    +'<div class="profile-section-title">Disponibilités habituelles</div>'
+    +'<div class="avail-grid">'
+    +'<div class="avail-head">Jour</div><div class="avail-head">Mat.</div><div class="avail-head">P-M</div><div class="avail-head">Soir</div>'
+    +availRows
+    +'</div>'
+
+    +'<div class="profile-section-title">Avis clients</div>'
+    +'<div id="reviews-list-'+p.id+'"><div class="no-reviews">Chargement des avis...</div></div>'
+
+    +'<button class="btn-book" onclick="openBooking(\''+p.id+'\')">📅 Demander un rendez-vous</button>';
+
+  document.getElementById('overlay-profile').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  loadFullRating(p.id);
+  loadFullReviews(p.id);
+}
+
+function loadFullRating(id){
+  db.collection('reviews').where('mechanic_id','==',id).get().then(function(snap){
+    var el = document.getElementById('rating-full-'+id);
+    if(!el) return;
+    if(snap.empty){ el.innerHTML = '<span style="color:rgba(255,255,255,.35);font-size:12.5px">Aucun avis pour l\'instant</span>'; return; }
+    var total = 0; snap.forEach(function(d){ total += (d.data().rating||0); });
+    var avg = total/snap.size;
+    el.innerHTML = starsHtml(avg) + ' <span style="color:white;font-weight:700">'+avg.toFixed(1)+'</span> <span style="color:rgba(255,255,255,.4);font-size:12px">('+snap.size+' avis)</span>';
+  }).catch(function(){});
+}
+
+function loadFullReviews(id){
+  db.collection('reviews').where('mechanic_id','==',id).get().then(function(snap){
+    var el = document.getElementById('reviews-list-'+id);
+    if(!el) return;
+    var reviews = snap.docs.map(function(d){ return d.data(); });
+    reviews.sort(function(a,b){
+      var da = a.created_at && a.created_at.toDate ? a.created_at.toDate() : new Date(0);
+      var db2 = b.created_at && b.created_at.toDate ? b.created_at.toDate() : new Date(0);
+      return db2-da;
+    });
+    if(reviews.length === 0){ el.innerHTML = '<div class="no-reviews">Aucun avis pour l\'instant — sois le premier !</div>'; return; }
+    el.innerHTML = reviews.map(function(r){
+      return '<div class="review-item">'
+        +'<div class="review-stars">'+starsHtml(r.rating)+'</div>'
+        +'<div class="review-text">'+(r.comment||'')+'</div>'
+        +'<div class="review-author">— '+(r.author_name||'Client Greaz')+'</div>'
+        +'</div>';
+    }).join('');
+  }).catch(function(){});
+}
+
+/* ── RÉSERVATION ── */
+function openBooking(id){
+  var p = allPros.find(function(x){ return x.id === id; });
+  if(!p) return;
+  currentProfile = p;
+  _bookingProblem = ""; selSlot = "";
+
+  var isGarage = p.type === 'garage';
+  var probCards = PROBLEMS.map(function(pr){
+    return '<div class="prob-btn" id="bprob-'+pr.id+'" onclick="selBProblem(\''+pr.id+'\')">'
+      +'<span class="prob-icon">'+pr.icon+'</span><div class="prob-label">'+pr.label+'</div></div>';
+  }).join("");
+
+  var todayStr = new Date().toISOString().slice(0,10);
+
+  document.getElementById('booking-drawer-body').innerHTML =
+    '<div class="alert-err" id="booking-err"></div>'
+    +'<div style="background:rgba(26,60,255,.08);border:1px solid rgba(26,60,255,.2);border-radius:var(--r2);padding:10px 14px;font-size:12.5px;color:rgba(255,255,255,.7);margin-bottom:1.25rem">'
+    +'Rendez-vous avec <strong style="color:white">'+p.name+'</strong>. On te confirme la date exacte rapidement.</div>'
+
+    +'<div class="ff"><label>Date souhaitée *</label><input type="date" id="b_date" min="'+todayStr+'" onchange="updateSlotOptions()"></div>'
+    +'<div class="ff"><label>Plage horaire *</label>'
+    +'<div class="slot-pick-row" id="slot-pick-row">'
+    +'<button type="button" class="slot-pick-btn" id="bslot-matin" onclick="selBSlot(\'matin\')" disabled>Matin</button>'
+    +'<button type="button" class="slot-pick-btn" id="bslot-aprem" onclick="selBSlot(\'aprem\')" disabled>Après-midi</button>'
+    +'<button type="button" class="slot-pick-btn" id="bslot-soir" onclick="selBSlot(\'soir\')" disabled>Soir</button>'
+    +'</div>'
+    +'<div class="slot-empty-msg" id="slot-empty-msg" style="display:none">Choisis d\'abord une date pour voir les plages disponibles.</div>'
+    +'</div>'
+
+    +'<div class="ff" style="margin-top:1.25rem"><label>Quel est le problème ?</label></div>'
+    +'<div class="problem-grid">'+probCards+'</div>'
+
+    +'<div class="ff"><label>Décrivez en détail (optionnel)</label><textarea id="b_desc" rows="2" placeholder="Ex : bruit au freinage, voyant allumé..."></textarea></div>'
+
+    +'<div class="ff2">'
+    +'<div class="ff"><label>Prénom *</label><input type="text" id="b_prenom" placeholder="Jean"></div>'
+    +'<div class="ff"><label>Nom *</label><input type="text" id="b_nom" placeholder="Tremblay"></div>'
+    +'</div>'
+    +'<div class="ff2">'
+    +'<div class="ff"><label>Téléphone *</label><input type="tel" id="b_phone" placeholder="514-555-0100" oninput="validateBPhone(this)"><div id="bphone-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Numéro canadien invalide</div></div>'
+    +'<div class="ff"><label>Courriel *</label><input type="email" id="b_email" placeholder="jean@email.com" oninput="validateBEmail(this)"><div id="bemail-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Courriel invalide</div></div>'
+    +'</div>'
+    +(isGarage ? '' : '<div class="ff"><label>Adresse d\'intervention *</label><input type="text" id="b_addr" placeholder="1234 Rue Principale, Montréal, QC"></div>')
+
+    +'<button class="btn-book" id="booking-submit-btn" onclick="submitBooking()">Envoyer ma demande de rendez-vous →</button>';
+
+  document.getElementById('overlay-booking').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function updateSlotOptions(){
+  var dateVal = document.getElementById('b_date').value;
+  var msg = document.getElementById('slot-empty-msg');
+  ['matin','aprem','soir'].forEach(function(s){ document.getElementById('bslot-'+s).disabled = true; document.getElementById('bslot-'+s).classList.remove('sel'); });
+  selSlot = "";
+  if(!dateVal || !currentProfile) return;
+
+  var sched = parseSchedule(currentProfile.schedule);
+  var dow = DOW_MAP[new Date(dateVal+'T00:00:00').getDay()];
+  var daySched = sched[dow] || {matin:false,aprem:false,soir:false};
+
+  var anyAvail = false;
+  ['matin','aprem','soir'].forEach(function(s){
+    if(daySched[s]){ document.getElementById('bslot-'+s).disabled = false; anyAvail = true; }
+  });
+  msg.style.display = anyAvail ? 'none' : 'block';
+  if(!anyAvail) msg.textContent = "Ce professionnel n'est pas disponible ce jour-là — choisis une autre date.";
+}
+
+function selBSlot(s){
+  if(document.getElementById('bslot-'+s).disabled) return;
+  selSlot = s;
+  ['matin','aprem','soir'].forEach(function(x){ document.getElementById('bslot-'+x).classList.remove('sel'); });
+  document.getElementById('bslot-'+s).classList.add('sel');
+}
+
+function selBProblem(id){
+  _bookingProblem = id;
+  document.querySelectorAll('.problem-grid .prob-btn').forEach(function(el){ el.classList.remove('sel'); });
+  document.getElementById('bprob-'+id).classList.add('sel');
+}
+
+function validateBPhone(el){
+  var clean = el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var valid = /^[2-9]\d{2}[2-9]\d{6}$/.test(clean) && clean.length===10;
+  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
+  var e=document.getElementById("bphone-err"); if(e) e.style.display = el.value.length>3 && !valid ? "block":"none";
+}
+function validateBEmail(el){
+  var valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
+  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
+  var e=document.getElementById("bemail-err"); if(e) e.style.display = el.value.length>3 && !valid ? "block":"none";
+}
+
+async function submitBooking(){
+  var errEl = document.getElementById('booking-err');
+  var btn = document.getElementById('booking-submit-btn');
+  errEl.style.display = 'none';
+
+  var date = document.getElementById('b_date').value;
+  var prenom = (document.getElementById('b_prenom').value||'').trim();
+  var nom = (document.getElementById('b_nom').value||'').trim();
+  var phone = (document.getElementById('b_phone').value||'').trim();
+  var email = (document.getElementById('b_email').value||'').trim();
+  var isGarage = currentProfile.type === 'garage';
+  var addr = isGarage ? '' : (document.getElementById('b_addr')?document.getElementById('b_addr').value.trim():'');
+
+  if(!date || !selSlot || !prenom || !phone || !email || (!isGarage && !addr)){
+    errEl.textContent = "Veuillez remplir tous les champs obligatoires (*)."; errEl.style.display = 'block'; return;
+  }
+  var emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  var phoneClean = phone.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var phoneValid = /^[2-9]\d{2}[2-9]\d{6}$/.test(phoneClean) && phoneClean.length===10;
+  if(!emailValid){ errEl.textContent="Courriel invalide."; errEl.style.display='block'; return; }
+  if(!phoneValid){ errEl.textContent="Numéro canadien invalide. Ex : 514-555-0100"; errEl.style.display='block'; return; }
+
+  var code = "GZ-" + Math.floor(Math.random()*90000+10000);
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi en cours...';
+
+  try {
+    await db.collection('appointments').add({
+      mechanic_id: currentProfile.id,
+      mechanic_name: currentProfile.name,
+      mechanic_type: currentProfile.type,
+      client_prenom: prenom, client_nom: nom, client_phone: phone, client_email: email,
+      client_address: addr,
+      date: date, time_slot: selSlot,
+      problem: _bookingProblem || 'Non précisé',
+      description: document.getElementById('b_desc').value.trim(),
+      status: 'en_attente',
+      booking_code: code,
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    document.getElementById('booking-drawer-body').innerHTML =
+      '<div class="success-screen"><span class="success-icon">✅</span>'
+      +'<div class="success-title">Demande envoyée !</div>'
+      +'<p class="success-sub">'+currentProfile.name+' va confirmer ton rendez-vous bientôt. On te contacte par SMS ou courriel.</p>'
+      +'<div class="success-code">'+code+'</div>'
+      +'<p style="font-size:11.5px;color:rgba(255,255,255,.4);margin-bottom:1.5rem">Ton code de référence</p>'
+      +'<button onclick="closeDrawer(\'booking\');closeDrawer(\'profile\')" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Compris ✓</button>'
+      +'</div>';
+
+  } catch(e){
+    errEl.textContent = "Erreur : "+e.message; errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = "Envoyer ma demande de rendez-vous →";
+  }
+}
+
+/* ── AVIS (mode spécial via lien) ── */
+function checkReviewMode(){
+  var params = new URLSearchParams(window.location.search);
+  if(params.get('avis') === '1'){
+    var bookingId = params.get('booking');
+    var code = params.get('code');
+    var mecId = params.get('mec');
+    if(bookingId && code && mecId) openReviewModal(bookingId, code, mecId);
+  }
+}
+
+var reviewRating = 0;
+
+function openReviewModal(bookingId, code, mecId){
+  db.collection('mechanics_public').doc(mecId).get().then(function(doc){
+    var mecName = doc.exists ? doc.data().name : 'ce professionnel';
+
+    document.getElementById('review-drawer-body').innerHTML =
+      '<div class="alert-err" id="review-err"></div>'
+      +'<p style="font-size:13.5px;color:rgba(255,255,255,.6);text-align:center;margin-bottom:.5rem">Comment s\'est passé ton rendez-vous avec</p>'
+      +'<p style="font-size:16px;font-weight:700;text-align:center;margin-bottom:1rem">'+mecName+' ?</p>'
+      +'<div class="star-picker" id="star-picker">'
+      + [1,2,3,4,5].map(function(i){ return '<button type="button" class="star-btn" id="rstar-'+i+'" onclick="setRating('+i+')">★</button>'; }).join('')
+      +'</div>'
+      +'<div class="ff"><label>Ton commentaire *</label><textarea id="r_comment" rows="3" placeholder="Décris ton expérience..."></textarea></div>'
+      +'<div class="ff"><label>Ton prénom (optionnel)</label><input type="text" id="r_author" placeholder="Jean"></div>'
+      +'<button class="btn-book" id="review-submit-btn" onclick="submitReview(\''+bookingId+'\',\''+code+'\',\''+mecId+'\')">Envoyer mon avis →</button>';
+
+    document.getElementById('overlay-review').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+}
+
+function setRating(n){
+  reviewRating = n;
+  for(var i=1;i<=5;i++){
+    document.getElementById('rstar-'+i).classList.toggle('active', i<=n);
+  }
+}
+
+async function submitReview(bookingId, code, mecId){
+  var errEl = document.getElementById('review-err');
+  var btn = document.getElementById('review-submit-btn');
+  errEl.style.display = 'none';
+
+  var comment = (document.getElementById('r_comment').value||'').trim();
+  var author = (document.getElementById('r_author').value||'').trim();
+
+  if(reviewRating === 0){ errEl.textContent = "Choisis une note d'étoiles."; errEl.style.display='block'; return; }
+  if(!comment){ errEl.textContent = "Écris un petit commentaire."; errEl.style.display='block'; return; }
+
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi...';
+
+  try {
+    await db.collection('reviews').add({
+      booking_id: bookingId,
+      booking_code: code,
+      mechanic_id: mecId,
+      rating: reviewRating,
+      comment: comment,
+      author_name: author || 'Client Greaz',
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    document.getElementById('review-drawer-body').innerHTML =
+      '<div class="success-screen"><span class="success-icon">🙏</span>'
+      +'<div class="success-title">Merci pour ton avis !</div>'
+      +'<p class="success-sub">Ça aide les autres clients à choisir le bon professionnel.</p>'
+      +'<button onclick="closeDrawer(\'review\')" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Fermer ✓</button>'
+      +'</div>';
+
+  } catch(e){
+    errEl.textContent = "Erreur : ce lien d'avis n'est plus valide ou a déjà été utilisé.";
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = "Envoyer mon avis →";
+  }
+}
+
+/* ── Init ── */
+loadDirectory();
 </script>
 </body>
 </html>
