@@ -5,240 +5,259 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Greaz — La mécanique, réinventée</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 :root {
   --blue:#1A3CFF; --blue2:#0F2ACC; --bluelt:#EEF1FF;
   --ink:#0A0C1B; --ink2:#1C2040; --muted:#6B7280;
   --line:rgba(255,255,255,.1); --surface:#F5F6FA;
   --white:#FFFFFF; --green:#00C26F; --orange:#FF6B2C;
+  --gold:#FFD700; --silver:#C0C0C0; --bronze:#CD7F32;
   --r:8px; --r2:16px; --r3:24px;
 }
-*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { font-family:'DM Sans',sans-serif; background:var(--ink); color:var(--white); min-height:100vh; overflow-x:hidden; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);min-height:100vh;overflow-x:hidden;}
 
 /* NAV */
-nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:.9rem 2rem; display:flex; align-items:center; justify-content:space-between; background:rgba(10,12,27,.85); backdrop-filter:blur(16px); border-bottom:1px solid var(--line); }
-.logo { font-family:'Bricolage Grotesque',sans-serif; font-size:1.5rem; font-weight:800; letter-spacing:-.03em; }
-.logo span { color:var(--blue); }
-.nav-badge { font-size:11px; font-weight:600; padding:4px 12px; border-radius:20px; border:1px solid rgba(255,255,255,.2); color:rgba(255,255,255,.6); }
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(10,12,27,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);}
+.logo{font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.03em;}
+.logo span{color:var(--blue);}
+.nav-badge{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);}
 
 /* HERO */
-.hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8rem 2rem 4rem; text-align:center; position:relative; overflow:hidden; }
-.hero-bg { position:absolute; inset:0; z-index:0; background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,60,255,.25) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(0,194,111,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(255,107,44,.08) 0%,transparent 60%); }
-.hero-grid { position:absolute; inset:0; z-index:0; opacity:.07; background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px); background-size:50px 50px; }
-.hero-content { position:relative; z-index:1; max-width:820px; }
-.hero-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(26,60,255,.15); border:1px solid rgba(26,60,255,.4); border-radius:40px; padding:6px 18px; font-size:13px; font-weight:500; color:rgba(255,255,255,.8); margin-bottom:2rem; animation:fadeUp .6s ease both; }
-.hero-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 1.5s infinite; box-shadow:0 0 6px var(--green); }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
-h1 { font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.6rem,6vw,4.5rem); font-weight:800; line-height:1.05; letter-spacing:-.04em; margin-bottom:1.5rem; animation:fadeUp .6s .1s ease both; }
-h1 .hl  { color:var(--blue); }
-h1 .hl2 { color:var(--green); }
-.hero-sub { font-size:1.05rem; color:rgba(255,255,255,.55); line-height:1.75; max-width:560px; margin:0 auto 3rem; animation:fadeUp .6s .2s ease both; }
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8rem 2rem 4rem;text-align:center;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,60,255,.25) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(0,194,111,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(255,107,44,.08) 0%,transparent 60%);}
+.hero-grid{position:absolute;inset:0;z-index:0;opacity:.07;background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);background-size:50px 50px;}
+.hero-content{position:relative;z-index:1;max-width:820px;}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(26,60,255,.15);border:1px solid rgba(26,60,255,.4);border-radius:40px;padding:6px 18px;font-size:13px;font-weight:500;color:rgba(255,255,255,.8);margin-bottom:2rem;animation:fadeUp .6s ease both;}
+.hero-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;box-shadow:0 0 6px var(--green);}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+h1{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(2.6rem,6vw,4.5rem);font-weight:800;line-height:1.05;letter-spacing:-.04em;margin-bottom:1.5rem;animation:fadeUp .6s .1s ease both;}
+h1 .hl{color:var(--blue);}
+h1 .hl2{color:var(--green);}
+.hero-sub{font-size:1.05rem;color:rgba(255,255,255,.55);line-height:1.75;max-width:560px;margin:0 auto 3rem;animation:fadeUp .6s .2s ease both;}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s .3s ease both;}
+.cta-card{flex:1;min-width:220px;max-width:270px;border-radius:var(--r3);padding:1.75rem;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;border:2px solid transparent;}
+.cta-card:hover{transform:translateY(-6px) scale(1.02);}
+.cta-card .cta-icon{font-size:2.2rem;margin-bottom:.875rem;display:block;}
+.cta-card h3{font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:.4rem;}
+.cta-card p{font-size:12.5px;line-height:1.6;opacity:.75;margin-bottom:1.25rem;}
+.cta-btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;padding:9px 18px;border-radius:var(--r2);border:none;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.cta-card-client{background:linear-gradient(135deg,#1A3CFF 0%,#0F2ACC 100%);border-color:rgba(255,255,255,.15);}
+.cta-card-client .cta-btn{background:white;color:var(--blue2);}
+.cta-card-mec{background:linear-gradient(135deg,#0a1f12 0%,#051a0a 100%);border-color:rgba(0,194,111,.25);}
+.cta-card-mec .cta-btn{background:rgba(0,194,111,.15);color:var(--green);border:1px solid rgba(0,194,111,.35);}
 
-/* CTA CARDS */
-.cta-row { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; animation:fadeUp .6s .3s ease both; }
-.cta-card { flex:1; min-width:220px; max-width:270px; border-radius:var(--r3); padding:1.75rem; cursor:pointer; transition:all .25s cubic-bezier(.34,1.56,.64,1); position:relative; overflow:hidden; border:2px solid transparent; }
-.cta-card:hover { transform:translateY(-6px) scale(1.02); }
-.cta-card .cta-icon { font-size:2.2rem; margin-bottom:.875rem; display:block; }
-.cta-card h3 { font-family:'Bricolage Grotesque',sans-serif; font-size:1.15rem; font-weight:700; margin-bottom:.4rem; }
-.cta-card p { font-size:12.5px; line-height:1.6; opacity:.75; margin-bottom:1.25rem; }
-.cta-btn { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; padding:9px 18px; border-radius:var(--r2); border:none; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+/* ══════════ ANNUAIRE ══════════ */
+.annuaire-section{padding:5rem 0 0;}
+.annuaire-header{padding:0 2rem 1.5rem;text-align:center;}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(26,60,255,.8);margin-bottom:.75rem;}
+.section-title{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;}
+.section-sub{font-size:14px;color:rgba(255,255,255,.45);margin-top:.75rem;}
 
-.cta-card-client { background:linear-gradient(135deg,#1A3CFF 0%,#0F2ACC 100%); border-color:rgba(255,255,255,.15); }
-.cta-card-client .cta-btn { background:white; color:var(--blue2); }
-.cta-card-client .cta-btn:hover { background:rgba(255,255,255,.9); }
+/* VIEW TOGGLE */
+.view-toggle{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:1.25rem;}
+.vtoggle-btn{display:flex;align-items:center;gap:6px;padding:8px 20px;border-radius:30px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);transition:all .2s;}
+.vtoggle-btn.act{background:rgba(26,60,255,.25);border-color:var(--blue);color:white;}
+.vtoggle-btn:hover:not(.act){border-color:rgba(255,255,255,.3);color:white;}
 
-.cta-card-mec { background:linear-gradient(135deg,#0a1f12 0%,#051a0a 100%); border-color:rgba(0,194,111,.25); }
-.cta-card-mec .cta-btn { background:rgba(0,194,111,.15); color:var(--green); border:1px solid rgba(0,194,111,.35); }
-.cta-card-mec .cta-btn:hover { background:rgba(0,194,111,.25); }
+/* FILTERS */
+.filters-bar-wrap{padding:0 1.25rem 1rem;}
+.filters-bar{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r2);padding:.75rem;display:flex;gap:8px;flex-wrap:wrap;max-width:900px;margin:0 auto;}
+.filters-bar input,.filters-bar select{flex:1;min-width:130px;padding:9px 12px;background:rgba(255,255,255,.05);border:1.5px solid var(--line);border-radius:var(--r);color:white;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;-webkit-appearance:none;appearance:none;}
+.filters-bar select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M5 7L0 2h10z' fill='%23666'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+.filters-bar select option{background:#1C2040;}
+.filters-bar input::placeholder{color:rgba(255,255,255,.3);}
+.filters-bar input:focus,.filters-bar select:focus{border-color:var(--blue);}
 
-/* STATS BAND */
-.stats-band { background:rgba(255,255,255,.03); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:1.5rem 2rem; }
-.stats-inner { max-width:800px; margin:0 auto; display:flex; justify-content:center; gap:3rem; flex-wrap:wrap; }
-.stat-item { text-align:center; }
-.stat-num { font-family:'Bricolage Grotesque',sans-serif; font-size:1.8rem; font-weight:800; letter-spacing:-.03em; }
-.stat-num.blue { color:var(--blue); }
-.stat-num.green { color:var(--green); }
-.stat-num.orange { color:var(--orange); }
-.stat-label { font-size:12px; color:rgba(255,255,255,.45); margin-top:2px; }
+/* MAP VIEW */
+#map-view{position:relative;}
+#greaz-map{width:100%;height:calc(100vh - 64px);z-index:1;background:#0A0C1B;}
+.map-controls{position:absolute;top:16px;left:16px;z-index:10;display:flex;flex-direction:column;gap:8px;}
+.map-ctrl-btn{width:40px;height:40px;border-radius:var(--r);background:var(--ink2);border:1px solid var(--line);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:white;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.3);}
+.map-ctrl-btn:hover{background:rgba(26,60,255,.25);border-color:var(--blue);}
+.results-count-map{position:absolute;top:16px;right:16px;z-index:10;background:rgba(10,12,27,.85);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:var(--r2);padding:8px 14px;font-size:12px;color:rgba(255,255,255,.6);}
 
-/* HOW IT WORKS */
-.how { padding:5rem 2rem; max-width:900px; margin:0 auto; }
-.steps-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2.5rem; position:relative; }
-.step-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:var(--r2); padding:1.5rem; position:relative; }
-.step-num { font-family:'Bricolage Grotesque',sans-serif; font-size:2.5rem; font-weight:800; opacity:.12; position:absolute; top:.75rem; right:1rem; }
-.step-icon { font-size:1.6rem; margin-bottom:.75rem; }
-.step-title { font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; margin-bottom:.4rem; }
-.step-desc { font-size:13px; color:rgba(255,255,255,.5); line-height:1.65; }
+/* CUSTOM LEAFLET MARKERS */
+.gz-marker-wrap{position:relative;width:52px;height:68px;}
+.gz-marker{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white;border:2.5px solid rgba(255,255,255,.25);box-shadow:0 4px 16px rgba(0,0,0,.5);cursor:pointer;transition:transform .15s;position:relative;}
+.gz-marker.mec{background:linear-gradient(135deg,#0a1f12,#051a0a);border-color:rgba(0,194,111,.5);}
+.gz-marker.garage{background:linear-gradient(135deg,#1a1020,#0d0818);border-color:rgba(255,107,44,.5);}
+.gz-marker-tail{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:10px solid rgba(10,12,27,.9);margin:0 auto;}
+.gz-cert-dot{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;border:2px solid var(--ink);font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:800;}
+.gz-cert-dot.gold{background:var(--gold);color:#7a6000;}
+.gz-cert-dot.silver{background:var(--silver);color:#555;}
+.gz-cert-dot.bronze{background:var(--bronze);color:#fff;}
+.gz-price-tag{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);background:var(--ink2);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap;color:var(--green);box-shadow:0 2px 8px rgba(0,0,0,.4);}
 
-/* FEATURES */
-.features { padding:5rem 2rem; max-width:900px; margin:0 auto; }
-.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2.5rem; }
-.feat-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:var(--r2); padding:1.5rem; }
-.feat-icon { font-size:1.6rem; margin-bottom:.75rem; }
-.feat-title { font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; margin-bottom:.4rem; }
-.feat-desc { font-size:13px; color:rgba(255,255,255,.5); line-height:1.65; }
+/* LEAFLET POPUP CUSTOM */
+.gz-popup .leaflet-popup-content-wrapper{background:var(--ink2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r2);box-shadow:0 12px 40px rgba(0,0,0,.6);padding:0;}
+.gz-popup .leaflet-popup-content{margin:0;color:white;}
+.gz-popup .leaflet-popup-tip{background:var(--ink2);}
+.gz-popup .leaflet-popup-close-button{color:rgba(255,255,255,.5)!important;font-size:18px!important;top:8px!important;right:10px!important;}
+.gz-popup-inner{padding:1rem;}
+.gz-popup-name{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;}
+.gz-popup-meta{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:6px;}
+.gz-popup-rating{font-size:12px;color:#FBBF24;margin-bottom:6px;}
+.gz-popup-price{font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px;}
+.gz-popup-btn{display:block;width:100%;padding:9px;background:var(--blue);color:white;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:background .2s;}
+.gz-popup-btn:hover{background:var(--blue2);}
 
-/* SERVICES */
-.services-section { padding:5rem 2rem; background:rgba(255,255,255,.02); border-top:1px solid var(--line); }
-.services-inner { max-width:900px; margin:0 auto; }
-.services-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:10px; margin-top:2.5rem; }
-.service-pill { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:1rem; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500; }
-.service-pill span { font-size:1.2rem; }
+/* GRID VIEW */
+#grid-view{padding:0 1.25rem 2rem;max-width:1050px;margin:0 auto;}
+.results-count{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:1rem;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.pro-card{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r2);padding:1.25rem;cursor:pointer;transition:all .2s;}
+.pro-card:hover{border-color:rgba(26,60,255,.35);transform:translateY(-2px);}
+.pro-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;}
+.pro-avatar{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;}
+.pro-avatar.mec{background:linear-gradient(135deg,#0a1f12,#051a0a);border:2px solid rgba(0,194,111,.4);}
+.pro-avatar.garage{background:linear-gradient(135deg,#1a1020,#0d0818);border:2px solid rgba(255,107,44,.4);}
+.pro-name{font-size:15px;font-weight:700;}
+.pro-meta{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px;}
+.pro-type-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:5px;}
+.pro-type-badge.mec{background:rgba(26,60,255,.15);color:#93BBFD;}
+.pro-type-badge.garage{background:rgba(255,107,44,.15);color:var(--orange);}
+.pro-rating{font-size:12px;color:#FBBF24;margin-top:8px;}
+.pro-rating .count{color:rgba(255,255,255,.4);margin-left:4px;}
+.pro-price{font-size:13px;color:var(--green);font-weight:600;margin-top:4px;}
+.pro-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+.pro-tag{font-size:10px;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:3px 8px;border-radius:4px;color:rgba(255,255,255,.6);}
+.pro-empty{grid-column:1/-1;text-align:center;padding:4rem 1rem;color:rgba(255,255,255,.4);}
+.pro-empty-icon{font-size:2.5rem;margin-bottom:1rem;opacity:.5;}
 
-/* SECTION LABELS */
-.section-label { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(26,60,255,.8); margin-bottom:.75rem; }
-.section-title { font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.8rem,4vw,2.5rem); font-weight:800; letter-spacing:-.03em; line-height:1.1; }
-.section-sub { font-size:14px; color:rgba(255,255,255,.45); margin-top:.75rem; }
+/* CERTIFICATION BADGES */
+.cert-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;margin-top:6px;}
+.cert-badge.gold{background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.35);color:var(--gold);}
+.cert-badge.silver{background:rgba(192,192,192,.12);border:1px solid rgba(192,192,192,.3);color:var(--silver);}
+.cert-badge.bronze{background:rgba(205,127,50,.12);border:1px solid rgba(205,127,50,.3);color:var(--bronze);}
 
-/* ══════════ ANNUAIRE (intégré) ══════════ */
-.annuaire-section { padding:5rem 2rem 2rem; max-width:1000px; margin:0 auto; }
-.filters-wrap { margin:0 auto 1.5rem; position:sticky; top:64px; z-index:50; }
-.filters-bar { background:var(--ink2); border:1px solid var(--line); border-radius:var(--r2); padding:.875rem; display:flex; gap:8px; flex-wrap:wrap; }
-.filters-bar input, .filters-bar select { flex:1; min-width:130px; padding:9px 12px; background:rgba(255,255,255,.05); border:1.5px solid var(--line); border-radius:var(--r); color:white; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; -webkit-appearance:none; appearance:none; }
-.filters-bar select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M5 7L0 2h10z' fill='%23666'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:28px; }
-.filters-bar select option { background:#1C2040; }
-.filters-bar input::placeholder { color:rgba(255,255,255,.3); }
-.filters-bar input:focus, .filters-bar select:focus { border-color:var(--blue); }
+/* PROFILE PRICING TABLE */
+.pricing-table{width:100%;border-collapse:collapse;margin-top:.5rem;}
+.pricing-table tr{border-bottom:1px solid rgba(255,255,255,.06);}
+.pricing-table tr:last-child{border:none;}
+.pricing-table td{padding:8px 4px;font-size:13px;}
+.pricing-table .svc{color:rgba(255,255,255,.75);}
+.pricing-table .price{text-align:right;font-weight:700;color:var(--green);}
 
-.results-count { font-size:12px; color:rgba(255,255,255,.4); margin-bottom:1rem; }
-.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
-.pro-card { background:var(--ink2); border:1px solid var(--line); border-radius:var(--r2); padding:1.25rem; cursor:pointer; transition:all .2s; }
-.pro-card:hover { border-color:rgba(26,60,255,.35); transform:translateY(-2px); }
-.pro-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
-.pro-avatar { width:46px; height:46px; border-radius:50%; background:var(--bluelt); color:var(--blue2); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0; }
-.pro-avatar.garage { background:rgba(255,107,44,.15); color:var(--orange); }
-.pro-info { flex:1; min-width:0; }
-.pro-name { font-size:15px; font-weight:700; }
-.pro-meta { font-size:12px; color:rgba(255,255,255,.45); margin-top:2px; }
-.pro-type-badge { font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; display:inline-block; margin-top:6px; }
-.pro-type-badge.mec { background:rgba(26,60,255,.15); color:#93BBFD; }
-.pro-type-badge.garage { background:rgba(255,107,44,.15); color:var(--orange); }
-.pro-rating { font-size:12px; color:#FBBF24; margin-top:8px; }
-.pro-rating .count { color:rgba(255,255,255,.4); margin-left:4px; }
-.pro-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
-.pro-tag { font-size:10px; background:rgba(255,255,255,.05); border:1px solid var(--line); padding:3px 8px; border-radius:4px; color:rgba(255,255,255,.6); }
-.pro-empty { grid-column:1/-1; text-align:center; padding:4rem 1rem; color:rgba(255,255,255,.4); }
-.pro-empty-icon { font-size:2.5rem; margin-bottom:1rem; opacity:.5; }
-
-.profile-head { display:flex; align-items:center; gap:14px; margin-bottom:1.25rem; }
-.profile-avatar { width:60px; height:60px; border-radius:50%; background:var(--bluelt); color:var(--blue2); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; flex-shrink:0; }
-.profile-avatar.garage { background:rgba(255,107,44,.15); color:var(--orange); }
-.profile-bio { font-size:13px; color:rgba(255,255,255,.6); line-height:1.65; margin-bottom:1.25rem; }
-.profile-section-title { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4); margin-bottom:.75rem; padding-bottom:.5rem; border-bottom:1px solid rgba(255,255,255,.06); margin-top:1.5rem; }
-
-.avail-grid { display:grid; grid-template-columns:auto repeat(3,1fr); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; font-size:12px; }
-.avail-head { background:rgba(255,255,255,.03); padding:6px; text-align:center; font-size:9px; font-weight:700; color:rgba(255,255,255,.4); text-transform:uppercase; border-bottom:1px solid var(--line); }
-.avail-head:first-child { text-align:left; padding-left:10px; }
-.avail-day { padding:7px 10px; font-size:11px; color:rgba(255,255,255,.5); border-top:1px solid var(--line); }
-.avail-cell { padding:5px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
-.avail-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.1); }
-.avail-dot.on { background:var(--green); box-shadow:0 0 6px rgba(0,194,111,.5); }
-
-.review-item { background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:var(--r); padding:.875rem; margin-bottom:8px; }
-.review-stars { color:#FBBF24; font-size:13px; margin-bottom:4px; }
-.review-text { font-size:13px; color:rgba(255,255,255,.7); line-height:1.55; }
-.review-author { font-size:11px; color:rgba(255,255,255,.35); margin-top:6px; }
-.no-reviews { font-size:12.5px; color:rgba(255,255,255,.35); text-align:center; padding:1.5rem 0; }
-
-.btn-book { width:100%; padding:14px; border-radius:var(--r2); border:none; background:var(--blue); color:white; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:1.5rem; transition:all .2s; }
-.btn-book:hover { background:var(--blue2); }
-
-.slot-pick-row { display:flex; gap:8px; margin-top:6px; }
-.slot-pick-btn { flex:1; padding:10px 6px; border-radius:var(--r); background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); cursor:pointer; text-align:center; font-size:12px; color:white; transition:all .2s; }
-.slot-pick-btn:hover { border-color:rgba(255,255,255,.25); }
-.slot-pick-btn.sel { background:rgba(26,60,255,.2); border-color:var(--blue); }
-.slot-pick-btn:disabled { opacity:.25; cursor:not-allowed; }
-.slot-empty-msg { font-size:12px; color:#fca5a5; margin-top:8px; }
-
-.star-picker { display:flex; gap:8px; justify-content:center; margin:1.25rem 0; }
-.star-btn { font-size:2.2rem; background:none; border:none; cursor:pointer; color:rgba(255,255,255,.2); transition:color .15s; line-height:1; }
-.star-btn.active { color:#FBBF24; }
+/* PROFILE / BOOKING / REVIEW */
+.profile-head{display:flex;align-items:center;gap:14px;margin-bottom:1.25rem;}
+.profile-avatar{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;flex-shrink:0;}
+.profile-avatar.mec{background:linear-gradient(135deg,#0a1f12,#051a0a);border:2.5px solid rgba(0,194,111,.4);}
+.profile-avatar.garage{background:linear-gradient(135deg,#1a1020,#0d0818);border:2.5px solid rgba(255,107,44,.4);}
+.profile-bio{font-size:13px;color:rgba(255,255,255,.6);line-height:1.65;margin-bottom:1.25rem;}
+.profile-section-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.06);margin-top:1.5rem;}
+.avail-grid{display:grid;grid-template-columns:auto repeat(3,1fr);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;font-size:12px;}
+.avail-head{background:rgba(255,255,255,.03);padding:6px;text-align:center;font-size:9px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;border-bottom:1px solid var(--line);}
+.avail-head:first-child{text-align:left;padding-left:10px;}
+.avail-day{padding:7px 10px;font-size:11px;color:rgba(255,255,255,.5);border-top:1px solid var(--line);}
+.avail-cell{padding:5px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+.avail-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.1);}
+.avail-dot.on{background:var(--green);box-shadow:0 0 6px rgba(0,194,111,.5);}
+.review-item{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r);padding:.875rem;margin-bottom:8px;}
+.review-stars{color:#FBBF24;font-size:13px;margin-bottom:4px;}
+.review-text{font-size:13px;color:rgba(255,255,255,.7);line-height:1.55;}
+.review-author{font-size:11px;color:rgba(255,255,255,.35);margin-top:6px;}
+.no-reviews{font-size:12.5px;color:rgba(255,255,255,.35);text-align:center;padding:1.5rem 0;}
+.btn-book{width:100%;padding:14px;border-radius:var(--r2);border:none;background:var(--blue);color:white;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:1.5rem;transition:all .2s;}
+.btn-book:hover{background:var(--blue2);}
 
 /* OVERLAY / DRAWER */
-.overlay { position:fixed; inset:0; background:rgba(5,7,20,.85); z-index:200; display:none; align-items:flex-end; justify-content:center; backdrop-filter:blur(8px); }
-.overlay.open { display:flex; }
-.drawer { background:var(--ink2); border-radius:28px 28px 0 0; width:100%; max-width:600px; max-height:92vh; overflow-y:auto; transform:translateY(100%); transition:transform .4s cubic-bezier(.32,.72,0,1); }
-.overlay.open .drawer { transform:translateY(0); }
-.drawer-handle { width:40px; height:4px; background:rgba(255,255,255,.2); border-radius:2px; margin:14px auto 0; }
-.drawer-header { padding:1.5rem 1.75rem 1rem; border-bottom:1px solid rgba(255,255,255,.07); display:flex; align-items:center; justify-content:space-between; }
-.drawer-title { font-family:'Bricolage Grotesque',sans-serif; font-size:1.2rem; font-weight:700; }
-.close-btn { width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.08); border:none; cursor:pointer; font-size:1rem; color:rgba(255,255,255,.6); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.drawer-body { padding:1.5rem 1.75rem 2.5rem; }
+.overlay{position:fixed;inset:0;background:rgba(5,7,20,.85);z-index:400;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.drawer{background:var(--ink2);border-radius:28px 28px 0 0;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .4s cubic-bezier(.32,.72,0,1);}
+.overlay.open .drawer{transform:translateY(0);}
+.drawer-handle{width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:14px auto 0;}
+.drawer-header{padding:1.5rem 1.75rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;}
+.drawer-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1.2rem;font-weight:700;}
+.close-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.08);border:none;cursor:pointer;font-size:1rem;color:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.drawer-body{padding:1.5rem 1.75rem 2.5rem;}
 
 /* FORMS */
-.form-section { margin-bottom:1.5rem; }
-.form-section-title { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4); margin-bottom:.75rem; padding-bottom:.5rem; border-bottom:1px solid rgba(255,255,255,.06); }
-.ff { margin-bottom:1rem; }
-.ff label { display:block; font-size:12px; font-weight:600; color:rgba(255,255,255,.5); margin-bottom:5px; }
-.ff input, .ff select, .ff textarea { width:100%; padding:11px 14px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.1); border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:14px; color:white; outline:none; transition:border-color .2s; -webkit-appearance:none; appearance:none; }
-.ff input::placeholder, .ff textarea::placeholder { color:rgba(255,255,255,.3); }
-.ff select option { background:var(--ink2); }
-.ff input:focus, .ff select:focus, .ff textarea:focus { border-color:var(--blue); background:rgba(26,60,255,.08); }
-.ff textarea { resize:vertical; }
-.ff2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.form-section{margin-bottom:1.5rem;}
+.form-section-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.06);}
+.ff{margin-bottom:1rem;}
+.ff label{display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:5px;}
+.ff input,.ff select,.ff textarea{width:100%;padding:11px 14px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;color:white;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;}
+.ff input::placeholder,.ff textarea::placeholder{color:rgba(255,255,255,.3);}
+.ff select option{background:var(--ink2);}
+.ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--blue);background:rgba(26,60,255,.08);}
+.ff textarea{resize:vertical;}
+.ff2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:.5rem;}
+.prob-btn{padding:10px 6px;border-radius:var(--r);background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);cursor:pointer;text-align:center;transition:all .2s;}
+.prob-btn.sel{background:rgba(26,60,255,.2);border-color:var(--blue);}
+.prob-icon{font-size:1.2rem;display:block;margin-bottom:3px;}
+.prob-label{font-size:10px;font-weight:600;color:white;line-height:1.25;}
+.urgency-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.urg-btn{padding:12px 8px;border-radius:var(--r2);background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);cursor:pointer;text-align:center;transition:all .2s;}
+.urg-btn.sel{background:rgba(26,60,255,.2);border-color:var(--blue);}
+.urg-icon{font-size:1.4rem;display:block;margin-bottom:4px;}
+.urg-label{font-size:12px;font-weight:600;color:white;}
+.urg-sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px;}
+.date-block{display:none;margin-top:1rem;}
+.date-block.show{display:block;}
+.contact-row{display:flex;gap:8px;margin-top:.5rem;}
+.contact-pill{flex:1;padding:9px;border-radius:var(--r);border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);transition:all .2s;}
+.contact-pill.sel{background:rgba(26,60,255,.2);border-color:var(--blue);color:white;}
+.slot-pick-row{display:flex;gap:8px;margin-top:6px;}
+.slot-pick-btn{flex:1;padding:10px 6px;border-radius:var(--r);background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);cursor:pointer;text-align:center;font-size:12px;color:white;transition:all .2s;}
+.slot-pick-btn.sel{background:rgba(26,60,255,.2);border-color:var(--blue);}
+.slot-pick-btn:disabled{opacity:.25;cursor:not-allowed;}
+.slot-empty-msg{font-size:12px;color:#fca5a5;margin-top:8px;}
+.star-picker{display:flex;gap:8px;justify-content:center;margin:1.25rem 0;}
+.star-btn{font-size:2.2rem;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.2);transition:color .15s;line-height:1;}
+.star-btn.active{color:#FBBF24;}
+.btn-submit{width:100%;padding:14px;border-radius:var(--r2);border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:1.5rem;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-submit.blue{background:var(--blue);color:white;}
+.btn-submit.blue:hover{background:var(--blue2);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;}
+.alert-err{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);color:#fca5a5;padding:10px 14px;border-radius:var(--r);font-size:13px;margin-bottom:1rem;display:none;}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:sp .7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.success-screen{text-align:center;padding:2.5rem 1rem;}
+.success-icon{font-size:4rem;margin-bottom:1rem;display:block;animation:pop .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.success-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:.5rem;}
+.success-sub{font-size:14px;color:rgba(255,255,255,.55);line-height:1.75;max-width:340px;margin:0 auto 2rem;}
+.success-code{background:rgba(26,60,255,.2);border:1px solid rgba(26,60,255,.4);border-radius:var(--r2);padding:12px 20px;font-size:1.1rem;font-weight:700;color:var(--blue);letter-spacing:.1em;display:inline-block;margin-bottom:2rem;}
 
-/* PROBLEM GRID */
-.problem-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:.75rem; }
-.prob-btn { padding:12px 8px; border-radius:var(--r2); background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); cursor:pointer; text-align:center; transition:all .2s; }
-.prob-btn:hover { border-color:rgba(255,255,255,.25); }
-.prob-btn.sel { background:rgba(26,60,255,.2); border-color:var(--blue); }
-.prob-icon { font-size:1.4rem; display:block; margin-bottom:4px; }
-.prob-label { font-size:11px; font-weight:600; color:white; line-height:1.3; }
-
-/* URGENCY */
-.urgency-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
-.urg-btn { padding:12px 8px; border-radius:var(--r2); background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); cursor:pointer; text-align:center; transition:all .2s; }
-.urg-btn:hover { border-color:rgba(255,255,255,.25); }
-.urg-btn.sel { background:rgba(26,60,255,.2); border-color:var(--blue); }
-.urg-icon { font-size:1.4rem; display:block; margin-bottom:4px; }
-.urg-label { font-size:12px; font-weight:600; color:white; }
-.urg-sub { font-size:10px; color:rgba(255,255,255,.45); margin-top:2px; }
-.date-block { display:none; margin-top:1rem; }
-.date-block.show { display:block; }
-
-/* CONTACT */
-.contact-row { display:flex; gap:8px; margin-top:.5rem; }
-.contact-pill { flex:1; padding:9px; border-radius:var(--r); border:1.5px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); cursor:pointer; text-align:center; font-size:12px; font-weight:600; color:rgba(255,255,255,.7); transition:all .2s; }
-.contact-pill.sel { background:rgba(26,60,255,.2); border-color:var(--blue); color:white; }
-
-/* SUBMIT */
-.btn-submit { width:100%; padding:14px; border-radius:var(--r2); border:none; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; margin-top:1.5rem; display:flex; align-items:center; justify-content:center; gap:8px; }
-.btn-submit.blue  { background:var(--blue); color:white; }
-.btn-submit.green { background:var(--green); color:white; }
-.btn-submit.blue:hover  { background:var(--blue2); }
-.btn-submit.green:hover { background:#00a85e; }
-.btn-submit:disabled { opacity:.6; cursor:not-allowed; }
-.spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.3); border-top-color:white; border-radius:50%; animation:sp .7s linear infinite; }
-@keyframes sp { to{transform:rotate(360deg);} }
-
-/* SUCCESS */
-.success-screen { text-align:center; padding:2.5rem 1rem; }
-.success-icon { font-size:4rem; margin-bottom:1rem; display:block; animation:pop .5s cubic-bezier(.34,1.56,.64,1); }
-@keyframes pop { from{transform:scale(0)} to{transform:scale(1)} }
-.success-title { font-family:'Bricolage Grotesque',sans-serif; font-size:1.4rem; font-weight:700; margin-bottom:.5rem; }
-.success-sub { font-size:14px; color:rgba(255,255,255,.55); line-height:1.75; max-width:340px; margin:0 auto 2rem; }
-.success-code { background:rgba(26,60,255,.2); border:1px solid rgba(26,60,255,.4); border-radius:var(--r2); padding:12px 20px; font-size:1.1rem; font-weight:700; color:var(--blue); letter-spacing:.1em; display:inline-block; margin-bottom:2rem; }
-
-/* ALERT */
-.alert-err { background:rgba(220,38,38,.1); border:1px solid rgba(220,38,38,.3); color:#fca5a5; padding:10px 14px; border-radius:var(--r); font-size:13px; margin-bottom:1rem; display:none; }
-
-/* FOOTER */
-footer { padding:3rem 2rem 2rem; border-top:1px solid rgba(255,255,255,.06); text-align:center; }
-.footer-logo { font-family:'Bricolage Grotesque',sans-serif; font-size:1.3rem; font-weight:800; margin-bottom:.5rem; }
-.footer-logo span { color:var(--blue); }
-footer p { font-size:12px; color:rgba(255,255,255,.3); }
-
-@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-
-@media(max-width:640px) {
-  .cta-row { flex-direction:column; align-items:center; }
-  .cta-card { max-width:100%; }
-  .feat-grid,.steps-row { grid-template-columns:1fr; }
-  .urgency-grid,.problem-grid { grid-template-columns:1fr 1fr; }
-  .ff2 { grid-template-columns:1fr; }
-  .stats-inner { gap:1.5rem; }
+/* REST OF PAGE */
+.stats-band{background:rgba(255,255,255,.03);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1.5rem 2rem;}
+.stats-inner{max-width:800px;margin:0 auto;display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;}
+.stat-item{text-align:center;}
+.stat-num{font-family:'Bricolage Grotesque',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-.03em;}
+.stat-num.blue{color:var(--blue);}
+.stat-num.green{color:var(--green);}
+.stat-num.orange{color:var(--orange);}
+.stat-label{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px;}
+.how{padding:5rem 2rem;max-width:900px;margin:0 auto;}
+.steps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem;}
+.step-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r2);padding:1.5rem;position:relative;}
+.step-num{font-family:'Bricolage Grotesque',sans-serif;font-size:2.5rem;font-weight:800;opacity:.12;position:absolute;top:.75rem;right:1rem;}
+.step-icon{font-size:1.6rem;margin-bottom:.75rem;}
+.step-title{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;margin-bottom:.4rem;}
+.step-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.65;}
+.features{padding:5rem 2rem;max-width:900px;margin:0 auto;}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem;}
+.feat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r2);padding:1.5rem;}
+.feat-icon{font-size:1.6rem;margin-bottom:.75rem;}
+.feat-title{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;margin-bottom:.4rem;}
+.feat-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.65;}
+footer{padding:3rem 2rem 2rem;border-top:1px solid rgba(255,255,255,.06);text-align:center;}
+.footer-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:.5rem;}
+.footer-logo span{color:var(--blue);}
+footer p{font-size:12px;color:rgba(255,255,255,.3);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:640px){
+  .cta-row{flex-direction:column;align-items:center;}
+  .cta-card{max-width:100%;}
+  .feat-grid,.steps-row{grid-template-columns:1fr;}
+  .urgency-grid,.problem-grid{grid-template-columns:1fr 1fr;}
+  .ff2{grid-template-columns:1fr;}
+  .stats-inner{gap:1.5rem;}
+  #greaz-map{height:calc(100vh - 120px);}
 }
 </style>
 </head>
@@ -254,52 +273,53 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
   <div class="hero-content">
-    <div class="hero-tag">
-      <span class="hero-dot"></span>
-      La plateforme automobile au Québec
-    </div>
+    <div class="hero-tag"><span class="hero-dot"></span>La plateforme automobile au Québec</div>
     <h1>La mécanique,<br><span class="hl">connectée.</span><br><span class="hl2">Réinventée.</span></h1>
-    <p class="hero-sub">Greaz met en ligne rapidement des mécaniciens indépendants et des garages avec leurs clients. Trouvez un pro, recevez une soumission, c'est réglé.</p>
-
+    <p class="hero-sub">Trouve le mécanicien certifié ou le garage autour de toi. Vois les prix, les avis, réserve en quelques secondes.</p>
     <div class="cta-row">
       <div class="cta-card cta-card-client" onclick="openDrawer('client')">
         <span class="cta-icon">🔧</span>
         <h3>J'ai besoin d'un mécanicien</h3>
         <p>Décrivez votre problème — un pro qualifié vous répond avec une soumission gratuite.</p>
-        <div style="display:flex;justify-content:flex-start">
-          <button class="cta-btn">Commencer →</button>
-        </div>
+        <div style="display:flex;justify-content:flex-start"><button class="cta-btn">Commencer →</button></div>
       </div>
-
       <div class="cta-card cta-card-mec" onclick="document.getElementById('annuaire').scrollIntoView({behavior:'smooth'})">
-        <span class="cta-icon">📇</span>
-        <h3>Trouver un pro</h3>
-        <p>Parcourez les mécaniciens et garages, leurs dispos, leurs avis — réservez un créneau direct.</p>
-        <div style="display:flex;justify-content:flex-start">
-          <button class="cta-btn">Voir l'annuaire →</button>
-        </div>
+        <span class="cta-icon">🗺️</span>
+        <h3>Trouver un pro près de moi</h3>
+        <p>Carte interactive, prix, certifications et avis vérifiés — le meilleur pro autour de toi.</p>
+        <div style="display:flex;justify-content:flex-start"><button class="cta-btn">Voir la carte →</button></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ANNUAIRE INTÉGRÉ -->
+<!-- ANNUAIRE -->
 <section class="annuaire-section" id="annuaire">
-  <div style="text-align:center; margin-bottom:1.75rem">
+  <div class="annuaire-header">
     <div class="section-label">Annuaire Greaz</div>
     <div class="section-title">Trouve ton pro</div>
-    <p class="section-sub">Vois leurs disponibilités, réserve un créneau, consulte les avis d'autres clients.</p>
+    <p class="section-sub">Carte interactive · Prix visibles · Certifications · Avis vérifiés</p>
+    <div class="view-toggle" style="margin-top:1.25rem">
+      <button class="vtoggle-btn act" id="btn-map" onclick="switchView('map')">🗺️ Carte</button>
+      <button class="vtoggle-btn" id="btn-grid" onclick="switchView('grid')">⊞ Grille</button>
+    </div>
   </div>
 
-  <div class="filters-wrap">
+  <div class="filters-bar-wrap">
     <div class="filters-bar">
-      <input type="text" id="search-input" placeholder="🔍 Nom, ville, service..." oninput="renderDirectory()">
-      <select id="filter-type" onchange="renderDirectory()">
+      <input type="text" id="search-input" placeholder="🔍 Nom, service..." oninput="applyFilters()">
+      <select id="filter-type" onchange="applyFilters()">
         <option value="">Tous les types</option>
         <option value="mecanicien">🔧 Mécanicien</option>
         <option value="garage">🏪 Garage</option>
       </select>
-      <select id="filter-ville" onchange="renderDirectory()">
+      <select id="filter-cert" onchange="applyFilters()">
+        <option value="">Toutes certifications</option>
+        <option value="1">✦ Certifiés+</option>
+        <option value="2">✦✦ Élite+</option>
+        <option value="3">✦✦✦ Premium</option>
+      </select>
+      <select id="filter-ville" onchange="applyFilters()">
         <option value="">Toutes les villes</option>
         <option>Montréal</option><option>Laval</option><option>Longueuil</option>
         <option>Québec</option><option>Gatineau</option><option>Sherbrooke</option>
@@ -309,9 +329,23 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
     </div>
   </div>
 
-  <div class="results-count" id="results-count"></div>
-  <div class="cards-grid" id="cards-grid">
-    <div class="pro-empty"><div class="pro-empty-icon">⏳</div>Chargement de l'annuaire...</div>
+  <!-- MAP VIEW -->
+  <div id="map-view">
+    <div id="greaz-map"></div>
+    <div class="map-controls">
+      <button class="map-ctrl-btn" onclick="geolocateMe()" title="Ma position">📍</button>
+      <button class="map-ctrl-btn" onclick="leafletMap.zoomIn()" title="Zoom +">＋</button>
+      <button class="map-ctrl-btn" onclick="leafletMap.zoomOut()" title="Zoom −">－</button>
+    </div>
+    <div class="results-count-map" id="results-count-map"></div>
+  </div>
+
+  <!-- GRID VIEW -->
+  <div id="grid-view" style="display:none;padding-top:1.25rem">
+    <div class="results-count" id="results-count-grid"></div>
+    <div class="cards-grid" id="cards-grid">
+      <div class="pro-empty"><div class="pro-empty-icon">⏳</div>Chargement...</div>
+    </div>
   </div>
 </section>
 
@@ -326,67 +360,24 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
 
 <!-- COMMENT ÇA MARCHE -->
 <section class="how">
-  <div style="text-align:center">
-    <div class="section-label">Comment ça marche</div>
-    <div class="section-title">Simple en 3 étapes</div>
-  </div>
-  <div class="steps-row" style="margin-top:2.5rem">
-    <div class="step-card">
-      <div class="step-num">01</div>
-      <div class="step-icon">📋</div>
-      <div class="step-title">Vous décrivez votre besoin</div>
-      <div class="step-desc">Type de véhicule, problème, urgence. Ça prend moins de 3 minutes.</div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">02</div>
-      <div class="step-icon">💬</div>
-      <div class="step-title">On vous envoie une soumission</div>
-      <div class="step-desc">Notre équipe analyse votre demande et vous envoie un devis clair par SMS ou courriel.</div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">03</div>
-      <div class="step-icon">✅</div>
-      <div class="step-title">Un pro arrive chez vous</div>
-      <div class="step-desc">Vous confirmez, on assigne le bon mécanicien ou garage. C'est réglé.</div>
-    </div>
+  <div style="text-align:center"><div class="section-label">Comment ça marche</div><div class="section-title">Simple en 3 étapes</div></div>
+  <div class="steps-row">
+    <div class="step-card"><div class="step-num">01</div><div class="step-icon">🗺️</div><div class="step-title">Tu trouves un pro sur la carte</div><div class="step-desc">Vois les mécaniciens certifiés et garages autour de toi avec leurs prix et avis.</div></div>
+    <div class="step-card"><div class="step-num">02</div><div class="step-icon">📅</div><div class="step-title">Tu réserves un créneau</div><div class="step-desc">Choisis une date, une plage horaire — le pro confirme rapidement par SMS.</div></div>
+    <div class="step-card"><div class="step-num">03</div><div class="step-icon">✅</div><div class="step-title">Le pro vient chez toi</div><div class="step-desc">Mécanicien mobile ou garage — c'est toi qui choisis. C'est réglé.</div></div>
   </div>
 </section>
 
 <!-- FEATURES -->
 <section class="features">
-  <div style="text-align:center">
-    <div class="section-label">Pourquoi Greaz</div>
-    <div class="section-title">La plateforme qui change tout</div>
-  </div>
+  <div style="text-align:center"><div class="section-label">Pourquoi Greaz</div><div class="section-title">La plateforme qui change tout</div></div>
   <div class="feat-grid">
-    <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Réponse ultra-rapide</div><div class="feat-desc">Soumission gratuite en moins d'une heure. Mécanicien assigné le jour même si urgent.</div></div>
-    <div class="feat-card"><div class="feat-icon">📍</div><div class="feat-title">À domicile ou en garage</div><div class="feat-desc">Mécanicien mobile chez vous, ou prise en charge dans un garage partenaire près de vous.</div></div>
-    <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-title">Pros vérifiés</div><div class="feat-desc">Chaque mécanicien et garage est validé par l'équipe Greaz avant d'accéder à la plateforme.</div></div>
+    <div class="feat-card"><div class="feat-icon">✦</div><div class="feat-title">Certification Greaz</div><div class="feat-desc">Chaque pro est vérifié et noté par notre équipe. Jusqu'à ✦✦✦ Greaz Premium — les meilleurs du Québec.</div></div>
+    <div class="feat-card"><div class="feat-icon">💰</div><div class="feat-title">Prix visibles</div><div class="feat-desc">Vois les tarifs avant même de cliquer. Vidange, freins, pneus — tout est affiché. Zéro surprise.</div></div>
+    <div class="feat-card"><div class="feat-icon">⭐</div><div class="feat-title">Avis vérifiés</div><div class="feat-desc">Seulement les clients qui ont réellement eu un rendez-vous peuvent laisser un avis.</div></div>
+    <div class="feat-card"><div class="feat-icon">📍</div><div class="feat-title">Carte interactive</div><div class="feat-desc">Vois les pros autour de toi en temps réel. Filtre par type, certification, disponibilité.</div></div>
     <div class="feat-card"><div class="feat-icon">🚗</div><div class="feat-title">Tous véhicules</div><div class="feat-desc">Voitures, VUS, motos, vans, VR et bateaux. Si ça a un moteur, on s'en occupe.</div></div>
-    <div class="feat-card"><div class="feat-icon">💰</div><div class="feat-title">Soumission gratuite</div><div class="feat-desc">Recevez un devis clair avant de confirmer. Aucune surprise, aucun engagement.</div></div>
-    <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Suivi en temps réel</div><div class="feat-desc">SMS + courriel à chaque étape. Vous savez exactement où en est votre demande.</div></div>
-  </div>
-</section>
-
-<!-- SERVICES -->
-<section class="services-section">
-  <div class="services-inner">
-    <div style="text-align:center">
-      <div class="section-label">Nos services</div>
-      <div class="section-title">Ce qu'on répare</div>
-      <p class="section-sub">Soumission gratuite · Mécanicien certifié · Paiement Interac</p>
-    </div>
-    <div class="services-grid">
-      <div class="service-pill"><span>🔋</span> Batterie / boost</div>
-      <div class="service-pill"><span>🔩</span> Crevaison / pneu</div>
-      <div class="service-pill"><span>🛑</span> Freins</div>
-      <div class="service-pill"><span>🛢️</span> Vidange / huile</div>
-      <div class="service-pill"><span>💡</span> Lumières / phares</div>
-      <div class="service-pill"><span>⚙️</span> Check engine</div>
-      <div class="service-pill"><span>❄️</span> Climatisation</div>
-      <div class="service-pill"><span>🌧️</span> Essuie-glaces</div>
-      <div class="service-pill"><span>🔧</span> Autre problème</div>
-    </div>
+    <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Confirmation instantanée</div><div class="feat-desc">SMS + courriel à chaque étape. Suivi de ta demande en temps réel.</div></div>
   </div>
 </section>
 
@@ -396,50 +387,28 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
   <p>© 2026 Greaz — Tous droits réservés</p>
 </footer>
 
-<!-- DRAWER CLIENT (soumission) -->
+<!-- DRAWERS -->
 <div class="overlay" id="overlay-client" onclick="if(event.target===this)closeDrawer('client')">
-  <div class="drawer">
-    <div class="drawer-handle"></div>
-    <div class="drawer-header">
-      <span class="drawer-title">🔧 Demande de service</span>
-      <button class="close-btn" onclick="closeDrawer('client')">✕</button>
-    </div>
+  <div class="drawer"><div class="drawer-handle"></div>
+    <div class="drawer-header"><span class="drawer-title">🔧 Demande de service</span><button class="close-btn" onclick="closeDrawer('client')">✕</button></div>
     <div class="drawer-body" id="drawer-client-body"></div>
   </div>
 </div>
-
-<!-- DRAWER PROFIL -->
 <div class="overlay" id="overlay-profile" onclick="if(event.target===this)closeDrawer('profile')">
-  <div class="drawer">
-    <div class="drawer-handle"></div>
-    <div class="drawer-header">
-      <span class="drawer-title" id="profile-drawer-title">Profil</span>
-      <button class="close-btn" onclick="closeDrawer('profile')">✕</button>
-    </div>
+  <div class="drawer"><div class="drawer-handle"></div>
+    <div class="drawer-header"><span class="drawer-title" id="profile-drawer-title">Profil</span><button class="close-btn" onclick="closeDrawer('profile')">✕</button></div>
     <div class="drawer-body" id="profile-drawer-body"></div>
   </div>
 </div>
-
-<!-- DRAWER RÉSERVATION -->
 <div class="overlay" id="overlay-booking" onclick="if(event.target===this)closeDrawer('booking')">
-  <div class="drawer">
-    <div class="drawer-handle"></div>
-    <div class="drawer-header">
-      <span class="drawer-title">📅 Demander un rendez-vous</span>
-      <button class="close-btn" onclick="closeDrawer('booking')">✕</button>
-    </div>
+  <div class="drawer"><div class="drawer-handle"></div>
+    <div class="drawer-header"><span class="drawer-title">📅 Demander un rendez-vous</span><button class="close-btn" onclick="closeDrawer('booking')">✕</button></div>
     <div class="drawer-body" id="booking-drawer-body"></div>
   </div>
 </div>
-
-<!-- DRAWER AVIS -->
 <div class="overlay" id="overlay-review" onclick="if(event.target===this)closeDrawer('review')">
-  <div class="drawer">
-    <div class="drawer-handle"></div>
-    <div class="drawer-header">
-      <span class="drawer-title">⭐ Laisser un avis</span>
-      <button class="close-btn" onclick="closeDrawer('review')">✕</button>
-    </div>
+  <div class="drawer"><div class="drawer-handle"></div>
+    <div class="drawer-header"><span class="drawer-title">⭐ Laisser un avis</span><button class="close-btn" onclick="closeDrawer('review')">✕</button></div>
     <div class="drawer-body" id="review-drawer-body"></div>
   </div>
 </div>
@@ -447,28 +416,24 @@ footer p { font-size:12px; color:rgba(255,255,255,.3); }
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// EmailJS — notification automatique à contact@greaz.ca
+// ── EmailJS ──
 emailjs.init({ publicKey: "COLLE_TA_CLE_PUBLIQUE_ICI" });
-var EMAILJS_SERVICE_ID  = "service_h2f013c";
+var EMAILJS_SERVICE_ID = "service_h2f013c";
 var EMAILJS_TEMPLATE_ID = "template_moboyo8";
 
 function notifierNouvelleDemandeClient(data){
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-    to_email:       "contact@greaz.ca",
-    type_demande:   "Nouveau client",
-    nom_client:      data.client_name,
-    telephone:       data.client_phone,
-    courriel:        data.client_email,
-    adresse:         data.address,
-    vehicule:        [data.vehicle_make, data.vehicle_model, data.vehicle_year].filter(Boolean).join(" "),
-    probleme:        data.problem,
-    urgence:         data.urgency,
-    code_reservation:data.booking_code,
+    to_email:"contact@greaz.ca", type_demande:"Nouveau client",
+    nom_client:data.client_name, telephone:data.client_phone,
+    courriel:data.client_email, adresse:data.address,
+    vehicule:[data.vehicle_make,data.vehicle_model,data.vehicle_year].filter(Boolean).join(" "),
+    probleme:data.problem, urgence:data.urgency, code_reservation:data.booking_code,
   }).catch(function(e){ console.log("EmailJS:", e); });
 }
-</script>
-<script>
+
+// ── Firebase ──
 firebase.initializeApp({
   apiKey:"AIzaSyAbvCBM1J-LL5B5_v5rqjbGcM8geufmbxs",
   authDomain:"greaz-4b00c.firebaseapp.com",
@@ -479,116 +444,620 @@ firebase.initializeApp({
 });
 var db = firebase.firestore();
 
-/* ── État partagé : formulaire SOUMISSION (client drawer) ── */
-var _urgency = "", _contact_pref = "both", _selProblem = "";
+// ── Constantes ──
+var DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+var DOW_MAP = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+
+var CERT = {
+  0: null,
+  1: { stars:'✦',   label:'Greaz Certifié', cls:'bronze', color:'#CD7F32' },
+  2: { stars:'✦✦',  label:'Greaz Élite',    cls:'silver', color:'#C0C0C0' },
+  3: { stars:'✦✦✦', label:'Greaz Premium',  cls:'gold',   color:'#FFD700' },
+};
 
 var PROBLEMS = [
-  {id:"battery",icon:"🔋",label:"Batterie / boost"},
-  {id:"flat",   icon:"🔩",label:"Crevaison / pneu"},
+  {id:"battery",icon:"🔋",label:"Batterie"},
+  {id:"flat",   icon:"🔩",label:"Pneu"},
   {id:"brakes", icon:"🛑",label:"Freins"},
-  {id:"oil",    icon:"🛢️",label:"Vidange / huile"},
-  {id:"lights", icon:"💡",label:"Lumières / phares"},
+  {id:"oil",    icon:"🛢️",label:"Vidange"},
+  {id:"lights", icon:"💡",label:"Phares"},
   {id:"engine", icon:"⚙️",label:"Check engine"},
-  {id:"ac",     icon:"❄️",label:"Climatisation"},
+  {id:"ac",     icon:"❄️",label:"Clim"},
   {id:"wiper",  icon:"🌧️",label:"Essuie-glaces"},
-  {id:"other",  icon:"🔧",label:"Autre problème"},
+  {id:"other",  icon:"🔧",label:"Autre"},
 ];
 
+// ── État global ──
+var allPros = [];
+var filteredPros = [];
+var currentProfile = null;
+var leafletMap = null;
+var leafletMarkers = [];
+var currentView = "map";
+
+// ── État formulaires ──
+var _urgency = "", _contact_pref = "both", _selProblem = "";
+var _bookingProblem = "", selSlot = "", reviewRating = 0;
+
+// ── Helpers ──
+function starsHtml(avg){
+  var s=""; for(var i=1;i<=5;i++) s+=i<=Math.round(avg||0)?'★':'☆'; return s;
+}
+function certBadgeHtml(level){
+  var c = CERT[level||0]; if(!c) return '';
+  return '<span class="cert-badge '+c.cls+'">'+c.stars+' '+c.label+'</span>';
+}
+function parsePricing(str){
+  if(!str) return [];
+  return str.split(',').map(function(item){
+    var parts = item.trim().split(':');
+    if(parts.length<2) return null;
+    return {service:parts[0].trim(), price:parts.slice(1).join(':').trim()};
+  }).filter(Boolean);
+}
+function lowestPrice(str){
+  var items = parsePricing(str);
+  var prices = items.map(function(i){ return parseInt(i.price.replace(/[^0-9]/g,'')); }).filter(function(n){ return !isNaN(n); });
+  if(!prices.length) return null;
+  return Math.min.apply(null,prices)+'$';
+}
+function parseSchedule(str){
+  var result={};
+  DAYS.forEach(function(d){ result[d]={matin:false,aprem:false,soir:false}; });
+  if(!str||str==='Non précisé') return result;
+  String(str).split('|').forEach(function(chunk){
+    var parts=chunk.split(':'); if(parts.length<2) return;
+    var day=parts[0].trim(); if(!result[day]) return;
+    var slots=parts.slice(1).join(':').split(',').map(function(s){return s.trim();});
+    slots.forEach(function(s){
+      if(s.indexOf('Matin')===0) result[day].matin=true;
+      if(s.indexOf('Après-midi')===0) result[day].aprem=true;
+      if(s.indexOf('Soir')===0) result[day].soir=true;
+    });
+  });
+  return result;
+}
+function initials(name){ return (name||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase(); }
+
+// ── VIEW TOGGLE ──
+function switchView(v){
+  currentView = v;
+  document.getElementById('map-view').style.display = v==='map' ? 'block' : 'none';
+  document.getElementById('grid-view').style.display = v==='grid' ? 'block' : 'none';
+  document.getElementById('btn-map').classList.toggle('act', v==='map');
+  document.getElementById('btn-grid').classList.toggle('act', v==='grid');
+  if(v==='map' && leafletMap) setTimeout(function(){ leafletMap.invalidateSize(); }, 50);
+  renderView();
+}
+
+// ── FIRESTORE ──
+function loadDirectory(){
+  db.collection('mechanics_public').get().then(function(snap){
+    allPros = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
+      .filter(function(p){ return p.active!==false; });
+    applyFilters();
+    checkReviewMode();
+  }).catch(function(e){
+    console.error('Firestore:', e);
+    document.getElementById('cards-grid').innerHTML = '<div class="pro-empty"><div class="pro-empty-icon">⚠️</div>Erreur de chargement</div>';
+  });
+}
+
+function applyFilters(){
+  var search = (document.getElementById('search-input').value||'').toLowerCase().trim();
+  var typeF = document.getElementById('filter-type').value;
+  var certF = parseInt(document.getElementById('filter-cert').value||'0');
+  var villeF = document.getElementById('filter-ville').value;
+
+  filteredPros = allPros.filter(function(p){
+    if(typeF && p.type!==typeF) return false;
+    if(villeF && p.city!==villeF) return false;
+    if(certF && (p.certification||0)<certF) return false;
+    if(search){
+      var hay=((p.name||'')+(p.city||'')+(p.services||'')+(p.vehicle_types||'')).toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+  renderView();
+}
+
+function renderView(){
+  if(currentView==='map') renderMap();
+  else renderGrid();
+}
+
+// ── MAP ──
+function initMap(){
+  leafletMap = L.map('greaz-map', {
+    center:[45.5017,-73.5673],
+    zoom:12,
+    zoomControl:false,
+    attributionControl:true,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    maxZoom:19,
+  }).addTo(leafletMap);
+
+  // Geolocate on load
+  geolocateMe();
+}
+
+function geolocateMe(){
+  if(!navigator.geolocation || !leafletMap) return;
+  navigator.geolocation.getCurrentPosition(function(pos){
+    leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 13);
+    L.circleMarker([pos.coords.latitude, pos.coords.longitude], {
+      radius:8, fillColor:'#1A3CFF', color:'white', weight:2, fillOpacity:1,
+    }).addTo(leafletMap).bindPopup('<div style="font-family:DM Sans,sans-serif;font-size:13px;color:#0A0C1B">📍 <strong>Vous êtes ici</strong></div>');
+  }, function(){
+    // Permission refused - stay on Montreal
+  });
+}
+
+function renderMap(){
+  if(!leafletMap) return;
+
+  // Clear existing markers
+  leafletMarkers.forEach(function(m){ leafletMap.removeLayer(m); });
+  leafletMarkers = [];
+
+  var count = 0;
+  filteredPros.forEach(function(p){
+    var lat = parseFloat(p.lat);
+    var lng = parseFloat(p.lng);
+    if(!lat || !lng || isNaN(lat) || isNaN(lng)) return;
+
+    count++;
+    var cert = CERT[p.certification||0];
+    var price = lowestPrice(p.pricing);
+    var isGarage = p.type==='garage';
+    var ini = initials(p.name);
+
+    var certDot = cert ? '<div class="gz-cert-dot '+cert.cls+'">✦</div>' : '';
+    var priceTag = price ? '<div class="gz-price-tag">À partir de '+price+'</div>' : '';
+
+    var icon = L.divIcon({
+      html: '<div class="gz-marker-wrap">'
+        +'<div class="gz-marker '+(isGarage?'garage':'mec')+'">'+ini+certDot+'</div>'
+        +'<div class="gz-marker-tail"></div>'
+        +priceTag
+        +'</div>',
+      className:'',
+      iconSize:[52,68],
+      iconAnchor:[26,68],
+      popupAnchor:[0,-70],
+    });
+
+    var marker = L.marker([lat,lng], {icon:icon}).addTo(leafletMap);
+
+    var certBadge = cert ? '<span style="background:rgba(0,0,0,.3);border:1px solid '+cert.color+';color:'+cert.color+';font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:4px">'+cert.stars+' '+cert.label+'</span>' : '';
+    var priceHtml = price ? '<div style="font-size:14px;font-weight:700;color:#00C26F;margin:6px 0">À partir de '+price+'</div>' : '';
+
+    marker.bindPopup(
+      '<div class="gz-popup-inner">'
+      +'<div class="gz-popup-name">'+p.name+'</div>'
+      +(cert?'<div>'+certBadge+'</div>':'')
+      +'<div class="gz-popup-meta" style="margin-top:6px">📍 '+(p.city||'—')+' · '+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</div>'
+      +'<div class="gz-popup-rating" id="map-rating-'+p.id+'">Chargement...</div>'
+      +priceHtml
+      +'<button class="gz-popup-btn" onclick="openProfile(\''+p.id+'\')">Voir le profil →</button>'
+      +'</div>',
+      { className:'gz-popup', maxWidth:260, minWidth:220 }
+    );
+
+    marker.on('popupopen', function(){
+      loadRatingSummary(p.id, 'map-rating-'+p.id);
+    });
+
+    leafletMarkers.push(marker);
+  });
+
+  document.getElementById('results-count-map').textContent = count + ' pro'+(count!==1?'s':'')+' visible'+(count!==1?'s':'')+' sur la carte';
+  if(count===0){
+    document.getElementById('results-count-map').textContent = 'Aucun pro avec coordonnées GPS — publie des pros depuis le dashboard';
+  }
+}
+
+// ── GRID ──
+function renderGrid(){
+  var el = document.getElementById('cards-grid');
+  var countEl = document.getElementById('results-count-grid');
+  if(!filteredPros.length){
+    countEl.textContent = '';
+    el.innerHTML = '<div class="pro-empty"><div class="pro-empty-icon">'+(allPros.length===0?'⏳':'🔧')+'</div>'+(allPros.length===0?'Chargement de l\'annuaire...':'Aucun résultat')+'</div>';
+    return;
+  }
+  countEl.textContent = filteredPros.length+' professionnel'+(filteredPros.length!==1?'s':'')+' disponible'+(filteredPros.length!==1?'s':'');
+
+  el.innerHTML = filteredPros.map(function(p){
+    var cert = CERT[p.certification||0];
+    var price = lowestPrice(p.pricing);
+    var isGarage = p.type==='garage';
+    var ini = initials(p.name);
+    var svcTags = (p.services||'').split(',').filter(Boolean).slice(0,3).map(function(s){
+      return '<span class="pro-tag">'+s.trim()+'</span>';
+    }).join('');
+
+    var avatarStyle = p.photo_url
+      ? 'background-image:url('+p.photo_url+');background-size:cover;background-position:center;font-size:0'
+      : '';
+    var avatarContent = p.photo_url ? '' : ini;
+
+    return '<div class="pro-card" onclick="openProfile(\''+p.id+'\')">'
+      +'<div class="pro-top">'
+      +'<div class="pro-avatar '+(isGarage?'garage':'mec')+'" style="'+avatarStyle+'">'+avatarContent+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div class="pro-name">'+p.name+'</div>'
+      +'<div class="pro-meta">📍 '+(p.city||'—')+(p.rayon?' · 🚗 '+p.rayon:'')+'</div>'
+      +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
+      +(cert?'<div>'+certBadgeHtml(p.certification)+'</div>':'')
+      +'</div></div>'
+      +(price?'<div class="pro-price">À partir de '+price+'</div>':'')
+      +'<div class="pro-rating" id="grid-rating-'+p.id+'">···</div>'
+      +(svcTags?'<div class="pro-tags">'+svcTags+'</div>':'')
+      +'</div>';
+  }).join('');
+
+  filteredPros.forEach(function(p){ loadRatingSummary(p.id, 'grid-rating-'+p.id); });
+}
+
+function loadRatingSummary(id, elId){
+  db.collection('reviews').where('mechanic_id','==',id).get().then(function(snap){
+    var el = document.getElementById(elId); if(!el) return;
+    if(snap.empty){ el.innerHTML='<span style="color:rgba(255,255,255,.3);font-size:12px">Pas encore d\'avis</span>'; return; }
+    var total=0; snap.forEach(function(d){ total+=(d.data().rating||0); });
+    var avg = total/snap.size;
+    var stars='';
+    for(var i=1;i<=5;i++) stars += i<=Math.round(avg)?'<span style="color:#FBBF24">★</span>':'<span style="color:rgba(255,255,255,.2)">★</span>';
+    el.innerHTML = stars+' <strong style="color:white">'+avg.toFixed(1)+'</strong><span class="count" style="margin-left:4px">('+snap.size+')</span>';
+  }).catch(function(){});
+}
+
+// ── PROFIL ──
+function openProfile(id){
+  var p = allPros.find(function(x){ return x.id===id; });
+  if(!p) return;
+  currentProfile = p;
+  var isGarage = p.type==='garage';
+  var ini = initials(p.name);
+  var cert = CERT[p.certification||0];
+  var price = lowestPrice(p.pricing);
+  var pricing = parsePricing(p.pricing);
+  var sched = parseSchedule(p.schedule);
+
+  var vehTags = (p.vehicle_types||'').split(',').filter(Boolean).map(function(v){ return '<span class="pro-tag">'+v.trim()+'</span>'; }).join('');
+  var svcTags = (p.services||'').split(',').filter(Boolean).map(function(v){ return '<span class="pro-tag">'+v.trim()+'</span>'; }).join('');
+
+  var availRows = DAYS.map(function(d){
+    return '<div class="avail-day">'+d.slice(0,3)+'</div>'
+      +['matin','aprem','soir'].map(function(s){
+        return '<div class="avail-cell"><div class="avail-dot'+(sched[d][s]?' on':'')+'"></div></div>';
+      }).join('');
+  }).join('');
+
+  var pricingTable = pricing.length
+    ? '<table class="pricing-table">'+pricing.map(function(item){
+        return '<tr><td class="svc">'+item.service+'</td><td class="price">'+item.price+'</td></tr>';
+      }).join('')+'</table>'
+    : '<div style="font-size:12.5px;color:rgba(255,255,255,.35)">Prix non renseignés</div>';
+
+  var avatarStyle = p.photo_url
+    ? 'background-image:url('+p.photo_url+');background-size:cover;background-position:center;font-size:0'
+    : '';
+  var avatarContent = p.photo_url ? '' : ini;
+
+  document.getElementById('profile-drawer-title').textContent = p.name;
+  document.getElementById('profile-drawer-body').innerHTML =
+    '<div class="profile-head">'
+    +'<div class="profile-avatar '+(isGarage?'garage':'mec')+'" style="'+avatarStyle+'">'+avatarContent+'</div>'
+    +'<div><div style="font-size:17px;font-weight:700">'+p.name+'</div>'
+    +'<div style="font-size:12.5px;color:rgba(255,255,255,.5);margin-top:2px">📍 '+(p.city||'—')+(p.rayon?' · Rayon '+p.rayon:'')+'</div>'
+    +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'" style="margin-top:5px">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
+    +(cert?'<div style="margin-top:5px">'+certBadgeHtml(p.certification)+'</div>':'')
+    +'</div></div>'
+
+    +(p.bio?'<div class="profile-bio">"'+p.bio+'"</div>':'')
+
+    +'<div class="profile-section-title">Avis clients</div>'
+    +'<div id="prating-'+p.id+'"><div style="color:rgba(255,255,255,.3);font-size:13px">Chargement...</div></div>'
+    +'<div id="reviews-list-'+p.id+'"></div>'
+    +'<button class="btn-book" style="margin-top:1rem;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#FBBF24" onclick="openDirectReview(\''+p.id+'\')">⭐ Laisser un avis</button>'
+
+    +'<div class="profile-section-title">Tarifs</div>'
+    +pricingTable
+
+    +(vehTags?'<div class="profile-section-title">Véhicules acceptés</div><div class="pro-tags">'+vehTags+'</div>':'')
+    +(svcTags?'<div class="profile-section-title">Services offerts</div><div class="pro-tags">'+svcTags+'</div>':'')
+
+    +'<div class="profile-section-title">Disponibilités habituelles</div>'
+    +'<div class="avail-grid">'
+    +'<div class="avail-head">Jour</div><div class="avail-head">Mat.</div><div class="avail-head">P-M</div><div class="avail-head">Soir</div>'
+    +availRows+'</div>'
+
+    +'<button class="btn-book" style="margin-top:1.5rem" onclick="openBooking(\''+p.id+'\')">📅 Demander un rendez-vous</button>';
+
+  document.getElementById('overlay-profile').classList.add('open');
+  document.body.style.overflow='hidden';
+  loadFullRating(p.id);
+  loadFullReviews(p.id);
+}
+
+function loadFullRating(id){
+  db.collection('reviews').where('mechanic_id','==',id).get().then(function(snap){
+    var el=document.getElementById('prating-'+id); if(!el) return;
+    if(snap.empty){
+      el.innerHTML='<div style="text-align:center;padding:1rem 0;color:rgba(255,255,255,.35);font-size:13px">Aucun avis — sois le premier !</div>';
+      return;
+    }
+    var total=0, dist={1:0,2:0,3:0,4:0,5:0};
+    snap.forEach(function(d){ var r=d.data().rating||0; total+=r; if(dist[r]!==undefined) dist[r]++; });
+    var avg=total/snap.size, count=snap.size;
+
+    var starsDisp='';
+    for(var i=1;i<=5;i++) starsDisp += i<=Math.round(avg)?'<span style="color:#FBBF24;font-size:18px">★</span>':'<span style="color:rgba(255,255,255,.2);font-size:18px">★</span>';
+
+    var bars='';
+    for(var star=5;star>=1;star--){
+      var pct=count>0?(dist[star]/count*100):0;
+      bars+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">'
+        +'<span style="font-size:11px;color:rgba(255,255,255,.5);min-width:8px;text-align:right">'+star+'</span>'
+        +'<div style="flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:3px">'
+        +'<div style="height:5px;background:#FBBF24;border-radius:3px;width:'+pct+'%;transition:width .4s"></div>'
+        +'</div>'
+        +'<span style="font-size:10px;color:rgba(255,255,255,.35);min-width:16px;text-align:right">'+dist[star]+'</span>'
+        +'</div>';
+    }
+
+    el.innerHTML='<div style="display:flex;align-items:center;gap:20px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:12px">'
+      +'<div style="text-align:center;flex-shrink:0">'
+      +'<div style="font-family:Bricolage Grotesque,sans-serif;font-size:3.2rem;font-weight:800;line-height:1;letter-spacing:-.05em;color:white">'+avg.toFixed(1)+'</div>'
+      +'<div style="margin:6px 0">'+starsDisp+'</div>'
+      +'<div style="font-size:11px;color:rgba(255,255,255,.4)">'+count+' avis</div>'
+      +'</div>'
+      +'<div style="flex:1">'+bars+'</div>'
+      +'</div>';
+  }).catch(function(){});
+}
+
+function loadFullReviews(id){
+  db.collection('reviews').where('mechanic_id','==',id).get().then(function(snap){
+    var el=document.getElementById('reviews-list-'+id); if(!el) return;
+    if(!snap.size) return;
+    var reviews=snap.docs.map(function(d){return d.data();});
+    reviews.sort(function(a,b){
+      var da=a.created_at&&a.created_at.toDate?a.created_at.toDate():new Date(0);
+      var db2=b.created_at&&b.created_at.toDate?b.created_at.toDate():new Date(0);
+      return db2-da;
+    });
+    el.innerHTML=reviews.map(function(r){
+      var stars='';
+      for(var i=1;i<=5;i++) stars+=i<=(r.rating||0)?'★':'☆';
+      var dateStr='';
+      if(r.created_at&&r.created_at.toDate){
+        dateStr=r.created_at.toDate().toLocaleDateString('fr-CA',{day:'numeric',month:'long',year:'numeric'});
+      }
+      return '<div class="review-item">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+        +'<div><span style="font-weight:600;font-size:13px;color:white">'+(r.author_name||'Client Greaz')+'</span>'
+        +(dateStr?'<div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:1px">'+dateStr+'</div>':'')
+        +'</div>'
+        +'<div style="color:#FBBF24;font-size:13px;letter-spacing:1px">'+stars+'</div>'
+        +'</div>'
+        +'<div class="review-text">'+(r.comment||'')+'</div>'
+        +'</div>';
+    }).join('');
+  }).catch(function(){});
+}
+
+// ── RÉSERVATION ──
+function openBooking(id){
+  var p=allPros.find(function(x){return x.id===id;}); if(!p) return;
+  currentProfile=p; _bookingProblem=""; selSlot="";
+  var isGarage=p.type==='garage';
+  var probCards=PROBLEMS.map(function(pr){
+    return '<div class="prob-btn" id="bprob-'+pr.id+'" onclick="selBProblem(\''+pr.id+'\')">'
+      +'<span class="prob-icon">'+pr.icon+'</span><div class="prob-label">'+pr.label+'</div></div>';
+  }).join("");
+  var today=new Date().toISOString().slice(0,10);
+  var yearsOpts=''; for(var y=2026;y>=2000;y--) yearsOpts+='<option>'+y+'</option>';
+  document.getElementById('booking-drawer-body').innerHTML=
+    '<div class="alert-err" id="booking-err"></div>'
+    +'<div style="background:rgba(26,60,255,.08);border:1px solid rgba(26,60,255,.2);border-radius:var(--r2);padding:10px 14px;font-size:12.5px;color:rgba(255,255,255,.7);margin-bottom:1.25rem">Rendez-vous avec <strong style="color:white">'+p.name+'</strong></div>'
+
+    +'<div class="ff"><label>Type de véhicule *</label><select id="b_vtype"><option value="">— Choisir —</option><option>Voiture / VUS</option><option>Camionnette</option><option>Moto / Scooter</option><option>Van / Minivan</option><option>VR / Motorisé</option><option>Bateau</option><option>Autre</option></select></div>'
+    +'<div class="ff2"><div class="ff"><label>Marque</label><input type="text" id="b_make" placeholder="Toyota, Honda, BMW..."></div>'
+    +'<div class="ff"><label>Année</label><select id="b_year"><option value="">Année</option>'+yearsOpts+'</select></div></div>'
+    +'<div class="ff"><label>Modèle</label><input type="text" id="b_model" placeholder="ex. Corolla, F-150, Civic..."></div>'
+
+    +'<div class="ff"><label>Date souhaitée *</label><input type="date" id="b_date" min="'+today+'" onchange="updateSlots()"></div>'
+    +'<div class="ff"><label>Plage horaire *</label><div class="slot-pick-row">'
+    +'<button type="button" class="slot-pick-btn" id="bslot-matin" onclick="selBSlot(\'matin\')" disabled>Matin</button>'
+    +'<button type="button" class="slot-pick-btn" id="bslot-aprem" onclick="selBSlot(\'aprem\')" disabled>Après-midi</button>'
+    +'<button type="button" class="slot-pick-btn" id="bslot-soir" onclick="selBSlot(\'soir\')" disabled>Soir</button>'
+    +'</div><div class="slot-empty-msg" id="slot-empty-msg" style="display:none">Ce professionnel n\'est pas disponible ce jour.</div></div>'
+    +'<div class="ff" style="margin-top:1.25rem"><label>Problème</label></div>'
+    +'<div class="problem-grid">'+probCards+'</div>'
+    +'<div class="ff"><label>Détails (optionnel)</label><textarea id="b_desc" rows="2" placeholder="Ex : bruit au freinage..."></textarea></div>'
+    +'<div class="ff2"><div class="ff"><label>Prénom *</label><input type="text" id="b_prenom" placeholder="Jean"></div>'
+    +'<div class="ff"><label>Nom *</label><input type="text" id="b_nom" placeholder="Tremblay"></div></div>'
+    +'<div class="ff2">'
+    +'<div class="ff"><label>Téléphone *</label><input type="tel" id="b_phone" placeholder="514-555-0100" oninput="vPhone(this)"><div id="bphone-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Numéro canadien invalide</div></div>'
+    +'<div class="ff"><label>Courriel *</label><input type="email" id="b_email" placeholder="jean@email.com" oninput="vEmail(this)"><div id="bemail-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Courriel invalide</div></div>'
+    +'</div>'
+    +(isGarage?'':'<div class="ff"><label>Adresse *</label><input type="text" id="b_addr" placeholder="1234 Rue Principale, Montréal"></div>')
+    +'<button class="btn-book" id="booking-submit-btn" onclick="submitBooking()">Envoyer ma demande →</button>';
+  document.getElementById('overlay-booking').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function updateSlots(){
+  var dateVal=document.getElementById('b_date').value;
+  var msg=document.getElementById('slot-empty-msg');
+  ['matin','aprem','soir'].forEach(function(s){ document.getElementById('bslot-'+s).disabled=true; document.getElementById('bslot-'+s).classList.remove('sel'); });
+  selSlot="";
+  if(!dateVal||!currentProfile) return;
+  var sched=parseSchedule(currentProfile.schedule);
+  var dow=DOW_MAP[new Date(dateVal+'T00:00:00').getDay()];
+  var day=sched[dow]||{matin:false,aprem:false,soir:false};
+  var any=false;
+  ['matin','aprem','soir'].forEach(function(s){ if(day[s]){ document.getElementById('bslot-'+s).disabled=false; any=true; } });
+  msg.style.display=any?'none':'block';
+}
+function selBSlot(s){
+  if(document.getElementById('bslot-'+s).disabled) return;
+  selSlot=s;
+  ['matin','aprem','soir'].forEach(function(x){ document.getElementById('bslot-'+x).classList.remove('sel'); });
+  document.getElementById('bslot-'+s).classList.add('sel');
+}
+function selBProblem(id){
+  _bookingProblem=id;
+  document.querySelectorAll('.problem-grid .prob-btn').forEach(function(el){ el.classList.remove('sel'); });
+  document.getElementById('bprob-'+id).classList.add('sel');
+}
+function vPhone(el){
+  var clean=el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var ok=/^[2-9]\d{2}[2-9]\d{6}$/.test(clean)&&clean.length===10;
+  el.style.borderColor=el.value.length>3?(ok?"#00C26F":"#f87171"):"";
+  var e=document.getElementById("bphone-err"); if(e) e.style.display=el.value.length>3&&!ok?"block":"none";
+}
+function vEmail(el){
+  var ok=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
+  el.style.borderColor=el.value.length>3?(ok?"#00C26F":"#f87171"):"";
+  var e=document.getElementById("bemail-err"); if(e) e.style.display=el.value.length>3&&!ok?"block":"none";
+}
+
+async function submitBooking(){
+  var errEl=document.getElementById('booking-err'), btn=document.getElementById('booking-submit-btn');
+  errEl.style.display='none';
+  var date=document.getElementById('b_date').value;
+  var prenom=(document.getElementById('b_prenom').value||'').trim();
+  var nom=(document.getElementById('b_nom').value||'').trim();
+  var phone=(document.getElementById('b_phone').value||'').trim();
+  var email=(document.getElementById('b_email').value||'').trim();
+  var isGarage=currentProfile.type==='garage';
+  var addr=isGarage?'':(document.getElementById('b_addr')?document.getElementById('b_addr').value.trim():'');
+  var vtype=document.getElementById('b_vtype').value||'';
+  if(!date||!selSlot||!prenom||!phone||!email||!vtype||(!isGarage&&!addr)){
+    errEl.textContent="Veuillez remplir tous les champs obligatoires (*), incluant le type de véhicule."; errEl.style.display='block'; return;
+  }
+  var eOk=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  var pClean=phone.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var pOk=/^[2-9]\d{2}[2-9]\d{6}$/.test(pClean)&&pClean.length===10;
+  if(!eOk){ errEl.textContent="Courriel invalide."; errEl.style.display='block'; return; }
+  if(!pOk){ errEl.textContent="Numéro canadien invalide."; errEl.style.display='block'; return; }
+  var code="GZ-"+Math.floor(Math.random()*90000+10000);
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi...';
+  try {
+    await db.collection('appointments').add({
+      mechanic_id:currentProfile.id, mechanic_name:currentProfile.name, mechanic_type:currentProfile.type,
+      client_prenom:prenom, client_nom:nom, client_phone:phone, client_email:email, client_address:addr,
+      vehicle_type:document.getElementById('b_vtype').value||'',
+      vehicle_make:document.getElementById('b_make').value||'',
+      vehicle_model:document.getElementById('b_model').value||'',
+      vehicle_year:document.getElementById('b_year').value||'',
+      date:date, time_slot:selSlot, problem:_bookingProblem||'Non précisé',
+      description:document.getElementById('b_desc').value.trim(),
+      status:'en_attente', booking_code:code,
+      created_at:firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    document.getElementById('booking-drawer-body').innerHTML=
+      '<div class="success-screen"><span class="success-icon">✅</span>'
+      +'<div class="success-title">Demande envoyée !</div>'
+      +'<p class="success-sub">'+currentProfile.name+' va confirmer ton rendez-vous. On te contacte par SMS ou courriel.</p>'
+      +'<div class="success-code">'+code+'</div>'
+      +'<p style="font-size:11.5px;color:rgba(255,255,255,.4);margin-bottom:1.5rem">Ton code de référence</p>'
+      +'<button onclick="closeDrawer(\'booking\');closeDrawer(\'profile\')" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Compris ✓</button>'
+      +'</div>';
+  } catch(e){
+    errEl.textContent="Erreur : "+e.message; errEl.style.display='block';
+    btn.disabled=false; btn.textContent="Envoyer ma demande →";
+  }
+}
+
+// ── FORMULAIRE CLIENT (soumission rapide) ──
 function openDrawer(type){
   renderClientForm();
   document.getElementById("overlay-"+type).classList.add("open");
-  document.body.style.overflow = "hidden";
+  document.body.style.overflow="hidden";
 }
 function closeDrawer(type){
   document.getElementById("overlay-"+type).classList.remove("open");
-  document.body.style.overflow = "";
+  document.body.style.overflow="";
 }
-
 function selProblem(id){
-  _selProblem = id;
+  _selProblem=id;
   document.querySelectorAll(".prob-btn").forEach(function(el){ el.classList.remove("sel"); });
-  var el = document.getElementById("prob-"+id);
-  if(el) el.classList.add("sel");
+  var el=document.getElementById("prob-"+id); if(el) el.classList.add("sel");
 }
 function selUrgency(val){
-  _urgency = val;
+  _urgency=val;
   ["asap","24h","date"].forEach(function(u){ var el=document.getElementById("urg-"+u); if(el)el.classList.remove("sel"); });
-  var el = document.getElementById("urg-"+val); if(el) el.classList.add("sel");
-  var db2 = document.getElementById("date-block");
+  var el=document.getElementById("urg-"+val); if(el) el.classList.add("sel");
+  var db2=document.getElementById("date-block");
   if(db2){ if(val==="date") db2.classList.add("show"); else db2.classList.remove("show"); }
 }
 function selContact(val){
-  _contact_pref = val;
+  _contact_pref=val;
   ["both","sms","email"].forEach(function(c){ var el=document.getElementById("cont-"+c); if(el)el.classList.remove("sel"); });
-  var el = document.getElementById("cont-"+val); if(el) el.classList.add("sel");
+  var el=document.getElementById("cont-"+val); if(el) el.classList.add("sel");
 }
-
 function validatePhone(el){
-  var clean = el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
-  var valid = /^[2-9]\d{2}[2-9]\d{6}$/.test(clean) && clean.length===10;
-  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
-  var e=document.getElementById("phone-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
+  var clean=el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var ok=/^[2-9]\d{2}[2-9]\d{6}$/.test(clean)&&clean.length===10;
+  el.style.borderColor=el.value.length>3?(ok?"#00C26F":"#f87171"):"";
+  var e=document.getElementById("phone-err"); if(e) e.style.display=el.value.length>3&&!ok?"block":"none";
 }
 function validateEmail(el){
-  var valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
-  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
-  var e=document.getElementById("email-err"); if(e) e.style.display=el.value.length>3&&!valid?"block":"none";
+  var ok=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
+  el.style.borderColor=el.value.length>3?(ok?"#00C26F":"#f87171"):"";
+  var e=document.getElementById("email-err"); if(e) e.style.display=el.value.length>3&&!ok?"block":"none";
 }
 
-/* ── FORMULAIRE CLIENT (soumission) ── */
 function renderClientForm(){
   _urgency=""; _contact_pref="both"; _selProblem="";
-  var yearsOpts=""; for(var y=2025;y>=2000;y--) yearsOpts+="<option>"+y+"</option>";
-  var probCards = PROBLEMS.map(function(p){
+  var yearsOpts=""; for(var y=2026;y>=2000;y--) yearsOpts+="<option>"+y+"</option>";
+  var probCards=PROBLEMS.map(function(p){
     return '<div class="prob-btn" id="prob-'+p.id+'" onclick="selProblem(\''+p.id+'\')">'
       +'<span class="prob-icon">'+p.icon+'</span><div class="prob-label">'+p.label+'</div></div>';
   }).join("");
-
-  document.getElementById("drawer-client-body").innerHTML =
+  document.getElementById("drawer-client-body").innerHTML=
     '<div class="alert-err" id="client-err"></div>'
     +'<div class="form-section"><div class="form-section-title">Votre véhicule</div>'
-    +'<div class="ff2">'
-    +'<div class="ff"><label>Type</label><select id="c_vtype"><option value="">— Choisir —</option><option>Voiture / VUS</option><option>Moto</option><option>Van / Minivan</option><option>VR / Motorisé</option><option>Bateau</option></select></div>'
-    +'<div class="ff"><label>Marque</label><select id="c_make"><option value="">— Marque —</option><option>Toyota</option><option>Honda</option><option>Ford</option><option>Chevrolet</option><option>BMW</option><option>Mercedes</option><option>Hyundai</option><option>Kia</option><option>Mazda</option><option>Subaru</option><option>Nissan</option><option>Autre</option></select></div>'
-    +'</div>'
-    +'<div class="ff2">'
-    +'<div class="ff"><label>Modèle</label><input type="text" id="c_model" placeholder="ex. Corolla"></div>'
-    +'<div class="ff"><label>Année</label><select id="c_year"><option value="">Année</option>'+yearsOpts+'</select></div>'
-    +'</div></div>'
+    +'<div class="ff2"><div class="ff"><label>Type</label><select id="c_vtype"><option value="">— Choisir —</option><option>Voiture / VUS</option><option>Moto</option><option>Van / Minivan</option><option>VR / Motorisé</option><option>Bateau</option></select></div>'
+    +'<div class="ff"><label>Marque</label><select id="c_make"><option value="">— Marque —</option><option>Toyota</option><option>Honda</option><option>Ford</option><option>Chevrolet</option><option>BMW</option><option>Mercedes</option><option>Hyundai</option><option>Kia</option><option>Mazda</option><option>Subaru</option><option>Nissan</option><option>Autre</option></select></div></div>'
+    +'<div class="ff2"><div class="ff"><label>Modèle</label><input type="text" id="c_model" placeholder="ex. Corolla"></div>'
+    +'<div class="ff"><label>Année</label><select id="c_year"><option value="">Année</option>'+yearsOpts+'</select></div></div></div>'
     +'<div class="form-section"><div class="form-section-title">Votre problème</div>'
     +'<div class="problem-grid">'+probCards+'</div>'
-    +'<div class="ff"><label>Décrivez en détail (optionnel)</label><textarea id="c_desc" rows="2" placeholder="Ex : bruit au freinage, voyant allumé..."></textarea></div></div>'
+    +'<div class="ff"><label>Décrivez (optionnel)</label><textarea id="c_desc" rows="2" placeholder="Ex : bruit au freinage, voyant allumé..."></textarea></div></div>'
     +'<div class="form-section"><div class="form-section-title">Urgence</div>'
     +'<div class="urgency-grid">'
     +'<div class="urg-btn" id="urg-asap" onclick="selUrgency(\'asap\')"><span class="urg-icon">🚨</span><div class="urg-label">Dès que possible</div><div class="urg-sub">Quelques heures</div></div>'
     +'<div class="urg-btn" id="urg-24h" onclick="selUrgency(\'24h\')"><span class="urg-icon">⏰</span><div class="urg-label">Sous 24h</div><div class="urg-sub">D\'ici demain</div></div>'
     +'<div class="urg-btn" id="urg-date" onclick="selUrgency(\'date\')"><span class="urg-icon">📅</span><div class="urg-label">Je propose une date</div><div class="urg-sub">À mon rythme</div></div>'
-    +'</div>'
-    +'<div class="date-block" id="date-block"><div class="ff2">'
-    +'<div class="ff"><label>Date souhaitée</label><input type="date" id="c_date"></div>'
-    +'<div class="ff"><label>Heure souhaitée</label><input type="time" id="c_time" value="10:00"></div>'
+    +'</div><div class="date-block" id="date-block"><div class="ff2">'
+    +'<div class="ff"><label>Date</label><input type="date" id="c_date"></div>'
+    +'<div class="ff"><label>Heure</label><input type="time" id="c_time" value="10:00"></div>'
     +'</div></div></div>'
     +'<div class="form-section"><div class="form-section-title">Vos informations</div>'
-    +'<div class="ff2">'
-    +'<div class="ff"><label>Prénom *</label><input type="text" id="c_prenom" placeholder="Jean"></div>'
-    +'<div class="ff"><label>Nom *</label><input type="text" id="c_nom" placeholder="Tremblay"></div>'
-    +'</div>'
+    +'<div class="ff2"><div class="ff"><label>Prénom *</label><input type="text" id="c_prenom" placeholder="Jean"></div>'
+    +'<div class="ff"><label>Nom *</label><input type="text" id="c_nom" placeholder="Tremblay"></div></div>'
     +'<div class="ff2">'
     +'<div class="ff"><label>Téléphone *</label><input type="tel" id="c_phone" placeholder="514-555-0100" oninput="validatePhone(this)"><div id="phone-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Numéro canadien invalide</div></div>'
     +'<div class="ff"><label>Courriel *</label><input type="email" id="c_email" placeholder="jean@email.com" oninput="validateEmail(this)"><div id="email-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Courriel invalide</div></div>'
-    +'</div>'
-    +'<div class="ff"><label>Adresse d\'intervention *</label><input type="text" id="c_addr" placeholder="1234 Rue Principale, Montréal, QC H2X 1Y4"></div>'
-    +'</div>'
+    +'</div><div class="ff"><label>Adresse *</label><input type="text" id="c_addr" placeholder="1234 Rue Principale, Montréal, QC H2X 1Y4"></div></div>'
     +'<div class="form-section"><div class="form-section-title">Comment vous répondre ?</div>'
     +'<div class="contact-row">'
     +'<div class="contact-pill sel" id="cont-both" onclick="selContact(\'both\')">📱 SMS + courriel</div>'
-    +'<div class="contact-pill" id="cont-sms" onclick="selContact(\'sms\')">💬 SMS seulement</div>'
-    +'<div class="contact-pill" id="cont-email" onclick="selContact(\'email\')">📧 Courriel seulement</div>'
+    +'<div class="contact-pill" id="cont-sms" onclick="selContact(\'sms\')">💬 SMS</div>'
+    +'<div class="contact-pill" id="cont-email" onclick="selContact(\'email\')">📧 Courriel</div>'
     +'</div></div>'
     +'<button class="btn-submit blue" id="client-submit-btn" onclick="submitClient()">Envoyer ma demande →</button>';
 }
 
-/* ── SUBMIT CLIENT (soumission) ── */
 async function submitClient(){
   var errEl=document.getElementById("client-err"), btn=document.getElementById("client-submit-btn");
   errEl.style.display="none";
@@ -597,24 +1066,19 @@ async function submitClient(){
   var phone=(document.getElementById("c_phone").value||"").trim();
   var email=(document.getElementById("c_email").value||"").trim();
   var addr=(document.getElementById("c_addr").value||"").trim();
-
-  if(!prenom||!phone||!email||!addr){ errEl.textContent="Veuillez remplir tous les champs obligatoires (*)."; errEl.style.display="block"; return; }
-
-  var emailValid=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
-  var phoneClean=phone.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
-  var phoneValid=/^[2-9]\d{2}[2-9]\d{6}$/.test(phoneClean)&&phoneClean.length===10;
-
-  if(!emailValid){ errEl.textContent="L'adresse courriel est invalide. Ex : jean@gmail.com"; errEl.style.display="block"; document.getElementById("c_email").style.borderColor="#f87171"; return; }
-  if(!phoneValid){ errEl.textContent="Le numéro doit être un numéro canadien valide à 10 chiffres. Ex : 514-555-0100"; errEl.style.display="block"; document.getElementById("c_phone").style.borderColor="#f87171"; return; }
-
+  if(!prenom||!phone||!email||!addr){ errEl.textContent="Veuillez remplir tous les champs (*)."; errEl.style.display="block"; return; }
+  var eOk=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  var pClean=phone.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
+  var pOk=/^[2-9]\d{2}[2-9]\d{6}$/.test(pClean)&&pClean.length===10;
+  if(!eOk){ errEl.textContent="Courriel invalide."; errEl.style.display="block"; document.getElementById("c_email").style.borderColor="#f87171"; return; }
+  if(!pOk){ errEl.textContent="Numéro canadien invalide."; errEl.style.display="block"; document.getElementById("c_phone").style.borderColor="#f87171"; return; }
   var date=document.getElementById("c_date").value||"";
   var time=document.getElementById("c_time").value||"";
   var urgLabel=_urgency==="asap"?"Dès que possible":_urgency==="24h"?"Sous 24h":_urgency==="date"?(date+" à "+time):"Non précisé";
   var code="GZ-"+Math.floor(Math.random()*90000+10000);
-
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi en cours...';
   try {
-    var leadData = {
+    var leadData={
       type:"client", client_name:prenom+" "+nom, client_phone:phone, client_email:email, address:addr,
       vehicle_type:document.getElementById("c_vtype").value||"",
       vehicle_make:document.getElementById("c_make").value||"",
@@ -628,12 +1092,12 @@ async function submitClient(){
     };
     await db.collection("leads").add(leadData);
     notifierNouvelleDemandeClient(leadData);
-    var contactLabel=_contact_pref==="sms"?"SMS":_contact_pref==="email"?"courriel":"SMS et courriel";
-    var urgReply=_urgency==="asap"?"dans l'heure":"sous 24h";
+    var cLabel=_contact_pref==="sms"?"SMS":_contact_pref==="email"?"courriel":"SMS et courriel";
+    var uReply=_urgency==="asap"?"dans l'heure":"sous 24h";
     document.getElementById("drawer-client-body").innerHTML=
       '<div class="success-screen"><span class="success-icon">✅</span>'
       +'<div class="success-title">Demande reçue !</div>'
-      +'<p class="success-sub">L\'équipe Greaz va vous envoyer une <strong style="color:white">soumission gratuite</strong> '+urgReply+' par '+contactLabel+'.</p>'
+      +'<p class="success-sub">L\'équipe Greaz va vous envoyer une <strong style="color:white">soumission gratuite</strong> '+uReply+' par '+cLabel+'.</p>'
       +'<div class="success-code">'+code+'</div>'
       +'<p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:2rem">Votre code de référence</p>'
       +'<button onclick="closeDrawer(\'client\')" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Compris ✓</button>'
@@ -644,429 +1108,118 @@ async function submitClient(){
   }
 }
 
-/* ══════════ ANNUAIRE — état & logique ══════════ */
-var DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-var DOW_MAP = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-var SLOT_LABELS = { matin:'Matin (8h-12h)', aprem:'Après-midi (12h-17h)', soir:'Soir (17h-21h)' };
-
-var allPros = [];
-var currentProfile = null;
-var _bookingProblem = "";
-var selSlot = "";
-
-function parseSchedule(str){
-  var result = {};
-  DAYS.forEach(function(d){ result[d] = {matin:false,aprem:false,soir:false}; });
-  if(!str || str === 'Non précisé') return result;
-  String(str).split('|').forEach(function(chunk){
-    var parts = chunk.split(':');
-    if(parts.length < 2) return;
-    var day = parts[0].trim();
-    if(!result[day]) return;
-    var slots = parts.slice(1).join(':').split(',').map(function(s){return s.trim();});
-    slots.forEach(function(s){
-      if(s.indexOf('Matin')===0) result[day].matin = true;
-      if(s.indexOf('Après-midi')===0) result[day].aprem = true;
-      if(s.indexOf('Soir')===0) result[day].soir = true;
-    });
-  });
-  return result;
-}
-
-function starsHtml(avg){
-  var full = Math.round(avg||0);
-  var s = '';
-  for(var i=1;i<=5;i++){ s += i<=full ? '★' : '☆'; }
-  return s;
-}
-
-function loadDirectory(){
-  db.collection('mechanics_public').get().then(function(snap){
-    allPros = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
-      .filter(function(p){ return p.active !== false; });
-    renderDirectory();
-    checkReviewMode();
-  }).catch(function(e){
-    document.getElementById('cards-grid').innerHTML =
-      '<div class="pro-empty"><div class="pro-empty-icon">⚠️</div>Erreur de chargement : '+e.message+'</div>';
-  });
-}
-
-function renderDirectory(){
-  var search = (document.getElementById('search-input').value||'').toLowerCase().trim();
-  var typeFilter = document.getElementById('filter-type').value;
-  var villeFilter = document.getElementById('filter-ville').value;
-
-  var list = allPros.filter(function(p){
-    if(typeFilter && p.type !== typeFilter) return false;
-    if(villeFilter && p.city !== villeFilter) return false;
-    if(search){
-      var hay = ((p.name||'')+(p.city||'')+(p.services||'')+(p.vehicle_types||'')).toLowerCase();
-      if(!hay.includes(search)) return false;
-    }
-    return true;
-  });
-
-  document.getElementById('results-count').textContent =
-    list.length + ' professionnel' + (list.length!==1?'s':'') + ' disponible' + (list.length!==1?'s':'');
-
-  var grid = document.getElementById('cards-grid');
-  if(list.length === 0){
-    grid.innerHTML = '<div class="pro-empty"><div class="pro-empty-icon">🔧</div>'
-      + (allPros.length===0 ? "L'annuaire est encore vide — reviens bientôt !" : "Aucun résultat pour cette recherche.")
-      + '</div>';
-    return;
-  }
-
-  grid.innerHTML = list.map(function(p){
-    var initials = (p.name||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
-    var isGarage = p.type === 'garage';
-    var svcTags = (p.services||'').split(',').filter(Boolean).slice(0,3).map(function(s){
-      return '<span class="pro-tag">'+s.trim()+'</span>';
-    }).join('');
-
-    return '<div class="pro-card" onclick="openProfile(\''+p.id+'\')">'
-      +'<div class="pro-top">'
-      +'<div class="pro-avatar'+(isGarage?' garage':'')+'">'+initials+'</div>'
-      +'<div class="pro-info">'
-      +'<div class="pro-name">'+(p.name||'—')+'</div>'
-      +'<div class="pro-meta">📍 '+(p.city||'—')+(p.rayon?' · 🚗 '+p.rayon:'')+'</div>'
-      +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
-      +'</div></div>'
-      +'<div class="pro-rating" id="rating-'+p.id+'">···</div>'
-      +(svcTags ? '<div class="pro-tags">'+svcTags+'</div>' : '')
-      +'</div>';
-  }).join('');
-
-  list.forEach(function(p){ loadRatingSummary(p.id); });
-}
-
-function loadRatingSummary(mechanicId){
-  db.collection('reviews').where('mechanic_id','==',mechanicId).get().then(function(snap){
-    var el = document.getElementById('rating-'+mechanicId);
-    if(!el) return;
-    if(snap.empty){ el.innerHTML = '<span style="color:rgba(255,255,255,.3)">Pas encore d\'avis</span>'; return; }
-    var total = 0;
-    snap.forEach(function(d){ total += (d.data().rating||0); });
-    var avg = total / snap.size;
-    el.innerHTML = starsHtml(avg) + ' ' + avg.toFixed(1) + '<span class="count">(' + snap.size + ' avis)</span>';
-  }).catch(function(){});
-}
-
-/* ── PROFIL ── */
-function openProfile(id){
-  var p = allPros.find(function(x){ return x.id === id; });
-  if(!p) return;
-  currentProfile = p;
-
-  var isGarage = p.type === 'garage';
-  var initials = (p.name||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
-  var sched = parseSchedule(p.schedule);
-  var vehTags = (p.vehicle_types||'').split(',').filter(Boolean).map(function(v){ return '<span class="pro-tag">'+v.trim()+'</span>'; }).join('');
-  var svcTags = (p.services||'').split(',').filter(Boolean).map(function(v){ return '<span class="pro-tag">'+v.trim()+'</span>'; }).join('');
-
-  var availRows = DAYS.map(function(d){
-    return '<div class="avail-day">'+d.slice(0,3)+'</div>'
-      + ['matin','aprem','soir'].map(function(s){
-          return '<div class="avail-cell"><div class="avail-dot'+(sched[d][s]?' on':'')+'"></div></div>';
-        }).join('');
-  }).join('');
-
-  document.getElementById('profile-drawer-title').textContent = p.name;
-  document.getElementById('profile-drawer-body').innerHTML =
-    '<div class="profile-head">'
-    +'<div class="profile-avatar'+(isGarage?' garage':'')+'">'+initials+'</div>'
-    +'<div><div style="font-size:17px;font-weight:700">'+p.name+'</div>'
-    +'<div style="font-size:12.5px;color:rgba(255,255,255,.5);margin-top:2px">📍 '+(p.city||'—')+(p.rayon?' · Rayon '+p.rayon:'')+'</div>'
-    +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'" style="margin-top:6px">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
-    +'</div></div>'
-    +(p.bio ? '<div class="profile-bio">"'+p.bio+'"</div>' : '')
-
-    +'<div id="rating-full-'+p.id+'" style="font-size:14px;color:#FBBF24;margin-bottom:.5rem">···</div>'
-
-    +(vehTags ? '<div class="profile-section-title">Véhicules acceptés</div><div class="pro-tags">'+vehTags+'</div>' : '')
-    +(svcTags ? '<div class="profile-section-title">Services offerts</div><div class="pro-tags">'+svcTags+'</div>' : '')
-
-    +'<div class="profile-section-title">Disponibilités habituelles</div>'
-    +'<div class="avail-grid">'
-    +'<div class="avail-head">Jour</div><div class="avail-head">Mat.</div><div class="avail-head">P-M</div><div class="avail-head">Soir</div>'
-    +availRows
+// ── AVIS DIRECT (bouton sur profil, sans lien unique) ──
+function openDirectReview(mecId){
+  var p = allPros.find(function(x){ return x.id===mecId; });
+  var mecName = p ? p.name : 'ce professionnel';
+  reviewRating = 0;
+  document.getElementById('review-drawer-body').innerHTML =
+    '<div class="alert-err" id="review-err"></div>'
+    +'<p style="font-size:13.5px;color:rgba(255,255,255,.6);text-align:center;margin-bottom:.5rem">Comment évalues-tu ton expérience avec</p>'
+    +'<p style="font-size:16px;font-weight:700;text-align:center;margin-bottom:1rem">'+mecName+' ?</p>'
+    +'<div class="star-picker">'
+    +[1,2,3,4,5].map(function(i){ return '<button type="button" class="star-btn" id="rstar-'+i+'" onclick="setRating('+i+')">★</button>'; }).join('')
     +'</div>'
-
-    +'<div class="profile-section-title">Avis clients</div>'
-    +'<div id="reviews-list-'+p.id+'"><div class="no-reviews">Chargement des avis...</div></div>'
-
-    +'<button class="btn-book" onclick="openBooking(\''+p.id+'\')">📅 Demander un rendez-vous</button>';
-
-  document.getElementById('overlay-profile').classList.add('open');
-  document.body.style.overflow = 'hidden';
-
-  loadFullRating(p.id);
-  loadFullReviews(p.id);
+    +'<div class="ff"><label>Ton commentaire *</label><textarea id="r_comment" rows="3" placeholder="Décris ton expérience..."></textarea></div>'
+    +'<div class="ff"><label>Ton prénom (optionnel)</label><input type="text" id="r_author" placeholder="Jean"></div>'
+    +'<button class="btn-book" id="review-submit-btn" onclick="submitDirectReview(\''+mecId+'\')">Envoyer mon avis →</button>';
+  document.getElementById('overlay-review').classList.add('open');
+  document.body.style.overflow='hidden';
 }
-
-function loadFullRating(id){
-  db.collection('reviews').where('mechanic_id','==',id).get().then(function(snap){
-    var el = document.getElementById('rating-full-'+id);
-    if(!el) return;
-    if(snap.empty){ el.innerHTML = '<span style="color:rgba(255,255,255,.35);font-size:12.5px">Aucun avis pour l\'instant</span>'; return; }
-    var total = 0; snap.forEach(function(d){ total += (d.data().rating||0); });
-    var avg = total/snap.size;
-    el.innerHTML = starsHtml(avg) + ' <span style="color:white;font-weight:700">'+avg.toFixed(1)+'</span> <span style="color:rgba(255,255,255,.4);font-size:12px">('+snap.size+' avis)</span>';
-  }).catch(function(){});
-}
-
-function loadFullReviews(id){
-  db.collection('reviews').where('mechanic_id','==',id).get().then(function(snap){
-    var el = document.getElementById('reviews-list-'+id);
-    if(!el) return;
-    var reviews = snap.docs.map(function(d){ return d.data(); });
-    reviews.sort(function(a,b){
-      var da = a.created_at && a.created_at.toDate ? a.created_at.toDate() : new Date(0);
-      var db2 = b.created_at && b.created_at.toDate ? b.created_at.toDate() : new Date(0);
-      return db2-da;
-    });
-    if(reviews.length === 0){ el.innerHTML = '<div class="no-reviews">Aucun avis pour l\'instant — sois le premier !</div>'; return; }
-    el.innerHTML = reviews.map(function(r){
-      return '<div class="review-item">'
-        +'<div class="review-stars">'+starsHtml(r.rating)+'</div>'
-        +'<div class="review-text">'+(r.comment||'')+'</div>'
-        +'<div class="review-author">— '+(r.author_name||'Client Greaz')+'</div>'
-        +'</div>';
-    }).join('');
-  }).catch(function(){});
-}
-
-/* ── RÉSERVATION ── */
-function openBooking(id){
-  var p = allPros.find(function(x){ return x.id === id; });
-  if(!p) return;
-  currentProfile = p;
-  _bookingProblem = ""; selSlot = "";
-
-  var isGarage = p.type === 'garage';
-  var probCards = PROBLEMS.map(function(pr){
-    return '<div class="prob-btn" id="bprob-'+pr.id+'" onclick="selBProblem(\''+pr.id+'\')">'
-      +'<span class="prob-icon">'+pr.icon+'</span><div class="prob-label">'+pr.label+'</div></div>';
-  }).join("");
-
-  var todayStr = new Date().toISOString().slice(0,10);
-
-  document.getElementById('booking-drawer-body').innerHTML =
-    '<div class="alert-err" id="booking-err"></div>'
-    +'<div style="background:rgba(26,60,255,.08);border:1px solid rgba(26,60,255,.2);border-radius:var(--r2);padding:10px 14px;font-size:12.5px;color:rgba(255,255,255,.7);margin-bottom:1.25rem">'
-    +'Rendez-vous avec <strong style="color:white">'+p.name+'</strong>. On te confirme la date exacte rapidement.</div>'
-
-    +'<div class="ff"><label>Date souhaitée *</label><input type="date" id="b_date" min="'+todayStr+'" onchange="updateSlotOptions()"></div>'
-    +'<div class="ff"><label>Plage horaire *</label>'
-    +'<div class="slot-pick-row" id="slot-pick-row">'
-    +'<button type="button" class="slot-pick-btn" id="bslot-matin" onclick="selBSlot(\'matin\')" disabled>Matin</button>'
-    +'<button type="button" class="slot-pick-btn" id="bslot-aprem" onclick="selBSlot(\'aprem\')" disabled>Après-midi</button>'
-    +'<button type="button" class="slot-pick-btn" id="bslot-soir" onclick="selBSlot(\'soir\')" disabled>Soir</button>'
-    +'</div>'
-    +'<div class="slot-empty-msg" id="slot-empty-msg" style="display:none">Choisis d\'abord une date pour voir les plages disponibles.</div>'
-    +'</div>'
-
-    +'<div class="ff" style="margin-top:1.25rem"><label>Quel est le problème ?</label></div>'
-    +'<div class="problem-grid">'+probCards+'</div>'
-
-    +'<div class="ff"><label>Décrivez en détail (optionnel)</label><textarea id="b_desc" rows="2" placeholder="Ex : bruit au freinage, voyant allumé..."></textarea></div>'
-
-    +'<div class="ff2">'
-    +'<div class="ff"><label>Prénom *</label><input type="text" id="b_prenom" placeholder="Jean"></div>'
-    +'<div class="ff"><label>Nom *</label><input type="text" id="b_nom" placeholder="Tremblay"></div>'
-    +'</div>'
-    +'<div class="ff2">'
-    +'<div class="ff"><label>Téléphone *</label><input type="tel" id="b_phone" placeholder="514-555-0100" oninput="validateBPhone(this)"><div id="bphone-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Numéro canadien invalide</div></div>'
-    +'<div class="ff"><label>Courriel *</label><input type="email" id="b_email" placeholder="jean@email.com" oninput="validateBEmail(this)"><div id="bemail-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Courriel invalide</div></div>'
-    +'</div>'
-    +(isGarage ? '' : '<div class="ff"><label>Adresse d\'intervention *</label><input type="text" id="b_addr" placeholder="1234 Rue Principale, Montréal, QC"></div>')
-
-    +'<button class="btn-book" id="booking-submit-btn" onclick="submitBooking()">Envoyer ma demande de rendez-vous →</button>';
-
-  document.getElementById('overlay-booking').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function updateSlotOptions(){
-  var dateVal = document.getElementById('b_date').value;
-  var msg = document.getElementById('slot-empty-msg');
-  ['matin','aprem','soir'].forEach(function(s){ document.getElementById('bslot-'+s).disabled = true; document.getElementById('bslot-'+s).classList.remove('sel'); });
-  selSlot = "";
-  if(!dateVal || !currentProfile) return;
-
-  var sched = parseSchedule(currentProfile.schedule);
-  var dow = DOW_MAP[new Date(dateVal+'T00:00:00').getDay()];
-  var daySched = sched[dow] || {matin:false,aprem:false,soir:false};
-
-  var anyAvail = false;
-  ['matin','aprem','soir'].forEach(function(s){
-    if(daySched[s]){ document.getElementById('bslot-'+s).disabled = false; anyAvail = true; }
-  });
-  msg.style.display = anyAvail ? 'none' : 'block';
-  if(!anyAvail) msg.textContent = "Ce professionnel n'est pas disponible ce jour-là — choisis une autre date.";
-}
-
-function selBSlot(s){
-  if(document.getElementById('bslot-'+s).disabled) return;
-  selSlot = s;
-  ['matin','aprem','soir'].forEach(function(x){ document.getElementById('bslot-'+x).classList.remove('sel'); });
-  document.getElementById('bslot-'+s).classList.add('sel');
-}
-
-function selBProblem(id){
-  _bookingProblem = id;
-  document.querySelectorAll('.problem-grid .prob-btn').forEach(function(el){ el.classList.remove('sel'); });
-  document.getElementById('bprob-'+id).classList.add('sel');
-}
-
-function validateBPhone(el){
-  var clean = el.value.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
-  var valid = /^[2-9]\d{2}[2-9]\d{6}$/.test(clean) && clean.length===10;
-  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
-  var e=document.getElementById("bphone-err"); if(e) e.style.display = el.value.length>3 && !valid ? "block":"none";
-}
-function validateBEmail(el){
-  var valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value);
-  el.style.borderColor = el.value.length>3 ? (valid?"#00C26F":"#f87171") : "";
-  var e=document.getElementById("bemail-err"); if(e) e.style.display = el.value.length>3 && !valid ? "block":"none";
-}
-
-async function submitBooking(){
-  var errEl = document.getElementById('booking-err');
-  var btn = document.getElementById('booking-submit-btn');
-  errEl.style.display = 'none';
-
-  var date = document.getElementById('b_date').value;
-  var prenom = (document.getElementById('b_prenom').value||'').trim();
-  var nom = (document.getElementById('b_nom').value||'').trim();
-  var phone = (document.getElementById('b_phone').value||'').trim();
-  var email = (document.getElementById('b_email').value||'').trim();
-  var isGarage = currentProfile.type === 'garage';
-  var addr = isGarage ? '' : (document.getElementById('b_addr')?document.getElementById('b_addr').value.trim():'');
-
-  if(!date || !selSlot || !prenom || !phone || !email || (!isGarage && !addr)){
-    errEl.textContent = "Veuillez remplir tous les champs obligatoires (*)."; errEl.style.display = 'block'; return;
-  }
-  var emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
-  var phoneClean = phone.replace(/[\s\-\(\)\.]/g,"").replace(/^\+1/,"");
-  var phoneValid = /^[2-9]\d{2}[2-9]\d{6}$/.test(phoneClean) && phoneClean.length===10;
-  if(!emailValid){ errEl.textContent="Courriel invalide."; errEl.style.display='block'; return; }
-  if(!phoneValid){ errEl.textContent="Numéro canadien invalide. Ex : 514-555-0100"; errEl.style.display='block'; return; }
-
-  var code = "GZ-" + Math.floor(Math.random()*90000+10000);
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi en cours...';
-
-  try {
-    await db.collection('appointments').add({
-      mechanic_id: currentProfile.id,
-      mechanic_name: currentProfile.name,
-      mechanic_type: currentProfile.type,
-      client_prenom: prenom, client_nom: nom, client_phone: phone, client_email: email,
-      client_address: addr,
-      date: date, time_slot: selSlot,
-      problem: _bookingProblem || 'Non précisé',
-      description: document.getElementById('b_desc').value.trim(),
-      status: 'en_attente',
-      booking_code: code,
-      created_at: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-
-    document.getElementById('booking-drawer-body').innerHTML =
-      '<div class="success-screen"><span class="success-icon">✅</span>'
-      +'<div class="success-title">Demande envoyée !</div>'
-      +'<p class="success-sub">'+currentProfile.name+' va confirmer ton rendez-vous bientôt. On te contacte par SMS ou courriel.</p>'
-      +'<div class="success-code">'+code+'</div>'
-      +'<p style="font-size:11.5px;color:rgba(255,255,255,.4);margin-bottom:1.5rem">Ton code de référence</p>'
-      +'<button onclick="closeDrawer(\'booking\');closeDrawer(\'profile\')" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Compris ✓</button>'
-      +'</div>';
-
-  } catch(e){
-    errEl.textContent = "Erreur : "+e.message; errEl.style.display = 'block';
-    btn.disabled = false; btn.textContent = "Envoyer ma demande de rendez-vous →";
-  }
-}
-
-/* ── AVIS (mode spécial via lien) ── */
-function checkReviewMode(){
-  var params = new URLSearchParams(window.location.search);
-  if(params.get('avis') === '1'){
-    var bookingId = params.get('booking');
-    var code = params.get('code');
-    var mecId = params.get('mec');
-    if(bookingId && code && mecId) openReviewModal(bookingId, code, mecId);
-  }
-}
-
-var reviewRating = 0;
-
-function openReviewModal(bookingId, code, mecId){
-  db.collection('mechanics_public').doc(mecId).get().then(function(doc){
-    var mecName = doc.exists ? doc.data().name : 'ce professionnel';
-
-    document.getElementById('review-drawer-body').innerHTML =
-      '<div class="alert-err" id="review-err"></div>'
-      +'<p style="font-size:13.5px;color:rgba(255,255,255,.6);text-align:center;margin-bottom:.5rem">Comment s\'est passé ton rendez-vous avec</p>'
-      +'<p style="font-size:16px;font-weight:700;text-align:center;margin-bottom:1rem">'+mecName+' ?</p>'
-      +'<div class="star-picker" id="star-picker">'
-      + [1,2,3,4,5].map(function(i){ return '<button type="button" class="star-btn" id="rstar-'+i+'" onclick="setRating('+i+')">★</button>'; }).join('')
-      +'</div>'
-      +'<div class="ff"><label>Ton commentaire *</label><textarea id="r_comment" rows="3" placeholder="Décris ton expérience..."></textarea></div>'
-      +'<div class="ff"><label>Ton prénom (optionnel)</label><input type="text" id="r_author" placeholder="Jean"></div>'
-      +'<button class="btn-book" id="review-submit-btn" onclick="submitReview(\''+bookingId+'\',\''+code+'\',\''+mecId+'\')">Envoyer mon avis →</button>';
-
-    document.getElementById('overlay-review').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  });
-}
-
-function setRating(n){
-  reviewRating = n;
-  for(var i=1;i<=5;i++){
-    document.getElementById('rstar-'+i).classList.toggle('active', i<=n);
-  }
-}
-
-async function submitReview(bookingId, code, mecId){
-  var errEl = document.getElementById('review-err');
-  var btn = document.getElementById('review-submit-btn');
-  errEl.style.display = 'none';
-
-  var comment = (document.getElementById('r_comment').value||'').trim();
-  var author = (document.getElementById('r_author').value||'').trim();
-
-  if(reviewRating === 0){ errEl.textContent = "Choisis une note d'étoiles."; errEl.style.display='block'; return; }
-  if(!comment){ errEl.textContent = "Écris un petit commentaire."; errEl.style.display='block'; return; }
-
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi...';
-
+async function submitDirectReview(mecId){
+  var errEl=document.getElementById('review-err'), btn=document.getElementById('review-submit-btn');
+  errEl.style.display='none';
+  var comment=(document.getElementById('r_comment').value||'').trim();
+  var author=(document.getElementById('r_author').value||'').trim();
+  if(reviewRating===0){ errEl.textContent="Choisis une note."; errEl.style.display='block'; return; }
+  if(!comment){ errEl.textContent="Écris un commentaire."; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi...';
   try {
     await db.collection('reviews').add({
-      booking_id: bookingId,
-      booking_code: code,
-      mechanic_id: mecId,
-      rating: reviewRating,
-      comment: comment,
-      author_name: author || 'Client Greaz',
-      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+      mechanic_id:mecId, rating:reviewRating, comment:comment,
+      author_name:author||'Client Greaz',
+      created_at:firebase.firestore.FieldValue.serverTimestamp(),
     });
-
-    document.getElementById('review-drawer-body').innerHTML =
+    // Rafraîchir le profil si encore ouvert
+    if(document.getElementById('overlay-profile').classList.contains('open')){
+      loadFullRating(mecId);
+      loadFullReviews(mecId);
+    }
+    document.getElementById('review-drawer-body').innerHTML=
       '<div class="success-screen"><span class="success-icon">🙏</span>'
       +'<div class="success-title">Merci pour ton avis !</div>'
       +'<p class="success-sub">Ça aide les autres clients à choisir le bon professionnel.</p>'
       +'<button onclick="closeDrawer(\'review\')" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Fermer ✓</button>'
       +'</div>';
-
   } catch(e){
-    errEl.textContent = "Erreur : ce lien d'avis n'est plus valide ou a déjà été utilisé.";
-    errEl.style.display = 'block';
-    btn.disabled = false; btn.textContent = "Envoyer mon avis →";
+    errEl.textContent="Erreur : "+e.message; errEl.style.display='block';
+    btn.disabled=false; btn.textContent="Envoyer mon avis →";
   }
 }
 
-/* ── Init ── */
-loadDirectory();
+// ── AVIS (lien unique) ──
+function checkReviewMode(){
+  var params=new URLSearchParams(window.location.search);
+  if(params.get('avis')==='1'){
+    var bookingId=params.get('booking'), code=params.get('code'), mecId=params.get('mec');
+    if(bookingId&&code&&mecId) openReviewModal(bookingId,code,mecId);
+  }
+}
+
+function openReviewModal(bookingId,code,mecId){
+  db.collection('mechanics_public').doc(mecId).get().then(function(doc){
+    var mecName=doc.exists?doc.data().name:'ce professionnel';
+    document.getElementById('review-drawer-body').innerHTML=
+      '<div class="alert-err" id="review-err"></div>'
+      +'<p style="font-size:13.5px;color:rgba(255,255,255,.6);text-align:center;margin-bottom:.5rem">Comment s\'est passé ton rendez-vous avec</p>'
+      +'<p style="font-size:16px;font-weight:700;text-align:center;margin-bottom:1rem">'+mecName+' ?</p>'
+      +'<div class="star-picker">'
+      +[1,2,3,4,5].map(function(i){return '<button type="button" class="star-btn" id="rstar-'+i+'" onclick="setRating('+i+')">★</button>';}).join('')
+      +'</div>'
+      +'<div class="ff"><label>Ton commentaire *</label><textarea id="r_comment" rows="3" placeholder="Décris ton expérience..."></textarea></div>'
+      +'<div class="ff"><label>Ton prénom (optionnel)</label><input type="text" id="r_author" placeholder="Jean"></div>'
+      +'<button class="btn-book" id="review-submit-btn" onclick="submitReview(\''+bookingId+'\',\''+code+'\',\''+mecId+'\')">Envoyer mon avis →</button>';
+    document.getElementById('overlay-review').classList.add('open');
+    document.body.style.overflow='hidden';
+  });
+}
+
+function setRating(n){
+  reviewRating=n;
+  for(var i=1;i<=5;i++) document.getElementById('rstar-'+i).classList.toggle('active',i<=n);
+}
+
+async function submitReview(bookingId,code,mecId){
+  var errEl=document.getElementById('review-err'), btn=document.getElementById('review-submit-btn');
+  errEl.style.display='none';
+  var comment=(document.getElementById('r_comment').value||'').trim();
+  var author=(document.getElementById('r_author').value||'').trim();
+  if(reviewRating===0){ errEl.textContent="Choisis une note."; errEl.style.display='block'; return; }
+  if(!comment){ errEl.textContent="Écris un commentaire."; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi...';
+  try {
+    await db.collection('reviews').add({
+      booking_id:bookingId, booking_code:code, mechanic_id:mecId,
+      rating:reviewRating, comment:comment, author_name:author||'Client Greaz',
+      created_at:firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    document.getElementById('review-drawer-body').innerHTML=
+      '<div class="success-screen"><span class="success-icon">🙏</span>'
+      +'<div class="success-title">Merci pour ton avis !</div>'
+      +'<p class="success-sub">Ça aide les autres clients à choisir le bon professionnel.</p>'
+      +'<button onclick="closeDrawer(\'review\')" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Fermer ✓</button>'
+      +'</div>';
+  } catch(e){
+    errEl.textContent="Erreur : ce lien n'est plus valide."; errEl.style.display='block';
+    btn.disabled=false; btn.textContent="Envoyer mon avis →";
+  }
+}
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', function(){
+  initMap();
+  loadDirectory();
+});
 </script>
 </body>
 </html>
