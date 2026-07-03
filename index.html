@@ -333,7 +333,7 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   <div id="map-view">
     <div id="greaz-map"></div>
     <div class="map-controls">
-      <button class="map-ctrl-btn" onclick="geolocateMe()" title="Ma position">📍</button>
+      <button class="map-ctrl-btn" id="geo-btn" onclick="geolocateMe()" title="Ma position">📍</button>
       <button class="map-ctrl-btn" onclick="leafletMap.zoomIn()" title="Zoom +">＋</button>
       <button class="map-ctrl-btn" onclick="leafletMap.zoomOut()" title="Zoom −">－</button>
     </div>
@@ -531,10 +531,56 @@ function switchView(v){
 }
 
 // ── FIRESTORE ──
+// ── File de géocodage (respecte la limite Nominatim 1 req/sec) ──
+var _geoQueue = [];
+var _geoRunning = false;
+
+function queueGeocode(p){
+  _geoQueue.push(p);
+  if(!_geoRunning) runGeoQueue();
+}
+
+async function runGeoQueue(){
+  _geoRunning = true;
+  while(_geoQueue.length > 0){
+    var p = _geoQueue.shift();
+    var addr = (p.address && p.address.trim())
+      ? p.address + ', Canada'
+      : (p.city||'') + ', Québec, Canada';
+    try {
+      var res = await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(addr)+'&format=json&limit=1&countrycodes=ca');
+      var data = await res.json();
+      if(data.length > 0){
+        p.lat = parseFloat(data[0].lat);
+        p.lng = parseFloat(data[0].lon);
+        // Sauvegarder dans Firestore pour pas regéocoder à chaque fois
+        db.collection('mechanics_public').doc(p.id).update({lat:p.lat, lng:p.lng}).catch(function(){});
+        // Ajouter le marqueur sur la carte si elle est active
+        if(currentView === 'map') addSingleMarker(p);
+      }
+    } catch(e){ console.log('Geocoding failed for', p.name); }
+    await new Promise(function(r){ setTimeout(r, 1300); });
+  }
+  _geoRunning = false;
+  // Mettre à jour le compteur de la carte
+  if(currentView === 'map'){
+    var visible = leafletMarkers.filter(function(m){ return leafletMap.getBounds().contains(m.getLatLng()); }).length;
+    document.getElementById('results-count-map').textContent = leafletMarkers.length + ' pro'+(leafletMarkers.length!==1?'s':'')+' sur la carte';
+  }
+}
+
 function loadDirectory(){
   db.collection('mechanics_public').get().then(function(snap){
     allPros = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
       .filter(function(p){ return p.active!==false; });
+
+    // Géocodage automatique des pros sans GPS
+    var sans = allPros.filter(function(p){ return !p.lat || !p.lng || isNaN(parseFloat(p.lat)); });
+    if(sans.length > 0){
+      console.log(sans.length + ' pros sans GPS — géocodage automatique...');
+      sans.forEach(function(p){ queueGeocode(p); });
+    }
+
     applyFilters();
     checkReviewMode();
   }).catch(function(e){
@@ -568,6 +614,54 @@ function renderView(){
 }
 
 // ── MAP ──
+function addSingleMarker(p){
+  var lat = parseFloat(p.lat), lng = parseFloat(p.lng);
+  if(!lat || !lng || isNaN(lat) || isNaN(lng)) return;
+
+  // Jitter si overlap
+  var nearby = leafletMarkers.filter(function(m){
+    var ml=m.getLatLng();
+    return Math.abs(ml.lat-lat)<0.0008 && Math.abs(ml.lng-lng)<0.0008;
+  });
+  if(nearby.length > 0){
+    var angle = (nearby.length/8)*2*Math.PI;
+    var radius = 0.0025 + nearby.length*0.0008;
+    lat = lat + radius*Math.cos(angle);
+    lng = lng + radius*Math.sin(angle);
+  }
+
+  var cert = CERT[p.certification||0];
+  var price = lowestPrice(p.pricing);
+  var isGarage = p.type==='garage';
+  var ini = initials(p.name);
+  var certDot = cert ? '<div class="gz-cert-dot '+cert.cls+'">✦</div>' : '';
+  var priceTag = price ? '<div class="gz-price-tag">À partir de '+price+'</div>' : '';
+
+  var icon = L.divIcon({
+    html:'<div class="gz-marker-wrap">'
+      +'<div class="gz-marker '+(isGarage?'garage':'mec')+'">'+ini+certDot+'</div>'
+      +'<div class="gz-marker-tail"></div>'+priceTag+'</div>',
+    className:'', iconSize:[52,68], iconAnchor:[26,68], popupAnchor:[0,-70],
+  });
+
+  var marker = L.marker([lat,lng],{icon:icon}).addTo(leafletMap);
+  var certBadge = cert ? '<span style="background:rgba(0,0,0,.3);border:1px solid '+cert.color+';color:'+cert.color+';font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:4px">'+cert.stars+' '+cert.label+'</span>' : '';
+  var priceHtml = price ? '<div style="font-size:14px;font-weight:700;color:#00C26F;margin:6px 0">À partir de '+price+'</div>' : '';
+
+  marker.bindPopup(
+    '<div class="gz-popup-inner">'
+    +'<div class="gz-popup-name">'+p.name+'</div>'
+    +(cert?'<div>'+certBadge+'</div>':'')
+    +'<div class="gz-popup-meta" style="margin-top:6px">📍 '+(p.city||'—')+' · '+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</div>'
+    +'<div class="gz-popup-rating" id="map-rating-'+p.id+'">···</div>'
+    +priceHtml
+    +'<button class="gz-popup-btn" onclick="openProfile(\''+p.id+'\')">Voir le profil →</button>'
+    +'</div>',
+    { className:'gz-popup', maxWidth:260, minWidth:220 }
+  );
+  marker.on('popupopen', function(){ loadRatingSummary(p.id, 'map-rating-'+p.id); });
+  leafletMarkers.push(marker);
+}
 function initMap(){
   leafletMap = L.map('greaz-map', {
     center:[45.5017,-73.5673],
@@ -581,20 +675,34 @@ function initMap(){
     maxZoom:19,
   }).addTo(leafletMap);
 
-  // Geolocate on load
-  geolocateMe();
+  // Événements de géolocalisation Leaflet
+  leafletMap.on('locationfound', function(e){
+    var btn = document.getElementById('geo-btn');
+    if(btn){ btn.textContent='📍'; btn.style.background=''; btn.title='Ma position'; }
+
+    // Supprimer l'ancien marqueur position si existe
+    if(window._geoMarker) leafletMap.removeLayer(window._geoMarker);
+    window._geoMarker = L.circleMarker(e.latlng, {
+      radius:10, fillColor:'#1A3CFF', color:'white', weight:3, fillOpacity:1,
+      className:'geo-pulse'
+    }).addTo(leafletMap);
+    window._geoMarker.bindPopup('<div style="font-family:DM Sans,sans-serif;font-size:13px;color:#0A0C1B;padding:4px">📍 <strong>Vous êtes ici</strong></div>').openPopup();
+    leafletMap.setView(e.latlng, 14);
+  });
+
+  leafletMap.on('locationerror', function(e){
+    var btn = document.getElementById('geo-btn');
+    if(btn){ btn.textContent='📍'; btn.style.background='rgba(239,68,68,.2)'; btn.title='Position non disponible'; }
+    setTimeout(function(){ if(btn) btn.style.background=''; }, 2500);
+    console.log('Geoloc error:', e.message);
+  });
 }
 
 function geolocateMe(){
-  if(!navigator.geolocation || !leafletMap) return;
-  navigator.geolocation.getCurrentPosition(function(pos){
-    leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 13);
-    L.circleMarker([pos.coords.latitude, pos.coords.longitude], {
-      radius:8, fillColor:'#1A3CFF', color:'white', weight:2, fillOpacity:1,
-    }).addTo(leafletMap).bindPopup('<div style="font-family:DM Sans,sans-serif;font-size:13px;color:#0A0C1B">📍 <strong>Vous êtes ici</strong></div>');
-  }, function(){
-    // Permission refused - stay on Montreal
-  });
+  if(!leafletMap) return;
+  var btn = document.getElementById('geo-btn');
+  if(btn){ btn.textContent='⏳'; btn.style.background='rgba(26,60,255,.3)'; }
+  leafletMap.locate({ setView:false, maxZoom:14, timeout:8000, enableHighAccuracy:true });
 }
 
 function renderMap(){
@@ -605,11 +713,24 @@ function renderMap(){
   leafletMarkers = [];
 
   var count = 0;
+  var coordsUsed = []; // track used positions to avoid overlap
+
   filteredPros.forEach(function(p){
     var lat = parseFloat(p.lat);
     var lng = parseFloat(p.lng);
     if(!lat || !lng || isNaN(lat) || isNaN(lng)) return;
 
+    // Décalage automatique si plusieurs pros au même endroit
+    var nearby = coordsUsed.filter(function(c){
+      return Math.abs(c[0]-lat)<0.0008 && Math.abs(c[1]-lng)<0.0008;
+    });
+    if(nearby.length > 0){
+      var angle = (nearby.length / 8) * 2 * Math.PI;
+      var radius = 0.0025 + nearby.length * 0.0008;
+      lat = lat + radius * Math.cos(angle);
+      lng = lng + radius * Math.sin(angle);
+    }
+    coordsUsed.push([lat, lng]);
     count++;
     var cert = CERT[p.certification||0];
     var price = lowestPrice(p.pricing);
