@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Greaz — La mécanique, réinventée</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -18,14 +18,10 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);min-height:100vh;overflow-x:hidden;}
-
-/* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(10,12,27,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);}
 .logo{font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.03em;}
 .logo span{color:var(--blue);}
 .nav-badge{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);}
-
-/* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8rem 2rem 4rem;text-align:center;position:relative;overflow:hidden;}
 .hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,60,255,.25) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(0,194,111,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(255,107,44,.08) 0%,transparent 60%);}
 .hero-grid{position:absolute;inset:0;z-index:0;opacity:.07;background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);background-size:50px 50px;}
@@ -48,38 +44,28 @@ h1 .hl2{color:var(--green);}
 .cta-card-client .cta-btn{background:white;color:var(--blue2);}
 .cta-card-mec{background:linear-gradient(135deg,#0a1f12 0%,#051a0a 100%);border-color:rgba(0,194,111,.25);}
 .cta-card-mec .cta-btn{background:rgba(0,194,111,.15);color:var(--green);border:1px solid rgba(0,194,111,.35);}
-
-/* ══════════ ANNUAIRE ══════════ */
 .annuaire-section{padding:5rem 0 0;}
 .annuaire-header{padding:0 2rem 1.5rem;text-align:center;}
 .section-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(26,60,255,.8);margin-bottom:.75rem;}
 .section-title{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;}
 .section-sub{font-size:14px;color:rgba(255,255,255,.45);margin-top:.75rem;}
-
-/* VIEW TOGGLE */
 .view-toggle{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:1.25rem;}
 .vtoggle-btn{display:flex;align-items:center;gap:6px;padding:8px 20px;border-radius:30px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);transition:all .2s;}
 .vtoggle-btn.act{background:rgba(26,60,255,.25);border-color:var(--blue);color:white;}
 .vtoggle-btn:hover:not(.act){border-color:rgba(255,255,255,.3);color:white;}
-
-/* FILTERS */
 .filters-bar-wrap{padding:0 1.25rem 1rem;}
 .filters-bar{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r2);padding:.75rem;display:flex;gap:8px;flex-wrap:wrap;max-width:900px;margin:0 auto;}
 .filters-bar input,.filters-bar select{flex:1;min-width:130px;padding:9px 12px;background:rgba(255,255,255,.05);border:1.5px solid var(--line);border-radius:var(--r);color:white;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;-webkit-appearance:none;appearance:none;}
 .filters-bar select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M5 7L0 2h10z' fill='%23666'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
-.filters-bar select option{background:#1C2040;}
+.filters-bar select option,.filters-bar select optgroup{background:#1C2040;}
 .filters-bar input::placeholder{color:rgba(255,255,255,.3);}
 .filters-bar input:focus,.filters-bar select:focus{border-color:var(--blue);}
-
-/* MAP VIEW */
 #map-view{position:relative;}
 #greaz-map{width:100%;height:calc(100vh - 64px);z-index:1;background:#0A0C1B;}
 .map-controls{position:absolute;top:16px;left:16px;z-index:10;display:flex;flex-direction:column;gap:8px;}
 .map-ctrl-btn{width:40px;height:40px;border-radius:var(--r);background:var(--ink2);border:1px solid var(--line);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:white;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.3);}
 .map-ctrl-btn:hover{background:rgba(26,60,255,.25);border-color:var(--blue);}
 .results-count-map{position:absolute;top:16px;right:16px;z-index:10;background:rgba(10,12,27,.85);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:var(--r2);padding:8px 14px;font-size:12px;color:rgba(255,255,255,.6);}
-
-/* CUSTOM LEAFLET MARKERS */
 .gz-marker-wrap{position:relative;width:52px;height:68px;}
 .gz-marker{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white;border:2.5px solid rgba(255,255,255,.25);box-shadow:0 4px 16px rgba(0,0,0,.5);cursor:pointer;transition:transform .15s;position:relative;}
 .gz-marker.mec{background:linear-gradient(135deg,#0a1f12,#051a0a);border-color:rgba(0,194,111,.5);}
@@ -90,8 +76,6 @@ h1 .hl2{color:var(--green);}
 .gz-cert-dot.silver{background:var(--silver);color:#555;}
 .gz-cert-dot.bronze{background:var(--bronze);color:#fff;}
 .gz-price-tag{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);background:var(--ink2);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap;color:var(--green);box-shadow:0 2px 8px rgba(0,0,0,.4);}
-
-/* LEAFLET POPUP CUSTOM */
 .gz-popup .leaflet-popup-content-wrapper{background:var(--ink2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r2);box-shadow:0 12px 40px rgba(0,0,0,.6);padding:0;}
 .gz-popup .leaflet-popup-content{margin:0;color:white;}
 .gz-popup .leaflet-popup-tip{background:var(--ink2);}
@@ -103,8 +87,6 @@ h1 .hl2{color:var(--green);}
 .gz-popup-price{font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px;}
 .gz-popup-btn{display:block;width:100%;padding:9px;background:var(--blue);color:white;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:background .2s;}
 .gz-popup-btn:hover{background:var(--blue2);}
-
-/* GRID VIEW */
 #grid-view{padding:0 1.25rem 2rem;max-width:1050px;margin:0 auto;}
 .results-count{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:1rem;}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
@@ -126,22 +108,16 @@ h1 .hl2{color:var(--green);}
 .pro-tag{font-size:10px;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:3px 8px;border-radius:4px;color:rgba(255,255,255,.6);}
 .pro-empty{grid-column:1/-1;text-align:center;padding:4rem 1rem;color:rgba(255,255,255,.4);}
 .pro-empty-icon{font-size:2.5rem;margin-bottom:1rem;opacity:.5;}
-
-/* CERTIFICATION BADGES */
 .cert-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;margin-top:6px;}
 .cert-badge.gold{background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.35);color:var(--gold);}
 .cert-badge.silver{background:rgba(192,192,192,.12);border:1px solid rgba(192,192,192,.3);color:var(--silver);}
 .cert-badge.bronze{background:rgba(205,127,50,.12);border:1px solid rgba(205,127,50,.3);color:var(--bronze);}
-
-/* PROFILE PRICING TABLE */
 .pricing-table{width:100%;border-collapse:collapse;margin-top:.5rem;}
 .pricing-table tr{border-bottom:1px solid rgba(255,255,255,.06);}
 .pricing-table tr:last-child{border:none;}
 .pricing-table td{padding:8px 4px;font-size:13px;}
 .pricing-table .svc{color:rgba(255,255,255,.75);}
 .pricing-table .price{text-align:right;font-weight:700;color:var(--green);}
-
-/* PROFILE / BOOKING / REVIEW */
 .profile-head{display:flex;align-items:center;gap:14px;margin-bottom:1.25rem;}
 .profile-avatar{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;flex-shrink:0;}
 .profile-avatar.mec{background:linear-gradient(135deg,#0a1f12,#051a0a);border:2.5px solid rgba(0,194,111,.4);}
@@ -162,8 +138,6 @@ h1 .hl2{color:var(--green);}
 .no-reviews{font-size:12.5px;color:rgba(255,255,255,.35);text-align:center;padding:1.5rem 0;}
 .btn-book{width:100%;padding:14px;border-radius:var(--r2);border:none;background:var(--blue);color:white;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:1.5rem;transition:all .2s;}
 .btn-book:hover{background:var(--blue2);}
-
-/* OVERLAY / DRAWER */
 .overlay{position:fixed;inset:0;background:rgba(5,7,20,.85);z-index:400;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px);}
 .overlay.open{display:flex;}
 .drawer{background:var(--ink2);border-radius:28px 28px 0 0;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .4s cubic-bezier(.32,.72,0,1);}
@@ -173,13 +147,11 @@ h1 .hl2{color:var(--green);}
 .drawer-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1.2rem;font-weight:700;}
 .close-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.08);border:none;cursor:pointer;font-size:1rem;color:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .drawer-body{padding:1.5rem 1.75rem 2.5rem;}
-
-/* FORMS */
 .form-section{margin-bottom:1.5rem;}
 .form-section-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.06);}
 .ff{margin-bottom:1rem;}
 .ff label{display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:5px;}
-.ff input,.ff select,.ff textarea{width:100%;padding:11px 14px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;color:white;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;}
+.ff input,.ff select,.ff textarea{width:100%;padding:11px 14px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:16px;color:white;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;}
 .ff input::placeholder,.ff textarea::placeholder{color:rgba(255,255,255,.3);}
 .ff select option{background:var(--ink2);}
 .ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--blue);background:rgba(26,60,255,.08);}
@@ -222,8 +194,6 @@ h1 .hl2{color:var(--green);}
 .success-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:.5rem;}
 .success-sub{font-size:14px;color:rgba(255,255,255,.55);line-height:1.75;max-width:340px;margin:0 auto 2rem;}
 .success-code{background:rgba(26,60,255,.2);border:1px solid rgba(26,60,255,.4);border-radius:var(--r2);padding:12px 20px;font-size:1.1rem;font-weight:700;color:var(--blue);letter-spacing:.1em;display:inline-block;margin-bottom:2rem;}
-
-/* REST OF PAGE */
 .stats-band{background:rgba(255,255,255,.03);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1.5rem 2rem;}
 .stats-inner{max-width:800px;margin:0 auto;display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;}
 .stat-item{text-align:center;}
@@ -258,6 +228,8 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   .ff2{grid-template-columns:1fr;}
   .stats-inner{gap:1.5rem;}
   #greaz-map{height:calc(100vh - 120px);}
+  nav{padding:.75rem 1rem;}
+  .hero{padding:6rem 1rem 3rem;}
 }
 </style>
 </head>
@@ -268,7 +240,6 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   <div class="nav-badge">🇨🇦 Québec · Plateforme auto</div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
@@ -293,7 +264,6 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   </div>
 </section>
 
-<!-- ANNUAIRE -->
 <section class="annuaire-section" id="annuaire">
   <div class="annuaire-header">
     <div class="section-label">Annuaire Greaz</div>
@@ -321,15 +291,11 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
       </select>
       <select id="filter-ville" onchange="applyFilters()">
         <option value="">Toutes les villes</option>
-        <option>Montréal</option><option>Laval</option><option>Longueuil</option>
-        <option>Québec</option><option>Gatineau</option><option>Sherbrooke</option>
-        <option>Saguenay</option><option>Lévis</option><option>Trois-Rivières</option>
-        <option>Terrebonne</option>
+<optgroup label="Montréal & Laval"><option>Montréal</option><option>Laval</option></optgroup><optgroup label="Montérégie"><option>Longueuil</option><option>Brossard</option><option>Boucherville</option><option>Saint-Bruno-de-Montarville</option><option>Saint-Lambert</option><option>Saint-Hubert</option><option>Candiac</option><option>La Prairie</option><option>Sainte-Catherine</option><option>Delson</option><option>Saint-Constant</option><option>Châteauguay</option><option>Mercier</option><option>Beauharnois</option><option>Salaberry-de-Valleyfield</option><option>Vaudreuil-Dorion</option><option>L'Île-Perrot</option><option>Pincourt</option><option>Sainte-Julie</option><option>Varennes</option><option>Verchères</option><option>Contrecœur</option><option>Saint-Amable</option><option>Beloeil</option><option>Mont-Saint-Hilaire</option><option>McMasterville</option><option>Otterburn Park</option><option>Saint-Basile-le-Grand</option><option>Chambly</option><option>Carignan</option><option>Marieville</option><option>Richelieu</option><option>Saint-Jean-sur-Richelieu</option><option>Saint-Hyacinthe</option><option>Sorel-Tracy</option><option>Granby</option><option>Bromont</option><option>Cowansville</option><option>Farnham</option><option>Saint-Césaire</option><option>Acton Vale</option><option>Saint-Rémi</option><option>Napierville</option><option>Huntingdon</option></optgroup><optgroup label="Laurentides"><option>Saint-Eustache</option><option>Deux-Montagnes</option><option>Sainte-Marthe-sur-le-Lac</option><option>Boisbriand</option><option>Sainte-Thérèse</option><option>Blainville</option><option>Rosemère</option><option>Lorraine</option><option>Bois-des-Filion</option><option>Mirabel</option><option>Saint-Jérôme</option><option>Prévost</option><option>Saint-Sauveur</option><option>Sainte-Adèle</option><option>Sainte-Agathe-des-Monts</option><option>Mont-Tremblant</option><option>Lachute</option><option>Saint-Colomban</option><option>Mont-Laurier</option></optgroup><optgroup label="Lanaudière"><option>Terrebonne</option><option>Mascouche</option><option>Repentigny</option><option>Charlemagne</option><option>L'Assomption</option><option>Lavaltrie</option><option>Saint-Charles-Borromée</option><option>Joliette</option><option>Notre-Dame-des-Prairies</option><option>Rawdon</option><option>Berthierville</option><option>Saint-Lin-Laurentides</option><option>Sainte-Julienne</option></optgroup><optgroup label="Capitale-Nationale"><option>Québec</option><option>L'Ancienne-Lorette</option><option>Saint-Augustin-de-Desmaures</option><option>Boischatel</option><option>Château-Richer</option><option>Beaupré</option><option>Stoneham-et-Tewkesbury</option><option>Sainte-Brigitte-de-Laval</option><option>Shannon</option><option>Donnacona</option><option>Pont-Rouge</option><option>Saint-Raymond</option><option>Baie-Saint-Paul</option><option>La Malbaie</option></optgroup><optgroup label="Chaudière-Appalaches"><option>Lévis</option><option>Saint-Georges</option><option>Sainte-Marie</option><option>Beauceville</option><option>Saint-Joseph-de-Beauce</option><option>Thetford Mines</option><option>Montmagny</option><option>Lac-Etchemin</option><option>Saint-Henri</option><option>Sainte-Croix</option></optgroup><optgroup label="Estrie"><option>Sherbrooke</option><option>Magog</option><option>Coaticook</option><option>Windsor</option><option>East Angus</option><option>Cookshire-Eaton</option><option>Lac-Mégantic</option><option>Val-des-Sources</option></optgroup><optgroup label="Mauricie"><option>Trois-Rivières</option><option>Shawinigan</option><option>Louiseville</option><option>La Tuque</option><option>Sainte-Anne-de-la-Pérade</option></optgroup><optgroup label="Centre-du-Québec"><option>Drummondville</option><option>Victoriaville</option><option>Bécancour</option><option>Nicolet</option><option>Plessisville</option><option>Warwick</option><option>Kingsey Falls</option></optgroup><optgroup label="Outaouais"><option>Gatineau</option><option>Cantley</option><option>Chelsea</option><option>Val-des-Monts</option><option>L'Ange-Gardien</option><option>Thurso</option><option>Maniwaki</option></optgroup><optgroup label="Saguenay–Lac-Saint-Jean"><option>Saguenay</option><option>Alma</option><option>Dolbeau-Mistassini</option><option>Roberval</option><option>Saint-Félicien</option><option>Chicoutimi</option><option>Jonquière</option></optgroup><optgroup label="Bas-Saint-Laurent"><option>Rimouski</option><option>Rivière-du-Loup</option><option>Matane</option><option>Mont-Joli</option><option>Amqui</option><option>Trois-Pistoles</option></optgroup><optgroup label="Abitibi-Témiscamingue"><option>Rouyn-Noranda</option><option>Val-d'Or</option><option>Amos</option><option>La Sarre</option><option>Malartic</option><option>Ville-Marie</option></optgroup><optgroup label="Côte-Nord"><option>Sept-Îles</option><option>Baie-Comeau</option><option>Port-Cartier</option></optgroup><optgroup label="Gaspésie–Îles-de-la-Madeleine"><option>Gaspé</option><option>Chandler</option><option>Carleton-sur-Mer</option><option>Les Îles-de-la-Madeleine</option><option>Sainte-Anne-des-Monts</option></optgroup><optgroup label="Nord-du-Québec"><option>Chibougamau</option><option>Lebel-sur-Quévillon</option><option>Matagami</option></optgroup><option>Autre</option>
       </select>
     </div>
   </div>
 
-  <!-- MAP VIEW -->
   <div id="map-view">
     <div id="greaz-map"></div>
     <div class="map-controls">
@@ -340,7 +306,6 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
     <div class="results-count-map" id="results-count-map"></div>
   </div>
 
-  <!-- GRID VIEW -->
   <div id="grid-view" style="display:none;padding-top:1.25rem">
     <div class="results-count" id="results-count-grid"></div>
     <div class="cards-grid" id="cards-grid">
@@ -349,7 +314,6 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   </div>
 </section>
 
-<!-- STATS -->
 <div class="stats-band">
   <div class="stats-inner">
     <div class="stat-item"><div class="stat-num blue">3 min</div><div class="stat-label">Pour recevoir une soumission</div></div>
@@ -358,7 +322,6 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   </div>
 </div>
 
-<!-- COMMENT ÇA MARCHE -->
 <section class="how">
   <div style="text-align:center"><div class="section-label">Comment ça marche</div><div class="section-title">Simple en 3 étapes</div></div>
   <div class="steps-row">
@@ -368,7 +331,6 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   </div>
 </section>
 
-<!-- FEATURES -->
 <section class="features">
   <div style="text-align:center"><div class="section-label">Pourquoi Greaz</div><div class="section-title">La plateforme qui change tout</div></div>
   <div class="feat-grid">
@@ -387,7 +349,6 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   <p>© 2026 Greaz — Tous droits réservés</p>
 </footer>
 
-<!-- DRAWERS -->
 <div class="overlay" id="overlay-client" onclick="if(event.target===this)closeDrawer('client')">
   <div class="drawer"><div class="drawer-handle"></div>
     <div class="drawer-header"><span class="drawer-title">🔧 Demande de service</span><button class="close-btn" onclick="closeDrawer('client')">✕</button></div>
@@ -418,7 +379,6 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// ── EmailJS ──
 emailjs.init({ publicKey: "COLLE_TA_CLE_PUBLIQUE_ICI" });
 var EMAILJS_SERVICE_ID = "service_h2f013c";
 var EMAILJS_TEMPLATE_ID = "template_moboyo8";
@@ -433,7 +393,6 @@ function notifierNouvelleDemandeClient(data){
   }).catch(function(e){ console.log("EmailJS:", e); });
 }
 
-// ── Firebase ──
 firebase.initializeApp({
   apiKey:"AIzaSyAbvCBM1J-LL5B5_v5rqjbGcM8geufmbxs",
   authDomain:"greaz-4b00c.firebaseapp.com",
@@ -444,9 +403,41 @@ firebase.initializeApp({
 });
 var db = firebase.firestore();
 
-// ── Constantes ──
 var DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 var DOW_MAP = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+
+// Centres approximatifs des villes — sert à détecter les GPS incohérents
+var CITY_COORDS = {
+  'Montréal':[45.5017,-73.5673],'Laval':[45.6066,-73.7124],'Longueuil':[45.5312,-73.5185],
+  'Brossard':[45.4501,-73.4658],'Terrebonne':[45.7000,-73.6467],'Repentigny':[45.7423,-73.4514],
+  'Mascouche':[45.7477,-73.6003],'Blainville':[45.6697,-73.8825],'Boisbriand':[45.6197,-73.8355],
+  'Saint-Eustache':[45.5649,-73.9036],'Deux-Montagnes':[45.5386,-73.8983],'Mirabel':[45.6501,-74.0822],
+  'Saint-Jérôme':[45.7799,-74.0037],'Boucherville':[45.6066,-73.4363],'Sainte-Julie':[45.5833,-73.3333],
+  'Rosemère':[45.6389,-73.7997],'Sainte-Thérèse':[45.6389,-73.8283],'Varennes':[45.6833,-73.4333],
+  'Chambly':[45.4500,-73.2833],'Beloeil':[45.5667,-73.2000],'Châteauguay':[45.3667,-73.7500],
+  'Candiac':[45.3833,-73.5167],'La Prairie':[45.4167,-73.5000],'Saint-Lambert':[45.4989,-73.5058],
+  'Saint-Bruno-de-Montarville':[45.5361,-73.3494],'Vaudreuil-Dorion':[45.4000,-74.0333],
+  'Saint-Jean-sur-Richelieu':[45.3067,-73.2625],'Saint-Hyacinthe':[45.6167,-72.9500],
+  'Sorel-Tracy':[46.0333,-73.1167],'Salaberry-de-Valleyfield':[45.2500,-74.1333],
+  'Granby':[45.4000,-72.7333],'Québec':[46.8139,-71.2080],'Lévis':[46.8033,-71.1779],
+  'Gatineau':[45.4765,-75.7013],'Sherbrooke':[45.4042,-71.8929],'Trois-Rivières':[46.3432,-72.5432],
+  'Saguenay':[48.4280,-71.0680],'Drummondville':[45.8833,-72.4833],'Victoriaville':[46.0553,-71.9564],
+  'Shawinigan':[46.5667,-72.7500],'Joliette':[46.0217,-73.4392],'Rimouski':[48.4489,-68.5236],
+  'Rivière-du-Loup':[47.8333,-69.5333],'Rouyn-Noranda':[48.2360,-79.0230],"Val-d'Or":[48.0972,-77.7972],
+  'Alma':[48.5500,-71.6500],'Magog':[45.2667,-72.1500],'Saint-Georges':[46.1167,-70.6667],
+  'Sainte-Marie':[46.4333,-71.0167],'Thetford Mines':[46.1000,-71.3000],'Mont-Tremblant':[46.1185,-74.5962],
+};
+
+function _kmBetween(lat1,lng1,lat2,lng2){
+  var R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function gpsMatchesCity(lat,lng,city){
+  var ref = CITY_COORDS[city];
+  if(!ref) return true;
+  return _kmBetween(parseFloat(lat),parseFloat(lng),ref[0],ref[1]) <= 60;
+}
 
 var CERT = {
   0: null,
@@ -467,7 +458,6 @@ var PROBLEMS = [
   {id:"other",  icon:"🔧",label:"Autre"},
 ];
 
-// ── État global ──
 var allPros = [];
 var filteredPros = [];
 var currentProfile = null;
@@ -475,11 +465,9 @@ var leafletMap = null;
 var leafletMarkers = [];
 var currentView = "map";
 
-// ── État formulaires ──
 var _urgency = "", _contact_pref = "both", _selProblem = "";
 var _bookingProblem = "", selSlot = "", reviewRating = 0;
 
-// ── Helpers ──
 function starsHtml(avg){
   var s=""; for(var i=1;i<=5;i++) s+=i<=Math.round(avg||0)?'★':'☆'; return s;
 }
@@ -519,19 +507,24 @@ function parseSchedule(str){
 }
 function initials(name){ return (name||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase(); }
 
-// ── VIEW TOGGLE ──
 function switchView(v){
   currentView = v;
   document.getElementById('map-view').style.display = v==='map' ? 'block' : 'none';
   document.getElementById('grid-view').style.display = v==='grid' ? 'block' : 'none';
   document.getElementById('btn-map').classList.toggle('act', v==='map');
   document.getElementById('btn-grid').classList.toggle('act', v==='grid');
-  if(v==='map' && leafletMap) setTimeout(function(){ leafletMap.invalidateSize(); }, 50);
+  if(v==='map' && leafletMap) setTimeout(function(){ leafletMap.invalidateSize(); fitAllMarkers(); }, 60);
   renderView();
 }
 
-// ── FIRESTORE ──
-// ── File de géocodage (respecte la limite Nominatim 1 req/sec) ──
+function fitAllMarkers(){
+  if(!leafletMap || !leafletMarkers.length) return;
+  try {
+    var group = L.featureGroup(leafletMarkers);
+    leafletMap.fitBounds(group.getBounds().pad(0.15), { maxZoom:13, animate:false });
+  } catch(e){}
+}
+
 var _geoQueue = [];
 var _geoRunning = false;
 
@@ -547,25 +540,25 @@ async function runGeoQueue(){
     var addr = (p.address && p.address.trim())
       ? p.address + ', Canada'
       : (p.city||'') + ', Québec, Canada';
+    if(!p.address && (!p.city || p.city==='Autre')) continue;
     try {
       var res = await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(addr)+'&format=json&limit=1&countrycodes=ca');
       var data = await res.json();
       if(data.length > 0){
-        p.lat = parseFloat(data[0].lat);
-        p.lng = parseFloat(data[0].lon);
-        // Sauvegarder dans Firestore pour pas regéocoder à chaque fois
-        db.collection('mechanics_public').doc(p.id).update({lat:p.lat, lng:p.lng}).catch(function(){});
-        // Ajouter le marqueur sur la carte si elle est active
-        if(currentView === 'map') addSingleMarker(p);
+        var lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+        if(gpsMatchesCity(lat, lng, p.city)){
+          p.lat = lat; p.lng = lng;
+          db.collection('mechanics_public').doc(p.id).update({lat:lat, lng:lng}).catch(function(){});
+          if(currentView === 'map') addSingleMarker(p);
+        }
       }
     } catch(e){ console.log('Geocoding failed for', p.name); }
     await new Promise(function(r){ setTimeout(r, 1300); });
   }
   _geoRunning = false;
-  // Mettre à jour le compteur de la carte
   if(currentView === 'map'){
-    var visible = leafletMarkers.filter(function(m){ return leafletMap.getBounds().contains(m.getLatLng()); }).length;
     document.getElementById('results-count-map').textContent = leafletMarkers.length + ' pro'+(leafletMarkers.length!==1?'s':'')+' sur la carte';
+    fitAllMarkers();
   }
 }
 
@@ -574,10 +567,20 @@ function loadDirectory(){
     allPros = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
       .filter(function(p){ return p.active!==false; });
 
-    // Géocodage automatique des pros sans GPS
+    // GPS non fiable : ville "Autre" sans adresse OU GPS incohérent avec la ville
+    allPros.forEach(function(p){
+      var hasGPS = p.lat && p.lng && !isNaN(parseFloat(p.lat));
+      var badAutre = p.city === 'Autre' && !(p.address && p.address.trim().length > 5);
+      var badMismatch = hasGPS && !gpsMatchesCity(p.lat, p.lng, p.city);
+      if(badAutre || badMismatch){
+        if(badMismatch) console.log('GPS incohérent, re-géocodage:', p.name, p.city);
+        p.lat = null; p.lng = null;
+      }
+    });
+
     var sans = allPros.filter(function(p){ return !p.lat || !p.lng || isNaN(parseFloat(p.lat)); });
     if(sans.length > 0){
-      console.log(sans.length + ' pros sans GPS — géocodage automatique...');
+      console.log(sans.length + ' pros sans GPS valide — géocodage automatique...');
       sans.forEach(function(p){ queueGeocode(p); });
     }
 
@@ -613,12 +616,10 @@ function renderView(){
   else renderGrid();
 }
 
-// ── MAP ──
 function addSingleMarker(p){
   var lat = parseFloat(p.lat), lng = parseFloat(p.lng);
   if(!lat || !lng || isNaN(lat) || isNaN(lng)) return;
 
-  // Jitter si overlap
   var nearby = leafletMarkers.filter(function(m){
     var ml=m.getLatLng();
     return Math.abs(ml.lat-lat)<0.0008 && Math.abs(ml.lng-lng)<0.0008;
@@ -662,10 +663,11 @@ function addSingleMarker(p){
   marker.on('popupopen', function(){ loadRatingSummary(p.id, 'map-rating-'+p.id); });
   leafletMarkers.push(marker);
 }
+
 function initMap(){
   leafletMap = L.map('greaz-map', {
     center:[45.5017,-73.5673],
-    zoom:12,
+    zoom:9,
     zoomControl:false,
     attributionControl:true,
   });
@@ -675,19 +677,15 @@ function initMap(){
     maxZoom:19,
   }).addTo(leafletMap);
 
-  // Événements de géolocalisation Leaflet
   leafletMap.on('locationfound', function(e){
     var btn = document.getElementById('geo-btn');
     if(btn){ btn.textContent='📍'; btn.style.background=''; btn.title='Ma position'; }
-
-    // Supprimer l'ancien marqueur position si existe
     if(window._geoMarker) leafletMap.removeLayer(window._geoMarker);
     window._geoMarker = L.circleMarker(e.latlng, {
-      radius:10, fillColor:'#1A3CFF', color:'white', weight:3, fillOpacity:1,
-      className:'geo-pulse'
+      radius:10, fillColor:'#1A3CFF', color:'white', weight:3, fillOpacity:1
     }).addTo(leafletMap);
     window._geoMarker.bindPopup('<div style="font-family:DM Sans,sans-serif;font-size:13px;color:#0A0C1B;padding:4px">📍 <strong>Vous êtes ici</strong></div>').openPopup();
-    leafletMap.setView(e.latlng, 14);
+    leafletMap.setView(e.latlng, 12);
   });
 
   leafletMap.on('locationerror', function(e){
@@ -702,25 +700,22 @@ function geolocateMe(){
   if(!leafletMap) return;
   var btn = document.getElementById('geo-btn');
   if(btn){ btn.textContent='⏳'; btn.style.background='rgba(26,60,255,.3)'; }
-  leafletMap.locate({ setView:false, maxZoom:14, timeout:8000, enableHighAccuracy:true });
+  leafletMap.locate({ setView:false, maxZoom:13, timeout:8000, enableHighAccuracy:true });
 }
 
 function renderMap(){
   if(!leafletMap) return;
-
-  // Clear existing markers
   leafletMarkers.forEach(function(m){ leafletMap.removeLayer(m); });
   leafletMarkers = [];
 
   var count = 0;
-  var coordsUsed = []; // track used positions to avoid overlap
+  var coordsUsed = [];
 
   filteredPros.forEach(function(p){
     var lat = parseFloat(p.lat);
     var lng = parseFloat(p.lng);
     if(!lat || !lng || isNaN(lat) || isNaN(lng)) return;
 
-    // Décalage automatique si plusieurs pros au même endroit
     var nearby = coordsUsed.filter(function(c){
       return Math.abs(c[0]-lat)<0.0008 && Math.abs(c[1]-lng)<0.0008;
     });
@@ -778,11 +773,11 @@ function renderMap(){
 
   document.getElementById('results-count-map').textContent = count + ' pro'+(count!==1?'s':'')+' visible'+(count!==1?'s':'')+' sur la carte';
   if(count===0){
-    document.getElementById('results-count-map').textContent = 'Aucun pro avec coordonnées GPS — publie des pros depuis le dashboard';
+    document.getElementById('results-count-map').textContent = 'Aucun pro avec coordonnées GPS';
   }
+  fitAllMarkers();
 }
 
-// ── GRID ──
 function renderGrid(){
   var el = document.getElementById('cards-grid');
   var countEl = document.getElementById('results-count-grid');
@@ -837,7 +832,6 @@ function loadRatingSummary(id, elId){
   }).catch(function(){});
 }
 
-// ── PROFIL ──
 function openProfile(id){
   var p = allPros.find(function(x){ return x.id===id; });
   if(!p) return;
@@ -845,7 +839,6 @@ function openProfile(id){
   var isGarage = p.type==='garage';
   var ini = initials(p.name);
   var cert = CERT[p.certification||0];
-  var price = lowestPrice(p.pricing);
   var pricing = parsePricing(p.pricing);
   var sched = parseSchedule(p.schedule);
 
@@ -879,25 +872,19 @@ function openProfile(id){
     +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'" style="margin-top:5px">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
     +(cert?'<div style="margin-top:5px">'+certBadgeHtml(p.certification)+'</div>':'')
     +'</div></div>'
-
     +(p.bio?'<div class="profile-bio">"'+p.bio+'"</div>':'')
-
     +'<div class="profile-section-title">Avis clients</div>'
     +'<div id="prating-'+p.id+'"><div style="color:rgba(255,255,255,.3);font-size:13px">Chargement...</div></div>'
     +'<div id="reviews-list-'+p.id+'"></div>'
     +'<button class="btn-book" style="margin-top:1rem;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#FBBF24" onclick="openDirectReview(\''+p.id+'\')">⭐ Laisser un avis</button>'
-
     +'<div class="profile-section-title">Tarifs</div>'
     +pricingTable
-
     +(vehTags?'<div class="profile-section-title">Véhicules acceptés</div><div class="pro-tags">'+vehTags+'</div>':'')
     +(svcTags?'<div class="profile-section-title">Services offerts</div><div class="pro-tags">'+svcTags+'</div>':'')
-
     +'<div class="profile-section-title">Disponibilités habituelles</div>'
     +'<div class="avail-grid">'
     +'<div class="avail-head">Jour</div><div class="avail-head">Mat.</div><div class="avail-head">P-M</div><div class="avail-head">Soir</div>'
     +availRows+'</div>'
-
     +'<button class="btn-book" style="margin-top:1.5rem" onclick="openBooking(\''+p.id+'\')">📅 Demander un rendez-vous</button>';
 
   document.getElementById('overlay-profile').classList.add('open');
@@ -973,7 +960,6 @@ function loadFullReviews(id){
   }).catch(function(){});
 }
 
-// ── RÉSERVATION ──
 function openBooking(id){
   var p=allPros.find(function(x){return x.id===id;}); if(!p) return;
   currentProfile=p; _bookingProblem=""; selSlot="";
@@ -987,12 +973,10 @@ function openBooking(id){
   document.getElementById('booking-drawer-body').innerHTML=
     '<div class="alert-err" id="booking-err"></div>'
     +'<div style="background:rgba(26,60,255,.08);border:1px solid rgba(26,60,255,.2);border-radius:var(--r2);padding:10px 14px;font-size:12.5px;color:rgba(255,255,255,.7);margin-bottom:1.25rem">Rendez-vous avec <strong style="color:white">'+p.name+'</strong></div>'
-
     +'<div class="ff"><label>Type de véhicule *</label><select id="b_vtype"><option value="">— Choisir —</option><option>Voiture / VUS</option><option>Camionnette</option><option>Moto / Scooter</option><option>Van / Minivan</option><option>VR / Motorisé</option><option>Bateau</option><option>Autre</option></select></div>'
     +'<div class="ff2"><div class="ff"><label>Marque</label><input type="text" id="b_make" placeholder="Toyota, Honda, BMW..."></div>'
     +'<div class="ff"><label>Année</label><select id="b_year"><option value="">Année</option>'+yearsOpts+'</select></div></div>'
     +'<div class="ff"><label>Modèle</label><input type="text" id="b_model" placeholder="ex. Corolla, F-150, Civic..."></div>'
-
     +'<div class="ff"><label>Date souhaitée *</label><input type="date" id="b_date" min="'+today+'" onchange="updateSlots()"></div>'
     +'<div class="ff"><label>Plage horaire *</label><div class="slot-pick-row">'
     +'<button type="button" class="slot-pick-btn" id="bslot-matin" onclick="selBSlot(\'matin\')" disabled>Matin</button>'
@@ -1009,6 +993,7 @@ function openBooking(id){
     +'<div class="ff"><label>Courriel *</label><input type="email" id="b_email" placeholder="jean@email.com" oninput="vEmail(this)"><div id="bemail-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Courriel invalide</div></div>'
     +'</div>'
     +(isGarage?'':'<div class="ff"><label>Adresse *</label><input type="text" id="b_addr" placeholder="1234 Rue Principale, Montréal"></div>')
+    +'<div class="ff"><label>Code de référence <span style="font-weight:400;color:rgba(255,255,255,.4);font-size:11px">(optionnel)</span></label><input type="text" id="b_referral" placeholder="Ex: MARIE10" style="text-transform:uppercase"></div>'
     +'<button class="btn-book" id="booking-submit-btn" onclick="submitBooking()">Envoyer ma demande →</button>';
   document.getElementById('overlay-booking').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1081,6 +1066,7 @@ async function submitBooking(){
       vehicle_year:document.getElementById('b_year').value||'',
       date:date, time_slot:selSlot, problem:_bookingProblem||'Non précisé',
       description:document.getElementById('b_desc').value.trim(),
+      referral_code:(document.getElementById('b_referral').value||'').trim().toUpperCase(),
       status:'en_attente', booking_code:code,
       created_at:firebase.firestore.FieldValue.serverTimestamp(),
     });
@@ -1098,7 +1084,6 @@ async function submitBooking(){
   }
 }
 
-// ── FORMULAIRE CLIENT (soumission rapide) ──
 function openDrawer(type){
   renderClientForm();
   document.getElementById("overlay-"+type).classList.add("open");
@@ -1169,7 +1154,8 @@ function renderClientForm(){
     +'<div class="ff2">'
     +'<div class="ff"><label>Téléphone *</label><input type="tel" id="c_phone" placeholder="514-555-0100" oninput="validatePhone(this)"><div id="phone-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Numéro canadien invalide</div></div>'
     +'<div class="ff"><label>Courriel *</label><input type="email" id="c_email" placeholder="jean@email.com" oninput="validateEmail(this)"><div id="email-err" style="font-size:11px;color:#f87171;margin-top:3px;display:none">Courriel invalide</div></div>'
-    +'</div><div class="ff"><label>Adresse *</label><input type="text" id="c_addr" placeholder="1234 Rue Principale, Montréal, QC H2X 1Y4"></div></div>'
+    +'</div><div class="ff"><label>Adresse *</label><input type="text" id="c_addr" placeholder="1234 Rue Principale, Montréal, QC H2X 1Y4"></div>'
+    +'<div class="ff"><label>Code de référence <span style="font-weight:400;color:rgba(255,255,255,.4);font-size:11px">(optionnel)</span></label><input type="text" id="c_referral" placeholder="Ex: MARIE10" style="text-transform:uppercase"></div></div>'
     +'<div class="form-section"><div class="form-section-title">Comment vous répondre ?</div>'
     +'<div class="contact-row">'
     +'<div class="contact-pill sel" id="cont-both" onclick="selContact(\'both\')">📱 SMS + courriel</div>'
@@ -1208,6 +1194,7 @@ async function submitClient(){
       problem:_selProblem||"Non précisé",
       description:document.getElementById("c_desc").value||"",
       urgency:urgLabel, contact_pref:_contact_pref||"both",
+      referral_code:(document.getElementById("c_referral").value||"").trim().toUpperCase(),
       booking_code:code, status:"nouveau",
       created_at:firebase.firestore.FieldValue.serverTimestamp(),
     };
@@ -1229,7 +1216,6 @@ async function submitClient(){
   }
 }
 
-// ── AVIS DIRECT (bouton sur profil, sans lien unique) ──
 function openDirectReview(mecId){
   var p = allPros.find(function(x){ return x.id===mecId; });
   var mecName = p ? p.name : 'ce professionnel';
@@ -1247,6 +1233,7 @@ function openDirectReview(mecId){
   document.getElementById('overlay-review').classList.add('open');
   document.body.style.overflow='hidden';
 }
+
 async function submitDirectReview(mecId){
   var errEl=document.getElementById('review-err'), btn=document.getElementById('review-submit-btn');
   errEl.style.display='none';
@@ -1261,7 +1248,6 @@ async function submitDirectReview(mecId){
       author_name:author||'Client Greaz',
       created_at:firebase.firestore.FieldValue.serverTimestamp(),
     });
-    // Rafraîchir le profil si encore ouvert
     if(document.getElementById('overlay-profile').classList.contains('open')){
       loadFullRating(mecId);
       loadFullReviews(mecId);
@@ -1278,7 +1264,6 @@ async function submitDirectReview(mecId){
   }
 }
 
-// ── AVIS (lien unique) ──
 function checkReviewMode(){
   var params=new URLSearchParams(window.location.search);
   if(params.get('avis')==='1'){
@@ -1336,7 +1321,6 @@ async function submitReview(bookingId,code,mecId){
   }
 }
 
-// ── INIT ──
 window.addEventListener('DOMContentLoaded', function(){
   initMap();
   loadDirectory();
