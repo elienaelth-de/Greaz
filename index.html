@@ -202,6 +202,71 @@ h1 .hl2{color:var(--green);}
 .stat-num.green{color:var(--green);}
 .stat-num.orange{color:var(--orange);}
 .stat-label{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px;}
+/* ═══ RECHERCHE PAR ADRESSE ═══ */
+.addr-bar{display:flex;gap:8px;align-items:center;max-width:900px;margin:0 auto 10px;background:linear-gradient(135deg,rgba(26,60,255,.14),rgba(0,194,111,.06));border:1.5px solid rgba(26,60,255,.3);border-radius:var(--r2);padding:.6rem .75rem;flex-wrap:wrap}
+.addr-ic{font-size:1.15rem;flex-shrink:0}
+.addr-bar input{flex:1;min-width:180px;padding:10px 12px;background:rgba(255,255,255,.06);border:1.5px solid var(--line);border-radius:var(--r);color:white;font-family:'DM Sans',sans-serif;font-size:14px;outline:none}
+.addr-bar input::placeholder{color:rgba(255,255,255,.35)}
+.addr-bar input:focus{border-color:var(--blue);background:rgba(26,60,255,.1)}
+.addr-bar select{padding:10px 11px;background:rgba(255,255,255,.06);border:1.5px solid var(--line);border-radius:var(--r);color:white;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer}
+.addr-bar select option{background:#1C2040}
+.addr-btn{padding:10px 20px;background:var(--blue);color:white;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;transition:background .2s;white-space:nowrap}
+.addr-btn:hover{background:var(--blue2)}
+.addr-btn:disabled{opacity:.6;cursor:not-allowed}
+.addr-active{display:none;max-width:900px;margin:0 auto 10px;background:rgba(0,194,111,.1);border:1px solid rgba(0,194,111,.3);border-radius:var(--r);padding:8px 13px;font-size:12.5px;color:rgba(255,255,255,.75);align-items:center;justify-content:space-between;gap:10px}
+.addr-active.show{display:flex}
+.addr-active button{background:none;border:none;color:rgba(255,255,255,.45);font-size:11.5px;cursor:pointer;font-family:inherit;white-space:nowrap;padding:2px 6px;border-radius:5px}
+.addr-active button:hover{color:#f87171;background:rgba(248,113,113,.1)}
+.dist-tag{display:inline-block;font-size:11px;font-weight:700;color:var(--green);background:rgba(0,194,111,.13);border:1px solid rgba(0,194,111,.28);padding:2px 9px;border-radius:10px;margin-top:5px}
+@media(max-width:640px){
+  .addr-bar{gap:6px;padding:.55rem}
+  .addr-bar input{min-width:100%;order:1}
+  .addr-ic{display:none}
+  .addr-bar select{flex:1}
+  .addr-btn{flex:1}
+}
+
+/* ═══ SECTION MEMBERSHIP PREMIUM ═══ */
+.membership{position:relative;padding:6rem 2rem;overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.mb-glow{position:absolute;inset:0;background:radial-gradient(ellipse 50% 60% at 75% 50%,rgba(255,215,0,.09),transparent 65%),radial-gradient(ellipse 45% 55% at 20% 45%,rgba(26,60,255,.13),transparent 65%);pointer-events:none}
+.mb-inner{position:relative;z-index:1;max-width:1050px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.mb-title{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(2rem,4vw,2.9rem);font-weight:800;line-height:1.08;letter-spacing:-.035em;margin:.5rem 0 1rem}
+.mb-hl{background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mb-sub{font-size:14.5px;color:rgba(255,255,255,.55);line-height:1.75;margin-bottom:1.75rem}
+.mb-perks{display:flex;flex-direction:column;gap:13px;margin-bottom:2rem}
+.mb-perk{display:flex;gap:13px;align-items:flex-start}
+.mb-perk span{font-size:1.35rem;flex-shrink:0;width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.mb-perk b{display:block;font-size:14px;font-weight:700;margin-bottom:1px}
+.mb-perk small{font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.5}
+.mb-cta{padding:14px 30px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,#FFD700,#FFA500);color:#1a1200;font-family:'DM Sans',sans-serif;font-size:14.5px;font-weight:800;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 6px 24px rgba(255,183,0,.28)}
+.mb-cta:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(255,183,0,.4)}
+.mb-right{display:flex;flex-direction:column;align-items:center;gap:1.25rem}
+.mb-card{width:100%;max-width:330px;aspect-ratio:1.6;border-radius:22px;padding:1.5rem;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a1d2e 0%,#12141f 55%,#1f1a12 100%);border:1px solid rgba(255,215,0,.22);box-shadow:0 22px 55px rgba(0,0,0,.55);display:flex;flex-direction:column;transform:rotate(-3deg);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.mb-card:hover{transform:rotate(0deg) scale(1.03)}
+.mb-card-shine{position:absolute;top:-60%;left:-30%;width:75%;height:220%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);transform:rotate(22deg);animation:shine 4.5s ease-in-out infinite}
+@keyframes shine{0%,100%{left:-40%}50%{left:110%}}
+.mb-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:auto}
+.mb-card-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:800}
+.mb-card-logo span{color:var(--gold)}
+.mb-card-tier{font-size:11px;font-weight:700;padding:4px 11px;border-radius:14px;background:rgba(255,215,0,.14);border:1px solid rgba(255,215,0,.35);color:var(--gold)}
+.mb-card-pts{font-family:'Bricolage Grotesque',sans-serif;font-size:2.6rem;font-weight:800;line-height:1;letter-spacing:-.04em;background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mb-card-lbl{font-size:10.5px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;margin-bottom:12px}
+.mb-card-bar{height:5px;background:rgba(255,255,255,.09);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.mb-card-fill{height:100%;width:78%;background:linear-gradient(90deg,#FFD700,#FFA500);border-radius:4px}
+.mb-card-foot{display:flex;justify-content:space-between;align-items:center;font-size:9.5px;letter-spacing:.12em;color:rgba(255,255,255,.32);font-weight:600}
+.mb-tiers{display:flex;gap:9px;width:100%;max-width:330px}
+.mb-tier{flex:1;text-align:center;padding:11px 6px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--line);transition:all .2s}
+.mb-tier.act{background:rgba(255,215,0,.08);border-color:rgba(255,215,0,.32)}
+.mb-tier span{font-size:1.15rem;display:block}
+.mb-tier b{display:block;font-size:11.5px;font-weight:700;margin-top:3px}
+.mb-tier small{font-size:10px;color:rgba(255,255,255,.4)}
+@media(max-width:820px){
+  .mb-inner{grid-template-columns:1fr;gap:2.5rem}
+  .mb-right{order:-1}
+  .membership{padding:4rem 1.25rem}
+  .mb-card{transform:rotate(0)}
+}
+
 .how{padding:5rem 2rem;max-width:900px;margin:0 auto;}
 .steps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem;}
 .step-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r2);padding:1.5rem;position:relative;}
@@ -220,6 +285,57 @@ footer{padding:3rem 2rem 2rem;border-top:1px solid rgba(255,255,255,.06);text-al
 .footer-logo span{color:var(--blue);}
 footer p{font-size:12px;color:rgba(255,255,255,.3);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ NAV COMPTE ═══ */
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-account{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:30px;border:1.5px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:white;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;backdrop-filter:blur(10px)}
+.nav-account:hover{background:rgba(26,60,255,.25);border-color:var(--blue)}
+.nav-account.logged{background:linear-gradient(135deg,rgba(26,60,255,.3),rgba(0,194,111,.2));border-color:rgba(26,60,255,.5)}
+.nav-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+
+/* ═══ ESPACE CLIENT ═══ */
+.acc-hero{background:linear-gradient(135deg,rgba(26,60,255,.18),rgba(0,194,111,.1));border:1px solid rgba(255,255,255,.1);border-radius:var(--r3);padding:1.5rem;margin-bottom:1.25rem;position:relative;overflow:hidden}
+.acc-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:220px;height:220px;background:radial-gradient(circle,rgba(26,60,255,.25),transparent 70%);pointer-events:none}
+.acc-name{font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.02em}
+.acc-mail{font-size:12.5px;color:rgba(255,255,255,.5);margin-top:2px}
+
+/* Fidélité */
+.loyalty{position:relative;z-index:1;margin-top:1.25rem}
+.loy-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px}
+.loy-pts{font-family:'Bricolage Grotesque',sans-serif;font-size:2.2rem;font-weight:800;line-height:1;letter-spacing:-.03em;background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.loy-lbl{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.loy-tier{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:20px;font-size:11.5px;font-weight:700}
+.tier-bronze{background:rgba(205,127,50,.15);border:1px solid rgba(205,127,50,.4);color:#E5A672}
+.tier-silver{background:rgba(192,192,192,.15);border:1px solid rgba(192,192,192,.4);color:#D8D8D8}
+.tier-gold{background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.45);color:var(--gold)}
+.loy-bar{height:7px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden}
+.loy-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FFA500);border-radius:5px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.loy-next{font-size:11.5px;color:rgba(255,255,255,.45);margin-top:7px}
+
+/* Cartes véhicules */
+.veh-card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:var(--r2);padding:1rem 1.1rem;margin-bottom:9px;display:flex;align-items:center;gap:13px;transition:all .2s}
+.veh-card:hover{border-color:rgba(26,60,255,.4);background:rgba(26,60,255,.06)}
+.veh-ic{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(26,60,255,.2),rgba(0,194,111,.12));display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.veh-name{font-size:14.5px;font-weight:700}
+.veh-plate{font-size:11.5px;color:var(--green);font-weight:600;letter-spacing:.06em;margin-top:1px}
+
+/* RDV client */
+.crdv{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:var(--r2);padding:1rem 1.1rem;margin-bottom:9px;border-left:3px solid var(--blue)}
+.crdv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:7px}
+.crdv-mec{font-size:14.5px;font-weight:700}
+.crdv-meta{font-size:12px;color:rgba(255,255,255,.5);line-height:1.7}
+.crdv-status{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;white-space:nowrap}
+
+.acc-section{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin:1.5rem 0 .85rem;display:flex;justify-content:space-between;align-items:center}
+.acc-add{font-size:11px;font-weight:700;color:var(--blue);background:rgba(26,60,255,.14);border:1px solid rgba(26,60,255,.3);padding:4px 12px;border-radius:16px;cursor:pointer;font-family:inherit;letter-spacing:0;text-transform:none}
+.acc-add:hover{background:rgba(26,60,255,.25)}
+
+.auth-switch{text-align:center;font-size:13px;color:rgba(255,255,255,.5);margin-top:1.25rem}
+.auth-switch b{color:var(--blue);cursor:pointer;font-weight:700}
+.perk{display:flex;gap:11px;align-items:flex-start;background:rgba(255,255,255,.03);border-radius:var(--r);padding:11px 13px;margin-bottom:7px}
+.perk-ic{font-size:1.2rem;flex-shrink:0}
+.perk-t{font-size:13px;font-weight:700}
+.perk-d{font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.5;margin-top:1px}
 @media(max-width:640px){
   .cta-row{flex-direction:column;align-items:center;}
   .cta-card{max-width:100%;}
@@ -229,6 +345,8 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   .stats-inner{gap:1.5rem;}
   #greaz-map{height:calc(100vh - 120px);}
   nav{padding:.75rem 1rem;}
+  .nav-badge{display:none}
+  .nav-account{padding:6px 13px;font-size:12px}
   .hero{padding:6rem 1rem 3rem;}
 }
 </style>
@@ -237,7 +355,12 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
 
 <nav>
   <div class="logo">Gre<span>az</span></div>
-  <div class="nav-badge">🇨🇦 Québec · Plateforme auto</div>
+  <div class="nav-right">
+    <div class="nav-badge">🇨🇦 Québec</div>
+    <button class="nav-account" id="nav-account-btn" onclick="openAccount()">
+      <span id="nav-account-label">Mon espace</span>
+    </button>
+  </div>
 </nav>
 
 <section class="hero">
@@ -272,6 +395,25 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
     <div class="view-toggle" style="margin-top:1.25rem">
       <button class="vtoggle-btn act" id="btn-map" onclick="switchView('map')">🗺️ Carte</button>
       <button class="vtoggle-btn" id="btn-grid" onclick="switchView('grid')">⊞ Grille</button>
+    </div>
+  </div>
+
+  <div class="filters-bar-wrap">
+    <div class="addr-bar">
+      <div class="addr-ic">📍</div>
+      <input type="text" id="addr-input" placeholder="Ton adresse ou ta ville — ex : 1234 rue Principale, Laval"
+        onkeydown="if(event.key==='Enter')searchByAddress()">
+      <select id="addr-radius" onchange="if(_refPoint)applyFilters()">
+        <option value="10">10 km</option>
+        <option value="25" selected>25 km</option>
+        <option value="50">50 km</option>
+        <option value="0">Partout</option>
+      </select>
+      <button class="addr-btn" id="addr-btn" onclick="searchByAddress()">Chercher</button>
+    </div>
+    <div class="addr-active" id="addr-active">
+      <span id="addr-active-txt"></span>
+      <button onclick="clearAddress()">✕ Retirer</button>
     </div>
   </div>
 
@@ -322,12 +464,50 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
   </div>
 </div>
 
+<section class="membership">
+  <div class="mb-glow"></div>
+  <div class="mb-inner">
+    <div class="mb-left">
+      <div class="section-label" style="color:var(--gold)">Programme Greaz</div>
+      <h2 class="mb-title">Chaque visite<br><span class="mb-hl">te rapporte.</span></h2>
+      <p class="mb-sub">Crée ton compte gratuit. Enregistre tes véhicules, suis tes rendez-vous, et accumule des points échangeables contre des rabais chez nos pros certifiés.</p>
+      <div class="mb-perks">
+        <div class="mb-perk"><span>🚗</span><div><b>Tes véhicules enregistrés</b><small>Réserve en 2 clics, sans tout retaper</small></div></div>
+        <div class="mb-perk"><span>📋</span><div><b>Ton historique d'entretien</b><small>Tous tes rendez-vous au même endroit</small></div></div>
+        <div class="mb-perk"><span>🎁</span><div><b>50 points par réservation</b><small>200 points = 10 $ de rabais</small></div></div>
+      </div>
+      <button class="mb-cta" onclick="openAccount();renderAuth('signup')">Créer mon compte gratuit →</button>
+    </div>
+    <div class="mb-right">
+      <div class="mb-card">
+        <div class="mb-card-shine"></div>
+        <div class="mb-card-top">
+          <div class="mb-card-logo">Gre<span>az</span></div>
+          <div class="mb-card-tier">🥇 Or</div>
+        </div>
+        <div class="mb-card-pts">520</div>
+        <div class="mb-card-lbl">Points Greaz</div>
+        <div class="mb-card-bar"><div class="mb-card-fill"></div></div>
+        <div class="mb-card-foot">
+          <span>MEMBRE DEPUIS 2026</span>
+          <span>✦✦✦</span>
+        </div>
+      </div>
+      <div class="mb-tiers">
+        <div class="mb-tier"><span>🥉</span><b>Bronze</b><small>0 pt</small></div>
+        <div class="mb-tier"><span>🥈</span><b>Argent</b><small>150 pts</small></div>
+        <div class="mb-tier act"><span>🥇</span><b>Or</b><small>500 pts</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="how">
   <div style="text-align:center"><div class="section-label">Comment ça marche</div><div class="section-title">Simple en 3 étapes</div></div>
   <div class="steps-row">
     <div class="step-card"><div class="step-num">01</div><div class="step-icon">🗺️</div><div class="step-title">Tu trouves un pro sur la carte</div><div class="step-desc">Vois les mécaniciens certifiés et garages autour de toi avec leurs prix et avis.</div></div>
     <div class="step-card"><div class="step-num">02</div><div class="step-icon">📅</div><div class="step-title">Tu réserves un créneau</div><div class="step-desc">Choisis une date, une plage horaire — le pro confirme rapidement par SMS.</div></div>
-    <div class="step-card"><div class="step-num">03</div><div class="step-icon">✅</div><div class="step-title">Le pro vient chez toi</div><div class="step-desc">Mécanicien mobile ou garage — c'est toi qui choisis. C'est réglé.</div></div>
+    <div class="step-card"><div class="step-num">03</div><div class="step-icon">✅</div><div class="step-title">Tu suis tout dans ton espace</div><div class="step-desc">Statut de ton rendez-vous, historique de tes véhicules, et tes points qui s'accumulent.</div></div>
   </div>
 </section>
 
@@ -339,7 +519,7 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
     <div class="feat-card"><div class="feat-icon">⭐</div><div class="feat-title">Avis vérifiés</div><div class="feat-desc">Seulement les clients qui ont réellement eu un rendez-vous peuvent laisser un avis.</div></div>
     <div class="feat-card"><div class="feat-icon">📍</div><div class="feat-title">Carte interactive</div><div class="feat-desc">Vois les pros autour de toi en temps réel. Filtre par type, certification, disponibilité.</div></div>
     <div class="feat-card"><div class="feat-icon">🚗</div><div class="feat-title">Tous véhicules</div><div class="feat-desc">Voitures, VUS, motos, vans, VR et bateaux. Si ça a un moteur, on s'en occupe.</div></div>
-    <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Confirmation instantanée</div><div class="feat-desc">SMS + courriel à chaque étape. Suivi de ta demande en temps réel.</div></div>
+    <div class="feat-card"><div class="feat-icon">🎁</div><div class="feat-title">Points et rabais</div><div class="feat-desc">50 points par réservation. Monte les niveaux et débloque des rabais chez nos pros certifiés.</div></div>
   </div>
 </section>
 
@@ -367,6 +547,12 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
     <div class="drawer-body" id="booking-drawer-body"></div>
   </div>
 </div>
+<div class="overlay" id="overlay-account" onclick="if(event.target===this)closeDrawer('account')">
+  <div class="drawer"><div class="drawer-handle"></div>
+    <div class="drawer-header"><span class="drawer-title" id="account-title">Mon espace Greaz</span><button class="close-btn" onclick="closeDrawer('account')">✕</button></div>
+    <div class="drawer-body" id="account-body"></div>
+  </div>
+</div>
 <div class="overlay" id="overlay-review" onclick="if(event.target===this)closeDrawer('review')">
   <div class="drawer"><div class="drawer-handle"></div>
     <div class="drawer-header"><span class="drawer-title">⭐ Laisser un avis</span><button class="close-btn" onclick="closeDrawer('review')">✕</button></div>
@@ -376,12 +562,13 @@ footer p{font-size:12px;color:rgba(255,255,255,.3);}
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-emailjs.init({ publicKey: "COLLE_TA_CLE_PUBLIQUE_ICI" });
-var EMAILJS_SERVICE_ID = "service_h2f013c";
-var EMAILJS_TEMPLATE_ID = "template_moboyo8";
+emailjs.init({ publicKey: "wVQqsSCjIEvcucyEc" });
+var EMAILJS_SERVICE_ID = "service_2v5zpll";
+var EMAILJS_TEMPLATE_ID = "template_b0le5ae";
 
 function notifierNouvelleDemandeClient(data){
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -519,6 +706,7 @@ function switchView(v){
 
 function fitAllMarkers(){
   if(!leafletMap || !leafletMarkers.length) return;
+  if(_refPoint) return;   // une adresse est active : on garde la vue centrée dessus
   try {
     var group = L.featureGroup(leafletMarkers);
     leafletMap.fitBounds(group.getBounds().pad(0.15), { maxZoom:13, animate:false });
@@ -592,6 +780,84 @@ function loadDirectory(){
   });
 }
 
+/* ══════════ RECHERCHE PAR ADRESSE ══════════ */
+var _refPoint = null;      // {lat, lng, label} — point de référence choisi
+var _refMarker = null;
+
+async function searchByAddress(){
+  var input = document.getElementById('addr-input');
+  var btn = document.getElementById('addr-btn');
+  var q = (input.value||'').trim();
+  if(!q){ input.focus(); return; }
+
+  btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:14px;height:14px"></span>';
+  try {
+    // On force le Québec pour éviter les résultats ailleurs dans le monde
+    var query = q + (/qu[ée]bec|qc/i.test(q) ? '' : ', Québec') + ', Canada';
+    var res = await fetch('https://nominatim.openstreetmap.org/search?q='
+      + encodeURIComponent(query) + '&format=json&limit=1&countrycodes=ca');
+    var data = await res.json();
+
+    if(!data.length){
+      alert('Adresse introuvable.\n\nEssaie avec une ville, un code postal ou une adresse plus complète.\nEx : « Laval », « H7T 1R3 », « 1234 rue Principale, Longueuil »');
+      btn.disabled=false; btn.textContent='Chercher'; return;
+    }
+
+    var lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+
+    // Vérifie que c'est bien au Québec
+    if(lat < 44.5 || lat > 63 || lng < -80 || lng > -56.5){
+      alert('Cette adresse semble être hors du Québec.\n\nGreaz couvre pour l\'instant le Québec seulement.');
+      btn.disabled=false; btn.textContent='Chercher'; return;
+    }
+
+    var label = (data[0].display_name||q).split(',').slice(0,3).join(', ');
+    _refPoint = { lat:lat, lng:lng, label:label };
+
+    // Marqueur du point de référence
+    if(leafletMap){
+      if(_refMarker) leafletMap.removeLayer(_refMarker);
+      _refMarker = L.circleMarker([lat,lng], {
+        radius:11, fillColor:'#1A3CFF', color:'white', weight:3, fillOpacity:1
+      }).addTo(leafletMap);
+      _refMarker.bindPopup('<div style="font-family:DM Sans,sans-serif;font-size:13px;color:#0A0C1B;padding:5px 3px">📍 <strong>Ton point de départ</strong><br><span style="font-size:11.5px;color:#555">'+label+'</span></div>');
+      leafletMap.setView([lat,lng], 12);
+    }
+
+    var bar = document.getElementById('addr-active');
+    document.getElementById('addr-active-txt').innerHTML = '📍 Autour de <b>'+label+'</b>';
+    bar.classList.add('show');
+
+    applyFilters();
+  } catch(e){
+    alert('Impossible de localiser cette adresse pour le moment. Réessaie dans quelques secondes.');
+  }
+  btn.disabled=false; btn.textContent='Chercher';
+}
+
+function clearAddress(){
+  _refPoint = null;
+  document.getElementById('addr-input').value = '';
+  document.getElementById('addr-active').classList.remove('show');
+  if(_refMarker && leafletMap){ leafletMap.removeLayer(_refMarker); _refMarker = null; }
+  if(window._geoMarker && leafletMap){ leafletMap.removeLayer(window._geoMarker); window._geoMarker = null; }
+  filteredPros.forEach(function(p){ delete p._dist; });
+  applyFilters();
+  if(leafletMap) setTimeout(fitAllMarkers, 100);
+}
+
+/* Distance d'un pro par rapport au point de référence (null si inconnu) */
+function proDistance(p){
+  if(!_refPoint) return null;
+  var lat = parseFloat(p.lat), lng = parseFloat(p.lng);
+  if(!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+  return _kmBetween(_refPoint.lat, _refPoint.lng, lat, lng);
+}
+function distLabel(km){
+  if(km === null || km === undefined) return '';
+  return km < 1 ? '📍 moins de 1 km' : '📍 à '+km.toFixed(1)+' km';
+}
+
 function applyFilters(){
   var search = (document.getElementById('search-input').value||'').toLowerCase().trim();
   var typeF = document.getElementById('filter-type').value;
@@ -606,8 +872,27 @@ function applyFilters(){
       var hay=((p.name||'')+(p.city||'')+(p.services||'')+(p.vehicle_types||'')).toLowerCase();
       if(!hay.includes(search)) return false;
     }
+    // Filtre par rayon autour de l'adresse saisie
+    if(_refPoint){
+      var radius = parseInt(document.getElementById('addr-radius').value||'0');
+      if(radius > 0){
+        var d = proDistance(p);
+        if(d === null || d > radius) return false;
+      }
+    }
     return true;
   });
+
+  // Tri par distance quand une adresse est active
+  if(_refPoint){
+    filteredPros.forEach(function(p){ p._dist = proDistance(p); });
+    filteredPros.sort(function(a,b){
+      if(a._dist === null) return 1;
+      if(b._dist === null) return -1;
+      return a._dist - b._dist;
+    });
+  }
+
   renderView();
 }
 
@@ -653,7 +938,7 @@ function addSingleMarker(p){
     '<div class="gz-popup-inner">'
     +'<div class="gz-popup-name">'+p.name+'</div>'
     +(cert?'<div>'+certBadge+'</div>':'')
-    +'<div class="gz-popup-meta" style="margin-top:6px">📍 '+(p.city||'—')+' · '+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</div>'
+    +'<div class="gz-popup-meta" style="margin-top:6px">📍 '+(p.city||'—')+' · '+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+(p._dist!==undefined&&p._dist!==null?'<br><span style="color:#00C26F;font-weight:700">'+distLabel(p._dist)+'</span>':'')+'</div>'
     +'<div class="gz-popup-rating" id="map-rating-'+p.id+'">···</div>'
     +priceHtml
     +'<button class="gz-popup-btn" onclick="openProfile(\''+p.id+'\')">Voir le profil →</button>'
@@ -665,16 +950,29 @@ function addSingleMarker(p){
 }
 
 function initMap(){
+  // Limites : tout le Québec — impossible de dériver hors du territoire
+  var QC_BOUNDS = L.latLngBounds(
+    L.latLng(44.5, -80.0),   // sud-ouest (Montérégie / Abitibi)
+    L.latLng(63.0, -56.5)    // nord-est (Nunavik / Îles-de-la-Madeleine)
+  );
+
   leafletMap = L.map('greaz-map', {
     center:[45.5017,-73.5673],
     zoom:9,
+    minZoom:6,                    // on ne peut pas dézoomer sur le monde
+    maxZoom:19,
     zoomControl:false,
     attributionControl:true,
+    maxBounds: QC_BOUNDS,
+    maxBoundsViscosity: 1.0,      // la carte "colle" aux limites
+    worldCopyJump: false,
   });
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
     maxZoom:19,
+    noWrap:true,                  // pas de répétition du globe
+    bounds: QC_BOUNDS,
   }).addTo(leafletMap);
 
   leafletMap.on('locationfound', function(e){
@@ -686,6 +984,16 @@ function initMap(){
     }).addTo(leafletMap);
     window._geoMarker.bindPopup('<div style="font-family:DM Sans,sans-serif;font-size:13px;color:#0A0C1B;padding:4px">📍 <strong>Vous êtes ici</strong></div>').openPopup();
     leafletMap.setView(e.latlng, 12);
+
+    // Active aussi le tri par distance depuis ma position
+    _refPoint = { lat:e.latlng.lat, lng:e.latlng.lng, label:'ma position actuelle' };
+    if(_refMarker){ leafletMap.removeLayer(_refMarker); _refMarker = null; }
+    var bar = document.getElementById('addr-active');
+    if(bar){
+      document.getElementById('addr-active-txt').innerHTML = '📍 Autour de <b>ma position actuelle</b>';
+      bar.classList.add('show');
+    }
+    applyFilters();
   });
 
   leafletMap.on('locationerror', function(e){
@@ -756,7 +1064,7 @@ function renderMap(){
       '<div class="gz-popup-inner">'
       +'<div class="gz-popup-name">'+p.name+'</div>'
       +(cert?'<div>'+certBadge+'</div>':'')
-      +'<div class="gz-popup-meta" style="margin-top:6px">📍 '+(p.city||'—')+' · '+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</div>'
+      +'<div class="gz-popup-meta" style="margin-top:6px">📍 '+(p.city||'—')+' · '+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+(p._dist!==undefined&&p._dist!==null?'<br><span style="color:#00C26F;font-weight:700">'+distLabel(p._dist)+'</span>':'')+'</div>'
       +'<div class="gz-popup-rating" id="map-rating-'+p.id+'">Chargement...</div>'
       +priceHtml
       +'<button class="gz-popup-btn" onclick="openProfile(\''+p.id+'\')">Voir le profil →</button>'
@@ -808,6 +1116,7 @@ function renderGrid(){
       +'<div style="flex:1;min-width:0">'
       +'<div class="pro-name">'+p.name+'</div>'
       +'<div class="pro-meta">📍 '+(p.city||'—')+(p.rayon?' · 🚗 '+p.rayon:'')+'</div>'
+      +(p._dist!==undefined&&p._dist!==null?'<div class="dist-tag">'+distLabel(p._dist)+'</div>':'')
       +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
       +(cert?'<div>'+certBadgeHtml(p.certification)+'</div>':'')
       +'</div></div>'
@@ -997,6 +1306,52 @@ function openBooking(id){
     +'<button class="btn-book" id="booking-submit-btn" onclick="submitBooking()">Envoyer ma demande →</button>';
   document.getElementById('overlay-booking').classList.add('open');
   document.body.style.overflow='hidden';
+  prefillBooking();
+}
+
+/* Pré-remplit le formulaire avec le profil client connecté */
+function prefillBooking(){
+  if(!clientData) return;
+  var set = function(id,val){ var e=document.getElementById(id); if(e && val) e.value=val; };
+  set('b_prenom', clientData.prenom);
+  set('b_nom', clientData.nom);
+  set('b_phone', clientData.phone);
+  set('b_email', clientData.email);
+
+  var vehicles = clientData.vehicles||[];
+  if(vehicles.length){
+    var v = vehicles[0];
+    set('b_make', v.make); set('b_model', v.model); set('b_year', v.year);
+    // Sélecteur de véhicule si plusieurs
+    if(vehicles.length > 1){
+      var opts = vehicles.map(function(x,i){
+        return '<option value="'+i+'">'+[x.year,x.make,x.model].filter(Boolean).join(' ')+(x.plate?' · '+x.plate:'')+'</option>';
+      }).join('');
+      var makeField = document.getElementById('b_make');
+      if(makeField && makeField.parentElement && makeField.parentElement.parentElement){
+        var picker = document.createElement('div');
+        picker.className = 'ff';
+        picker.innerHTML = '<label>Mon véhicule</label><select id="b_vehpick" onchange="pickVehicle(this.value)">'+opts+'</select>';
+        makeField.parentElement.parentElement.insertAdjacentElement('beforebegin', picker);
+      }
+    }
+  }
+
+  // Bandeau de bienvenue
+  var body = document.getElementById('booking-drawer-body');
+  if(body && !document.getElementById('bk-welcome')){
+    var banner = document.createElement('div');
+    banner.id = 'bk-welcome';
+    banner.style.cssText = 'background:linear-gradient(135deg,rgba(0,194,111,.14),rgba(26,60,255,.08));border:1px solid rgba(0,194,111,.28);border-radius:var(--r2);padding:11px 14px;font-size:12.5px;color:rgba(255,255,255,.8);margin-bottom:1rem';
+    banner.innerHTML = '✓ Connecté comme <b>'+(clientData.prenom||'')+'</b> — tes infos sont pré-remplies · <b style="color:var(--gold)">+'+PTS_PER_BOOKING+' points</b> pour cette réservation';
+    body.insertBefore(banner, body.firstChild);
+  }
+}
+
+function pickVehicle(idx){
+  var v = (clientData.vehicles||[])[idx]; if(!v) return;
+  var set = function(id,val){ var e=document.getElementById(id); if(e) e.value=val||''; };
+  set('b_make', v.make); set('b_model', v.model); set('b_year', v.year);
 }
 
 function updateSlots(){
@@ -1068,15 +1423,24 @@ async function submitBooking(){
       description:document.getElementById('b_desc').value.trim(),
       referral_code:(document.getElementById('b_referral').value||'').trim().toUpperCase(),
       status:'en_attente', booking_code:code,
+      client_uid: clientUser ? clientUser.uid : '',
       created_at:firebase.firestore.FieldValue.serverTimestamp(),
     });
+    if(clientUser) await awardPoints();
+
     document.getElementById('booking-drawer-body').innerHTML=
       '<div class="success-screen"><span class="success-icon">✅</span>'
       +'<div class="success-title">Demande envoyée !</div>'
       +'<p class="success-sub">'+currentProfile.name+' va confirmer ton rendez-vous. On te contacte par SMS ou courriel.</p>'
       +'<div class="success-code">'+code+'</div>'
       +'<p style="font-size:11.5px;color:rgba(255,255,255,.4);margin-bottom:1.5rem">Ton code de référence</p>'
-      +'<button onclick="closeDrawer(\'booking\');closeDrawer(\'profile\')" style="padding:12px 28px;background:var(--blue);color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Compris ✓</button>'
+      + (clientUser
+        ? '<div style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);border-radius:var(--r2);padding:13px;margin-bottom:1.5rem"><div style="font-size:14px;font-weight:700;color:var(--gold)">🎁 +'+PTS_PER_BOOKING+' points Greaz !</div><div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:3px">Total : '+(clientData?clientData.points:0)+' points</div></div>'
+        : '<div style="background:linear-gradient(135deg,rgba(26,60,255,.15),rgba(0,194,111,.08));border:1px solid rgba(26,60,255,.3);border-radius:var(--r2);padding:14px;margin-bottom:1.5rem">'
+          +'<div style="font-size:13.5px;font-weight:700;margin-bottom:4px">✨ Crée ton compte Greaz</div>'
+          +'<div style="font-size:12px;color:rgba(255,255,255,.6);line-height:1.6;margin-bottom:10px">Suis tes rendez-vous, enregistre tes véhicules et gagne <b style="color:var(--gold)">'+PTS_PER_BOOKING+' points</b> par réservation.</div>'
+          +'<button onclick="closeDrawer(\'booking\');closeDrawer(\'profile\');openAccount();renderAuth(\'signup\')" style="width:100%;padding:11px;background:var(--blue);color:white;border:none;border-radius:var(--r);font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Créer mon compte gratuit →</button></div>')
+      +'<button onclick="closeDrawer(\'booking\');closeDrawer(\'profile\')" style="padding:12px 28px;background:'+(clientUser?'var(--blue)':'rgba(255,255,255,.08)')+';color:white;border:none;border-radius:var(--r2);font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%">Compris ✓</button>'
       +'</div>';
   } catch(e){
     errEl.textContent="Erreur : "+e.message; errEl.style.display='block';
@@ -1319,6 +1683,329 @@ async function submitReview(bookingId,code,mecId){
     errEl.textContent="Erreur : ce lien n'est plus valide."; errEl.style.display='block';
     btn.disabled=false; btn.textContent="Envoyer mon avis →";
   }
+}
+
+/* ══════════════════════════════════════════
+   ESPACE CLIENT — compte, véhicules, RDV, fidélité
+   ══════════════════════════════════════════ */
+var clientUser = null;   // user Firebase
+var clientData = null;   // doc clients/{uid}
+var _authMode = 'login';
+
+/* Niveaux de fidélité */
+var TIERS = [
+  { id:'bronze', label:'Bronze',  min:0,   cls:'tier-bronze', icon:'🥉' },
+  { id:'silver', label:'Argent',  min:150, cls:'tier-silver', icon:'🥈' },
+  { id:'gold',   label:'Or',      min:500, cls:'tier-gold',   icon:'🥇' },
+];
+var PTS_PER_BOOKING = 50;
+
+function getTier(pts){
+  var t = TIERS[0];
+  TIERS.forEach(function(x){ if(pts >= x.min) t = x; });
+  return t;
+}
+function nextTier(pts){
+  for(var i=0;i<TIERS.length;i++){ if(pts < TIERS[i].min) return TIERS[i]; }
+  return null;
+}
+
+/* ── Auth ── */
+firebase.auth().onAuthStateChanged(function(user){
+  if(user){ loadClientProfile(user); }
+  else { clientUser = null; clientData = null; updateNavAccount(); }
+});
+
+function updateNavAccount(){
+  var btn = document.getElementById('nav-account-btn');
+  var lbl = document.getElementById('nav-account-label');
+  if(!btn) return;
+  if(clientData){
+    var ini = (clientData.prenom||'?').charAt(0).toUpperCase();
+    btn.classList.add('logged');
+    lbl.innerHTML = '<span class="nav-avatar">'+ini+'</span> '+(clientData.prenom||'Mon espace');
+  } else {
+    btn.classList.remove('logged');
+    lbl.textContent = 'Mon espace';
+  }
+}
+
+async function loadClientProfile(user){
+  clientUser = user;
+  try {
+    var doc = await db.collection('clients').doc(user.uid).get();
+    if(doc.exists){ clientData = doc.data(); }
+    else {
+      clientData = { prenom:'', nom:'', email:user.email, phone:'', vehicles:[], points:0, created_at:null };
+      await db.collection('clients').doc(user.uid).set(Object.assign({}, clientData, {
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
+      }));
+    }
+    updateNavAccount();
+    if(document.getElementById('overlay-account').classList.contains('open')) renderAccount();
+  } catch(e){ console.log('Profil client:', e); }
+}
+
+function openAccount(){
+  document.getElementById('overlay-account').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if(clientUser && clientData) renderAccount();
+  else renderAuth('login');
+}
+
+/* ── Écran connexion / inscription ── */
+function renderAuth(mode){
+  _authMode = mode;
+  var isSignup = mode === 'signup';
+  document.getElementById('account-title').textContent = isSignup ? 'Créer mon compte' : 'Me connecter';
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="auth-err"></div>'
+    + (isSignup
+      ? '<div style="background:linear-gradient(135deg,rgba(26,60,255,.14),rgba(0,194,111,.08));border:1px solid rgba(26,60,255,.25);border-radius:var(--r2);padding:1.1rem;margin-bottom:1.5rem">'
+        +'<div style="font-size:14px;font-weight:700;margin-bottom:.7rem">✨ Pourquoi créer un compte ?</div>'
+        +'<div class="perk"><span class="perk-ic">🚗</span><div><div class="perk-t">Tes véhicules enregistrés</div><div class="perk-d">Plus besoin de tout retaper à chaque fois</div></div></div>'
+        +'<div class="perk"><span class="perk-ic">📋</span><div><div class="perk-t">Historique de tes rendez-vous</div><div class="perk-d">Tout ton suivi d\'entretien au même endroit</div></div></div>'
+        +'<div class="perk"><span class="perk-ic">🎁</span><div><div class="perk-t">Points et rabais</div><div class="perk-d">'+PTS_PER_BOOKING+' points par rendez-vous — échangeables contre des rabais</div></div></div>'
+        +'</div>'
+      : '')
+    + (isSignup ? '<div class="ff2"><div class="ff"><label>Prénom *</label><input type="text" id="au-prenom" placeholder="Jean"></div>'
+      +'<div class="ff"><label>Nom</label><input type="text" id="au-nom" placeholder="Tremblay"></div></div>'
+      +'<div class="ff"><label>Téléphone</label><input type="tel" id="au-phone" placeholder="514-555-0100"></div>' : '')
+    +'<div class="ff"><label>Courriel *</label><input type="email" id="au-email" placeholder="jean@email.com" autocomplete="username"></div>'
+    +'<div class="ff"><label>Mot de passe *</label><input type="password" id="au-pass" placeholder="Min. 6 caractères" autocomplete="'+(isSignup?'new-password':'current-password')+'" onkeydown="if(event.key===\'Enter\')doAuth()"></div>'
+    +'<button class="btn-submit blue" id="auth-btn" onclick="doAuth()">'+(isSignup?'Créer mon compte →':'Me connecter →')+'</button>'
+    +'<div class="auth-switch">'+(isSignup
+      ? 'Déjà un compte ? <b onclick="renderAuth(\'login\')">Me connecter</b>'
+      : 'Pas encore de compte ? <b onclick="renderAuth(\'signup\')">En créer un</b>')+'</div>'
+    + (isSignup ? '' : '<div class="auth-switch" style="margin-top:.75rem"><b onclick="resetPass()" style="color:rgba(255,255,255,.45);font-weight:500;font-size:12px">Mot de passe oublié ?</b></div>');
+}
+
+async function doAuth(){
+  var errEl = document.getElementById('auth-err');
+  var btn = document.getElementById('auth-btn');
+  var email = (document.getElementById('au-email').value||'').trim();
+  var pass = document.getElementById('au-pass').value||'';
+  errEl.style.display = 'none';
+
+  if(!email || !pass){ errEl.textContent='Remplis ton courriel et ton mot de passe.'; errEl.style.display='block'; return; }
+  if(_authMode==='signup'){
+    var prenom = (document.getElementById('au-prenom').value||'').trim();
+    if(!prenom){ errEl.textContent='Ton prénom est obligatoire.'; errEl.style.display='block'; return; }
+    if(pass.length < 6){ errEl.textContent='Mot de passe trop court (min. 6 caractères).'; errEl.style.display='block'; return; }
+  }
+
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Un instant...';
+  try {
+    if(_authMode === 'signup'){
+      var cred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
+      await db.collection('clients').doc(cred.user.uid).set({
+        prenom: (document.getElementById('au-prenom').value||'').trim(),
+        nom: (document.getElementById('au-nom').value||'').trim(),
+        email: email,
+        phone: (document.getElementById('au-phone').value||'').trim(),
+        vehicles: [], points: 0,
+        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      await loadClientProfile(cred.user);
+    } else {
+      var c2 = await firebase.auth().signInWithEmailAndPassword(email, pass);
+      await loadClientProfile(c2.user);
+    }
+    renderAccount();
+  } catch(e){
+    var msg = 'Une erreur est survenue.';
+    if(e.code==='auth/email-already-in-use') msg='Ce courriel a déjà un compte. Connecte-toi.';
+    if(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential') msg='Courriel ou mot de passe incorrect.';
+    if(e.code==='auth/user-not-found') msg='Aucun compte avec ce courriel.';
+    if(e.code==='auth/invalid-email') msg='Courriel invalide.';
+    if(e.code==='auth/weak-password') msg='Mot de passe trop faible (min. 6 caractères).';
+    if(e.code==='auth/too-many-requests') msg='Trop de tentatives. Réessaie dans quelques minutes.';
+    errEl.textContent = msg; errEl.style.display='block';
+    btn.disabled=false; btn.textContent = _authMode==='signup'?'Créer mon compte →':'Me connecter →';
+  }
+}
+
+function resetPass(){
+  var email = (document.getElementById('au-email').value||'').trim();
+  if(!email){ alert('Entre ton courriel d\'abord, puis reclique.'); return; }
+  firebase.auth().sendPasswordResetEmail(email)
+    .then(function(){ alert('📧 Un courriel de réinitialisation a été envoyé à '+email); })
+    .catch(function(e){ alert('Erreur : '+e.message); });
+}
+
+function clientLogout(){
+  firebase.auth().signOut().then(function(){
+    clientUser=null; clientData=null; updateNavAccount();
+    closeDrawer('account');
+  });
+}
+
+/* ── Espace client ── */
+function renderAccount(){
+  if(!clientData){ renderAuth('login'); return; }
+  document.getElementById('account-title').textContent = 'Mon espace Greaz';
+
+  var pts = clientData.points||0;
+  var tier = getTier(pts);
+  var nxt = nextTier(pts);
+  var pct = nxt ? Math.min(100, Math.round(pts/nxt.min*100)) : 100;
+  var vehicles = clientData.vehicles||[];
+
+  var vehHtml = vehicles.length
+    ? vehicles.map(function(v,i){
+        return '<div class="veh-card">'
+          +'<div class="veh-ic">🚗</div>'
+          +'<div style="flex:1"><div class="veh-name">'+[v.year,v.make,v.model].filter(Boolean).join(' ')+'</div>'
+          +(v.plate?'<div class="veh-plate">'+v.plate+'</div>':'')+'</div>'
+          +'<button class="close-btn" style="width:28px;height:28px;font-size:13px" onclick="removeVehicle('+i+')">✕</button>'
+          +'</div>';
+      }).join('')
+    : '<div style="font-size:13px;color:rgba(255,255,255,.4);text-align:center;padding:1.5rem 0">Aucun véhicule enregistré.<br><span style="font-size:12px">Ajoute-le pour réserver en 2 clics la prochaine fois.</span></div>';
+
+  document.getElementById('account-body').innerHTML =
+    '<div class="acc-hero">'
+    +'<div class="acc-name">Salut '+(clientData.prenom||'')+' 👋</div>'
+    +'<div class="acc-mail">'+(clientData.email||'')+'</div>'
+    +'<div class="loyalty">'
+    +'<div class="loy-top"><div><div class="loy-pts">'+pts+'</div><div class="loy-lbl">Points Greaz</div></div>'
+    +'<span class="loy-tier '+tier.cls+'">'+tier.icon+' '+tier.label+'</span></div>'
+    +'<div class="loy-bar"><div class="loy-fill" style="width:'+pct+'%"></div></div>'
+    +'<div class="loy-next">'+(nxt
+      ? 'Encore <b style="color:var(--gold)">'+(nxt.min-pts)+' points</b> pour atteindre '+nxt.icon+' '+nxt.label
+      : '🎉 Tu es au niveau maximum !')+'</div>'
+    +'</div></div>'
+
+    +'<div class="acc-section">🎁 Mes récompenses</div>'
+    + renderRewards(pts)
+
+    +'<div class="acc-section">🚗 Mes véhicules <button class="acc-add" onclick="openVehicleForm()">+ Ajouter</button></div>'
+    + vehHtml
+
+    +'<div class="acc-section">📅 Mes rendez-vous</div>'
+    +'<div id="acc-rdvs"><div style="font-size:13px;color:rgba(255,255,255,.4);text-align:center;padding:1rem 0">Chargement...</div></div>'
+
+    +'<button class="btn-book" style="margin-top:2rem;background:rgba(255,255,255,.06);border:1px solid var(--line);color:rgba(255,255,255,.6)" onclick="clientLogout()">Me déconnecter</button>';
+
+  loadClientRdvs();
+}
+
+function renderRewards(pts){
+  var rewards = [
+    { pts:200, label:'10 $ de rabais',  icon:'💵' },
+    { pts:500, label:'25 $ de rabais',  icon:'💰' },
+    { pts:1000, label:'Vidange gratuite', icon:'🛢️' },
+  ];
+  return rewards.map(function(r){
+    var unlocked = pts >= r.pts;
+    return '<div class="perk" style="'+(unlocked?'border:1px solid rgba(255,215,0,.35);background:rgba(255,215,0,.07)':'opacity:.55')+'">'
+      +'<span class="perk-ic">'+r.icon+'</span>'
+      +'<div style="flex:1"><div class="perk-t">'+r.label+'</div>'
+      +'<div class="perk-d">'+(unlocked?'✓ Débloqué — mentionne-le lors de ta réservation':r.pts+' points requis')+'</div></div>'
+      +(unlocked?'<span style="font-size:11px;font-weight:700;color:var(--gold);align-self:center">DISPO</span>':'')
+      +'</div>';
+  }).join('');
+}
+
+function loadClientRdvs(){
+  if(!clientData || !clientData.email) return;
+  var el = document.getElementById('acc-rdvs');
+  db.collection('appointments').where('client_email','==',clientData.email).get().then(function(snap){
+    if(!el) return;
+    if(snap.empty){
+      el.innerHTML = '<div style="font-size:13px;color:rgba(255,255,255,.4);text-align:center;padding:1.5rem 0">Aucun rendez-vous encore.<br><span style="font-size:12px">Trouve un pro sur la carte pour commencer 🗺️</span></div>';
+      return;
+    }
+    var list = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    list.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+
+    var ST = {
+      en_attente:{l:'En attente',c:'#FBBF24',bg:'rgba(251,191,36,.15)'},
+      confirme:{l:'Confirmé',c:'#00C26F',bg:'rgba(0,194,111,.15)'},
+      termine:{l:'Terminé',c:'#93BBFD',bg:'rgba(26,60,255,.15)'},
+      annule:{l:'Annulé',c:'#f87171',bg:'rgba(248,113,113,.15)'},
+    };
+    var SL = {matin:'Matin',aprem:'Après-midi',soir:'Soir'};
+
+    el.innerHTML = list.map(function(r){
+      var s = ST[r.status] || ST.en_attente;
+      var veh = [r.vehicle_year,r.vehicle_make,r.vehicle_model].filter(Boolean).join(' ');
+      return '<div class="crdv" style="border-left-color:'+s.c+'">'
+        +'<div class="crdv-top"><div><div class="crdv-mec">🔧 '+(r.mechanic_name||'—')+'</div></div>'
+        +'<span class="crdv-status" style="background:'+s.bg+';color:'+s.c+'">'+s.l+'</span></div>'
+        +'<div class="crdv-meta">'
+        +'📅 '+fmtRdvDate(r.date)+(r.time_slot?' · '+(SL[r.time_slot]||r.time_slot):'')
+        +(veh?'<br>🚗 '+veh:'')
+        +(r.problem&&r.problem!=='Non précisé'?'<br>🔩 '+r.problem:'')
+        +'<br><span style="font-family:monospace;font-size:11px;color:rgba(255,255,255,.35)">'+(r.booking_code||'')+'</span>'
+        +'</div></div>';
+    }).join('');
+  }).catch(function(e){
+    if(el) el.innerHTML = '<div style="font-size:12.5px;color:rgba(255,255,255,.35);text-align:center;padding:1rem 0">Impossible de charger tes rendez-vous.</div>';
+  });
+}
+function fmtRdvDate(d){
+  if(!d) return '—';
+  try { return new Date(d+'T00:00:00').toLocaleDateString('fr-CA',{weekday:'long',day:'numeric',month:'long'}); }
+  catch(e){ return d; }
+}
+
+/* ── Véhicules ── */
+function openVehicleForm(){
+  var yearsOpts=''; for(var y=2026;y>=1990;y--) yearsOpts+='<option>'+y+'</option>';
+  document.getElementById('account-title').textContent = 'Ajouter un véhicule';
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="veh-err"></div>'
+    +'<div class="ff2"><div class="ff"><label>Marque *</label><input type="text" id="v-make" placeholder="Toyota"></div>'
+    +'<div class="ff"><label>Année</label><select id="v-year"><option value="">Année</option>'+yearsOpts+'</select></div></div>'
+    +'<div class="ff"><label>Modèle *</label><input type="text" id="v-model" placeholder="Corolla"></div>'
+    +'<div class="ff"><label>Plaque d\'immatriculation</label><input type="text" id="v-plate" placeholder="ABC 123" style="text-transform:uppercase"></div>'
+    +'<button class="btn-submit blue" id="veh-btn" onclick="saveVehicle()">✓ Enregistrer</button>'
+    +'<button class="btn-book" style="margin-top:.75rem;background:rgba(255,255,255,.06);border:1px solid var(--line);color:rgba(255,255,255,.6)" onclick="renderAccount()">Annuler</button>';
+}
+
+async function saveVehicle(){
+  var make = (document.getElementById('v-make').value||'').trim();
+  var model = (document.getElementById('v-model').value||'').trim();
+  var errEl = document.getElementById('veh-err');
+  var btn = document.getElementById('veh-btn');
+  if(!make || !model){ errEl.textContent='La marque et le modèle sont obligatoires.'; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Enregistrement...';
+  var vehicles = (clientData.vehicles||[]).slice();
+  vehicles.push({
+    make: make, model: model,
+    year: document.getElementById('v-year').value||'',
+    plate: (document.getElementById('v-plate').value||'').trim().toUpperCase(),
+  });
+  try {
+    await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
+    clientData.vehicles = vehicles;
+    renderAccount();
+  } catch(e){
+    errEl.textContent='Erreur : '+e.message; errEl.style.display='block';
+    btn.disabled=false; btn.textContent='✓ Enregistrer';
+  }
+}
+
+async function removeVehicle(idx){
+  if(!confirm('Retirer ce véhicule ?')) return;
+  var vehicles = (clientData.vehicles||[]).slice();
+  vehicles.splice(idx,1);
+  try {
+    await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
+    clientData.vehicles = vehicles;
+    renderAccount();
+  } catch(e){ alert('Erreur : '+e.message); }
+}
+
+/* ── Points après réservation ── */
+async function awardPoints(){
+  if(!clientUser || !clientData) return;
+  try {
+    var newPts = (clientData.points||0) + PTS_PER_BOOKING;
+    await db.collection('clients').doc(clientUser.uid).update({ points: newPts });
+    clientData.points = newPts;
+    updateNavAccount();
+  } catch(e){ console.log('Points:', e); }
 }
 
 window.addEventListener('DOMContentLoaded', function(){
