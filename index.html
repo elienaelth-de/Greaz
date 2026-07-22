@@ -127,7 +127,8 @@ h1 .hl{background:linear-gradient(102deg,var(--green) 0%,#5BE8AC 55%,var(--green
   .reveal{opacity:1;transform:none}
   /* Carte : on garde la lisibilité, on coupe le mouvement */
   .gz-marker-wrap{animation:none;opacity:1}
-  .gz-origin-ring{display:none}
+  .gz-origin-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(26,60,255,.5);
+  opacity:0;animation:sonar 3.2s ease-out infinite}
   .gz-marker::before{animation:none;opacity:0}
 }
 /* Focus clavier visible */
@@ -155,45 +156,84 @@ h1 .hl{background:linear-gradient(102deg,var(--green) 0%,#5BE8AC 55%,var(--green
 #map-view{position:relative;}
 #greaz-map{width:100%;height:calc(100vh - 64px);height:calc(100dvh - 64px);z-index:1;background:var(--ink)}
 .map-controls{position:absolute;top:16px;left:16px;z-index:25;display:flex;flex-direction:column;gap:8px}
-.map-ctrl-btn{width:40px;height:40px;border-radius:var(--r);background:var(--ink2);border:1px solid var(--line);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:white;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.3);}
-.map-ctrl-btn:hover{background:rgba(26,60,255,.25);border-color:var(--blue);}
-.results-count-map{position:absolute;top:16px;right:16px;z-index:25;pointer-events:none;background:rgba(10,12,27,.85);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:var(--r2);padding:8px 14px;font-size:12px;color:rgba(255,255,255,.6);}
-.gz-marker-wrap{position:relative;width:52px;height:68px}
-/* Entrée en cascade — la carte se peuple sous tes yeux */
-.gz-marker-wrap{animation:pinDrop .55s var(--ease) both;animation-delay:calc(var(--i,0) * 22ms)}
-@keyframes pinDrop{
-  0%{opacity:0;transform:translateY(-26px) scale(.4)}
-  62%{opacity:1;transform:translateY(3px) scale(1.06)}
-  100%{opacity:1;transform:none}
+.map-ctrl-btn{width:38px;height:38px;border-radius:10px;
+  background:rgba(16,18,26,.9);border:1px solid rgba(200,212,235,.14);backdrop-filter:blur(18px);
+  color:var(--chrome);font-size:15px;font-weight:500;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;line-height:1;
+  box-shadow:0 3px 14px rgba(0,0,0,.45);
+  transition:background .2s,border-color .2s,color .2s}
+.map-ctrl-btn:hover{background:rgba(26,60,255,.24);border-color:rgba(26,60,255,.55);color:#fff}
+.results-count-map{position:absolute;top:16px;right:16px;z-index:25;pointer-events:none;
+  padding:8px 14px;border-radius:24px;background:rgba(16,18,26,.9);
+  border:1px solid rgba(200,212,235,.14);backdrop-filter:blur(18px);
+  font-family:var(--data);font-size:11.5px;font-weight:500;letter-spacing:-.01em;color:var(--muted);
+  box-shadow:0 3px 14px rgba(0,0,0,.4)}
+/* ═══════════════════════════════════════════
+   MARQUEURS
+   Avec 551 points sur la carte, la retenue prime :
+   un cercle net, une bague qui porte la certification,
+   et le prix seulement quand on survole.
+   ═══════════════════════════════════════════ */
+.gz-marker-wrap{position:relative;width:38px;height:38px;
+  animation:pinIn .42s var(--ease) both;animation-delay:calc(var(--i,0) * 16ms)}
+@keyframes pinIn{
+  from{opacity:0;transform:scale(.82)}
+  to{opacity:1;transform:scale(1)}
 }
-.gz-marker{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-family:var(--display);font-weight:700;font-size:14px;color:#fff;letter-spacing:-.02em;
-  border:2.5px solid rgba(255,255,255,.22);box-shadow:0 4px 16px rgba(0,0,0,.55);cursor:pointer;
-  transition:transform .28s var(--ease),box-shadow .28s var(--ease),border-color .28s;position:relative}
-.gz-marker-wrap:hover{z-index:600}
-.gz-marker-wrap:hover .gz-marker{transform:scale(1.14) translateY(-3px);border-color:rgba(255,255,255,.5);
-  box-shadow:0 10px 28px rgba(0,0,0,.6)}
-.gz-marker-wrap:hover .gz-price-tag{transform:translateX(-50%) translateY(2px);opacity:1}
 
-/* Halo pulsé sur les pros certifiés — la qualité se voit de loin */
-.gz-marker::before{content:'';position:absolute;inset:-4px;border-radius:50%;pointer-events:none;opacity:0}
-.gz-marker.lvl1::before{border:1.5px solid rgba(205,138,78,.55);animation:haloPulse 3.4s ease-out infinite}
-.gz-marker.lvl2::before{border:1.5px solid rgba(198,204,216,.55);animation:haloPulse 3s ease-out infinite}
-.gz-marker.lvl3::before{border:1.5px solid rgba(255,201,74,.65);animation:haloPulse 2.6s ease-out infinite}
-@keyframes haloPulse{
-  0%{opacity:.85;transform:scale(1)}
-  70%{opacity:0;transform:scale(1.7)}
-  100%{opacity:0;transform:scale(1.7)}
+.gz-marker{position:relative;width:34px;height:34px;margin:2px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-family:var(--body);font-weight:600;font-size:12.5px;letter-spacing:-.02em;color:#EDF0F6;
+  background:#161A24;
+  box-shadow:0 0 0 1.5px rgba(200,212,235,.22), 0 2px 5px rgba(0,0,0,.5), 0 6px 16px rgba(0,0,0,.35);
+  transition:transform .22s var(--ease), box-shadow .22s var(--ease), background .22s}
+
+/* Nature du pro : une teinte, pas un carnaval */
+.gz-marker.garage{background:#1A1620;box-shadow:0 0 0 1.5px rgba(255,107,44,.38), 0 2px 5px rgba(0,0,0,.5), 0 6px 16px rgba(0,0,0,.35)}
+.gz-marker.mec{background:#0F1B16;box-shadow:0 0 0 1.5px rgba(0,194,111,.4), 0 2px 5px rgba(0,0,0,.5), 0 6px 16px rgba(0,0,0,.35)}
+
+/* Certification : la bague s'épaissit et prend la couleur du palier.
+   Plus de pastille en surimpression — l'information est dans la forme. */
+.gz-marker.lvl1{box-shadow:0 0 0 2px rgba(205,138,78,.85), 0 2px 6px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.4)}
+.gz-marker.lvl2{box-shadow:0 0 0 2px rgba(198,204,216,.9), 0 2px 6px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.4)}
+.gz-marker.lvl3{box-shadow:0 0 0 2.25px rgba(255,201,74,.95), 0 0 14px rgba(255,201,74,.28), 0 2px 6px rgba(0,0,0,.5), 0 6px 20px rgba(0,0,0,.45);
+  animation:goldBreath 4.5s ease-in-out infinite}
+@keyframes goldBreath{
+  0%,100%{box-shadow:0 0 0 2.25px rgba(255,201,74,.95), 0 0 14px rgba(255,201,74,.24), 0 2px 6px rgba(0,0,0,.5), 0 6px 20px rgba(0,0,0,.45)}
+  50%{box-shadow:0 0 0 2.25px rgba(255,201,74,1), 0 0 22px rgba(255,201,74,.42), 0 2px 6px rgba(0,0,0,.5), 0 6px 20px rgba(0,0,0,.45)}
 }
-.gz-marker.mec{background:linear-gradient(135deg,#0a1f12,#051a0a);border-color:rgba(0,194,111,.5);}
-.gz-marker.garage{background:linear-gradient(135deg,#1a1020,#0d0818);border-color:rgba(255,107,44,.5);}
-.gz-marker-tail{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:10px solid rgba(10,12,27,.9);margin:0 auto;}
-.gz-cert-dot{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;border:2px solid var(--ink);font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:800;}
-.gz-cert-dot.gold{background:var(--gold);color:#7a6000;}
-.gz-cert-dot.silver{background:var(--silver);color:#555;}
-.gz-cert-dot.bronze{background:var(--bronze);color:#fff;}
-.gz-price-tag{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);background:var(--ink2);border:1px solid var(--line2);border-radius:10px;padding:2px 9px;font-family:var(--data);font-size:9.5px;font-weight:700;white-space:nowrap;color:var(--green);box-shadow:0 2px 10px rgba(0,0,0,.5);opacity:.92;transition:all .28s var(--ease)}
-.gz-popup .leaflet-popup-content-wrapper{background:var(--ink2);border:1px solid var(--line2);border-radius:var(--r2);box-shadow:0 16px 48px rgba(0,0,0,.65);padding:0}
+
+/* Survol : le marqueur se détache, le prix apparaît */
+.gz-marker-wrap:hover{z-index:700}
+.gz-marker-wrap:hover .gz-marker{transform:scale(1.18);background:#1E2330}
+.gz-marker-wrap:hover .gz-price-tag{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Prix : masqué au repos pour laisser la carte respirer */
+.gz-price-tag{position:absolute;top:calc(100% + 5px);left:50%;
+  transform:translateX(-50%) translateY(-4px);
+  background:rgba(14,16,22,.96);border:1px solid rgba(200,212,235,.18);border-radius:7px;
+  padding:3px 8px;font-family:var(--data);font-size:9.5px;font-weight:500;letter-spacing:-.01em;
+  white-space:nowrap;color:#8FEFC0;box-shadow:0 3px 12px rgba(0,0,0,.55);
+  opacity:0;pointer-events:none;transition:opacity .2s var(--ease),transform .22s var(--ease)}
+
+@media(prefers-reduced-motion:reduce){
+  .gz-marker-wrap{animation:none}
+  .gz-marker.lvl3{animation:none}
+}
+
+/* Sur écran tactile, pas de survol : le prix reste discret mais lisible */
+@media(hover:none){
+  .gz-price-tag{opacity:.9;transform:translateX(-50%) translateY(0)}
+}
+
+.gz-popup .leaflet-popup-content-wrapper{background:rgba(16,18,26,.97);border:1px solid rgba(200,212,235,.14);
+  border-radius:14px;box-shadow:0 20px 56px rgba(0,0,0,.7), 0 2px 8px rgba(0,0,0,.4);padding:0;
+  backdrop-filter:blur(20px) saturate(1.3)}
+.gz-popup .leaflet-popup-tip{background:rgba(16,18,26,.97);border:1px solid rgba(200,212,235,.14);
+  box-shadow:none}
+.gz-popup a.leaflet-popup-close-button{color:rgba(220,225,236,.4);font-size:17px;padding:9px 9px 0 0;
+  transition:color .2s}
+.gz-popup a.leaflet-popup-close-button:hover{color:var(--chrome);background:transparent}
 /* On anime l'intérieur, JAMAIS .leaflet-popup :
    Leaflet la positionne avec transform, une animation l'écraserait. */
 .gz-popup .leaflet-popup-content-wrapper,
@@ -211,7 +251,7 @@ h1 .hl{background:linear-gradient(102deg,var(--green) 0%,#5BE8AC 55%,var(--green
 .gz-popup-rating{font-size:12px;color:#FBBF24;margin-bottom:6px;}
 .gz-popup-price{font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px;}
 .gz-popup-btn{display:block;width:100%;padding:9px;background:var(--blue);color:white;border:none;border-radius:var(--r);font-family:var(--body);font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:background .2s;}
-.gz-popup-btn:hover{background:var(--blue2);}
+.gz-popup-btn:hover{background:var(--blue2)}
 #grid-view{padding:0 1.25rem 2rem;max-width:1050px;margin:0 auto;}
 .results-count{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:1rem;}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
@@ -331,46 +371,42 @@ h1 .hl{background:linear-gradient(102deg,var(--green) 0%,#5BE8AC 55%,var(--green
 .gz-origin{position:relative;width:16px;height:16px}
 .gz-origin-core{position:absolute;inset:0;border-radius:50%;background:var(--blue);
   border:2.5px solid #fff;box-shadow:0 2px 12px rgba(26,60,255,.7);z-index:2}
-.gz-origin-ring{position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;
-  border-radius:50%;border:1.5px solid rgba(26,60,255,.65);animation:sonar 2.8s ease-out infinite}
+.gz-origin-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(26,60,255,.5);
+  opacity:0;animation:sonar 3.2s ease-out infinite}
 .gz-origin-ring:nth-child(2){animation-delay:.9s}
 .gz-origin-ring:nth-child(3){animation-delay:1.8s}
 @keyframes sonar{
-  0%{opacity:.8;transform:scale(1)}
-  100%{opacity:0;transform:scale(7)}
+  0%{opacity:.65;transform:scale(1)}
+  70%{opacity:0;transform:scale(3.2)}
+  100%{opacity:0;transform:scale(3.2)}
 }
 
 /* Cercle de rayon — bordure qui respire */
 .gz-radius{animation:radiusIn .7s var(--ease) both}
 @keyframes radiusIn{from{opacity:0;stroke-width:0}to{opacity:1}}
 
-/* ═══ VOILE DE LA CARTE ═══
-   Empêche la carte de capturer le défilement tant qu'on n'a pas cliqué dessus */
-.map-veil{position:absolute;inset:0;z-index:20;pointer-events:none;
-  background:rgba(8,9,14,0);transition:background .3s var(--ease);
-  display:flex;align-items:center;justify-content:center}
-.map-veil.hidden{display:none}
-.map-veil{align-items:flex-end;padding-bottom:22px}
-.veil-hint{display:flex;align-items:center;gap:10px;padding:11px 20px;border-radius:40px;
-  background:rgba(18,20,28,.92);border:1px solid var(--line2);backdrop-filter:blur(16px);
-  font-size:13.5px;font-weight:600;color:var(--chrome);letter-spacing:-.01em;
-  box-shadow:0 8px 30px rgba(0,0,0,.45);
-  opacity:0;transform:translateY(8px) scale(.96);transition:all .3s var(--ease);pointer-events:none}
-#map-view:hover .veil-hint{opacity:1;transform:none}
-.veil-ic{font-size:1.05rem}
-/* Sur mobile, l'indice reste visible : pas de survol */
-@media(hover:none){
-  .map-veil{background:rgba(8,9,14,.18)}
-  .veil-hint{opacity:1;transform:none}
-  .veil-txt::after{content:' (touche pour activer)'}
-}
-/* Bandeau discret quand la carte est active */
-.map-live{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:25;
-  padding:7px 16px;border-radius:30px;background:rgba(18,20,28,.9);border:1px solid var(--line2);
-  backdrop-filter:blur(14px);font-size:11.5px;font-weight:500;color:var(--muted);
-  display:none;align-items:center;gap:7px;pointer-events:auto;cursor:pointer;transition:color .2s}
-.map-live.show{display:flex;animation:riseIn .4s var(--ease) both}
-.map-live:hover{color:var(--chrome)}
+/* ═══ BOUTON DE NAVIGATION ═══
+   La carte ne capte ni le défilement ni le glissement tant qu'on ne l'a pas demandé.
+   Les marqueurs restent cliquables en tout temps. */
+.map-nav-btn{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:25;
+  display:inline-flex;align-items:center;gap:9px;padding:12px 22px;border-radius:40px;
+  background:rgba(16,18,26,.92);border:1px solid rgba(200,212,235,.14);backdrop-filter:blur(20px);
+  font-family:var(--body);font-size:13px;font-weight:600;color:var(--chrome);letter-spacing:-.01em;
+  cursor:pointer;box-shadow:0 6px 26px rgba(0,0,0,.5);
+  transition:background .25s var(--ease),border-color .25s var(--ease),transform .25s var(--ease);
+  min-height:44px;white-space:nowrap}
+.map-nav-btn:hover{background:rgba(26,60,255,.28);border-color:var(--blue);
+  transform:translateX(-50%) translateY(-2px)}
+.map-nav-btn:active{transform:translateX(-50%) scale(.97)}
+.mnb-ic{font-size:1.05rem;line-height:1}
+
+/* Navigation active */
+.map-nav-btn.on{background:rgba(0,194,111,.16);border-color:rgba(0,194,111,.45);color:#7FE8B8}
+.map-nav-btn.on:hover{background:rgba(0,194,111,.24);border-color:var(--green)}
+.map-nav-btn.on .mnb-ic{animation:navPulse 2s ease-in-out infinite}
+@keyframes navPulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+@media(prefers-reduced-motion:reduce){.map-nav-btn.on .mnb-ic{animation:none}}
 
 /* ═══ RECHERCHE PAR ADRESSE ═══ */
 .addr-bar{display:flex;gap:8px;align-items:center;max-width:900px;margin:0 auto 10px;background:linear-gradient(135deg,rgba(26,60,255,.14),rgba(0,194,111,.06));border:1.5px solid rgba(26,60,255,.3);border-radius:var(--r2);padding:.6rem .75rem;flex-wrap:wrap}
@@ -575,8 +611,8 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
   .map-ctrl-btn{width:44px;height:44px}
   .results-count-map{font-size:11px;padding:7px 11px;top:12px;right:12px}
   .map-controls{top:12px;left:12px}
-  .veil-hint{font-size:12.5px;padding:11px 18px}
-  .map-live{font-size:11px;padding:7px 14px;bottom:12px;max-width:calc(100% - 24px);text-align:center}
+  .map-nav-btn{font-size:12.5px;padding:12px 18px;bottom:16px;max-width:calc(100% - 32px)}
+  .map-nav-btn .mnb-txt{overflow:hidden;text-overflow:ellipsis}
 
   /* Fiches pro */
   #grid-view{padding:0 1rem 2rem}
@@ -721,7 +757,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
       <div class="addr-ic">📍</div>
       <input type="text" id="addr-input" placeholder="Ton adresse ou ta ville — ex : 1234 rue Principale, Laval"
         onkeydown="if(event.key==='Enter')searchByAddress()">
-      <select id="addr-radius" onchange="if(_refPoint){applyFilters();drawRadius();}">
+      <select id="addr-radius" onchange="if(_refPoint){_pendingFit=true;drawRadius();applyFilters();}">
         <option value="10">10 km</option>
         <option value="25" selected>25 km</option>
         <option value="50">50 km</option>
@@ -758,21 +794,16 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 
   <div id="map-view">
     <div id="greaz-map"></div>
-    <div class="map-veil" id="map-veil">
-      <div class="veil-hint">
-        <span class="veil-ic">🗺️</span>
-        <span class="veil-txt">Clique pour explorer la carte</span>
-      </div>
-    </div>
+    <button class="map-nav-btn" id="map-nav-btn" onclick="toggleMapNav()">
+      <span class="mnb-ic">🖐️</span>
+      <span class="mnb-txt">Naviguer sur la carte</span>
+    </button>
     <div class="map-controls">
-      <button class="map-ctrl-btn" id="geo-btn" onclick="activateMap();geolocateMe()" title="Ma position">📍</button>
-      <button class="map-ctrl-btn" onclick="activateMap();leafletMap.zoomIn()" title="Zoom +">＋</button>
-      <button class="map-ctrl-btn" onclick="activateMap();leafletMap.zoomOut()" title="Zoom −">－</button>
+      <button class="map-ctrl-btn" id="geo-btn" onclick="geolocateMe()" title="Ma position">📍</button>
+      <button class="map-ctrl-btn" onclick="leafletMap.zoomIn()" title="Zoom +">＋</button>
+      <button class="map-ctrl-btn" onclick="leafletMap.zoomOut()" title="Zoom −">－</button>
     </div>
     <div class="results-count-map" id="results-count-map"></div>
-    <div class="map-live" id="map-live" onclick="deactivateMap()">
-      <span style="color:var(--green)">●</span> Carte active — clique ici pour reprendre le défilement
-    </div>
   </div>
 
   <div id="grid-view" style="display:none;padding-top:1.25rem">
@@ -974,6 +1005,7 @@ var PROBLEMS = [
 
 var allPros = [];
 var filteredPros = [];
+var _pendingFit = false;   // recadrer la vue au prochain filtrage
 var currentProfile = null;
 var leafletMap = null;
 var leafletMarkers = [];
@@ -1154,14 +1186,13 @@ async function searchByAddress(){
       });
       _refMarker = L.marker([lat,lng], {icon:originIcon, zIndexOffset:900}).addTo(leafletMap);
       _refMarker.bindPopup('<div style="font-family:Instrument Sans,sans-serif;font-size:13px;color:#0A0C1B;padding:5px 3px">📍 <strong>Ton point de départ</strong><br><span style="font-size:11.5px;color:#555">'+label+'</span></div>');
-      leafletMap.setView([lat,lng], 12);
-      drawRadius();   // cadre sur le rayon si un cercle est dessiné
+      drawRadius();
+      _pendingFit = true;   // le cadrage se fera sur les pros les plus proches
     }
 
     var bar = document.getElementById('addr-active');
     document.getElementById('addr-active-txt').innerHTML = '📍 Autour de <b>'+label+'</b>';
     bar.classList.add('show');
-    activateMap();
 
     applyFilters();
   } catch(e){
@@ -1191,8 +1222,40 @@ function drawRadius(){
     interactive: false,
   }).addTo(leafletMap);
 
-  // On cadre le cercle pour que le rayon soit lisible d'un coup d'œil
-  try { leafletMap.fitBounds(_radiusCircle.getBounds().pad(.12), { animate:true, duration:.6 }); } catch(e){}
+}
+
+/* Cadre la vue sur le point de départ et les pros les plus proches.
+   Mieux qu'un zoom fixe : on voit vraiment qui est à côté. */
+function fitToNearby(count){
+  if(!leafletMap || !_refPoint) return;
+  count = count || 6;
+
+  // Les pros affichés, triés par distance (applyFilters l'a déjà fait)
+  var near = filteredPros
+    .filter(function(p){ return p.lat && p.lng && p._dist !== null && p._dist !== undefined; })
+    .slice(0, count);
+
+  var pts = [ L.latLng(_refPoint.lat, _refPoint.lng) ];
+  near.forEach(function(p){ pts.push(L.latLng(parseFloat(p.lat), parseFloat(p.lng))); });
+
+  if(pts.length === 1){
+    // Personne autour : on montre la zone de recherche, ou un quartier
+    if(_radiusCircle){
+      try { leafletMap.fitBounds(_radiusCircle.getBounds().pad(.1), { animate:!REDUCED, duration:.7 }); return; } catch(e){}
+    }
+    leafletMap.setView([_refPoint.lat, _refPoint.lng], 13, { animate:!REDUCED });
+    return;
+  }
+
+  try {
+    leafletMap.fitBounds(L.latLngBounds(pts).pad(.22), {
+      animate: !REDUCED,
+      duration: .8,
+      maxZoom: 15,          // on ne colle pas au trottoir si un garage est juste à côté
+    });
+  } catch(e){
+    leafletMap.setView([_refPoint.lat, _refPoint.lng], 13);
+  }
 }
 
 function clearAddress(){
@@ -1255,6 +1318,12 @@ function applyFilters(){
   }
 
   renderView();
+
+  // Nouveau point de départ ou nouveau rayon : on recadre sur les plus proches
+  if(_refPoint && _pendingFit){
+    _pendingFit = false;
+    setTimeout(function(){ fitToNearby(6); }, 90);
+  }
 }
 
 function renderView(){
@@ -1281,15 +1350,14 @@ function addSingleMarker(p){
   var price = lowestPrice(p.pricing);
   var isGarage = p.type==='garage';
   var ini = initials(p.name);
-  var certDot = cert ? '<div class="gz-cert-dot '+cert.cls+'">✦</div>' : '';
-  var priceTag = price ? '<div class="gz-price-tag">À partir de '+price+'</div>' : '';
+  var priceTag = price ? '<div class="gz-price-tag">dès '+price+'</div>' : '';
 
   var lvl2 = p.certification||0;
   var icon = L.divIcon({
     html:'<div class="gz-marker-wrap" style="--i:'+Math.min(leafletMarkers.length,40)+'">'
-      +'<div class="gz-marker '+(isGarage?'garage':'mec')+(lvl2?' lvl'+lvl2:'')+'">'+ini+certDot+'</div>'
-      +'<div class="gz-marker-tail"></div>'+priceTag+'</div>',
-    className:'', iconSize:[52,68], iconAnchor:[26,68], popupAnchor:[0,-70],
+      +'<div class="gz-marker '+(isGarage?'garage':'mec')+(lvl2?' lvl'+lvl2:'')+'">'+ini+'</div>'
+      + priceTag + '</div>',
+    className:'', iconSize:[38,38], iconAnchor:[19,19], popupAnchor:[0,-22],
   });
 
   var marker = L.marker([lat,lng],{icon:icon}).addTo(leafletMap);
@@ -1339,11 +1407,6 @@ function initMap(){
     bounds: QC_BOUNDS,
   }).addTo(leafletMap);
 
-  // Un clic sur la carte l'active : les marqueurs restent cliquables du premier coup
-  leafletMap.on('click', function(){ activateMap(); });
-  leafletMap.on('popupopen', function(){ activateMap(); });
-  leafletMap.on('dragstart zoomstart', function(){ activateMap(); });
-
   leafletMap.on('locationfound', function(e){
     var btn = document.getElementById('geo-btn');
     if(btn){ btn.textContent='📍'; btn.style.background=''; btn.title='Ma position'; }
@@ -1352,12 +1415,12 @@ function initMap(){
       radius:10, fillColor:'#1A3CFF', color:'white', weight:3, fillOpacity:1
     }).addTo(leafletMap);
     window._geoMarker.bindPopup('<div style="font-family:Instrument Sans,sans-serif;font-size:13px;color:#0A0C1B;padding:4px">📍 <strong>Vous êtes ici</strong></div>').openPopup();
-    leafletMap.setView(e.latlng, 12);
 
     // Active aussi le tri par distance depuis ma position
     _refPoint = { lat:e.latlng.lat, lng:e.latlng.lng, label:'ma position actuelle' };
     if(_refMarker){ leafletMap.removeLayer(_refMarker); _refMarker = null; }
     drawRadius();
+    _pendingFit = true;
     var bar = document.getElementById('addr-active');
     if(bar){
       document.getElementById('addr-active-txt').innerHTML = '📍 Autour de <b>ma position actuelle</b>';
@@ -1378,15 +1441,25 @@ function initMap(){
    Tant qu'on n'a pas cliqué, la carte laisse passer le défilement de la page. */
 var _mapActive = false;
 
+function setNavBtn(on){
+  var b = document.getElementById('map-nav-btn');
+  if(!b) return;
+  b.classList.toggle('on', on);
+  b.querySelector('.mnb-ic').textContent = on ? '●' : '🖐️';
+  b.querySelector('.mnb-txt').textContent = on ? 'Navigation active — appuyer pour arrêter' : 'Naviguer sur la carte';
+}
+
+function toggleMapNav(){
+  if(_mapActive) deactivateMap();
+  else activateMap();
+}
+
 function activateMap(){
   if(!leafletMap || _mapActive) return;
   _mapActive = true;
   leafletMap.scrollWheelZoom.enable();
   leafletMap.dragging.enable();
-  var veil = document.getElementById('map-veil');
-  var live = document.getElementById('map-live');
-  if(veil) veil.classList.add('hidden');
-  if(live) live.classList.add('show');
+  setNavBtn(true);
 }
 
 function deactivateMap(){
@@ -1394,19 +1467,11 @@ function deactivateMap(){
   _mapActive = false;
   leafletMap.scrollWheelZoom.disable();
   if('ontouchstart' in window) leafletMap.dragging.disable();
-  var veil = document.getElementById('map-veil');
-  var live = document.getElementById('map-live');
-  if(veil) veil.classList.remove('hidden');
-  if(live) live.classList.remove('show');
+  setNavBtn(false);
 }
 
 /* La carte se désactive quand on clique ailleurs ou qu'on la quitte des yeux */
 function initMapGuards(){
-  document.addEventListener('click', function(e){
-    if(!_mapActive) return;
-    var mv = document.getElementById('map-view');
-    if(mv && !mv.contains(e.target)) deactivateMap();
-  });
   // Quand la carte sort de l'écran, on relâche le défilement
   if('IntersectionObserver' in window){
     var mv = document.getElementById('map-view');
@@ -1458,20 +1523,18 @@ function renderMap(){
     var isGarage = p.type==='garage';
     var ini = initials(p.name);
 
-    var certDot = cert ? '<div class="gz-cert-dot '+cert.cls+'">✦</div>' : '';
-    var priceTag = price ? '<div class="gz-price-tag">À partir de '+price+'</div>' : '';
+    var priceTag = price ? '<div class="gz-price-tag">dès '+price+'</div>' : '';
 
     var lvl = p.certification||0;
     var icon = L.divIcon({
       html: '<div class="gz-marker-wrap" style="--i:'+Math.min(count,40)+'">'
-        +'<div class="gz-marker '+(isGarage?'garage':'mec')+(lvl?' lvl'+lvl:'')+'">'+ini+certDot+'</div>'
-        +'<div class="gz-marker-tail"></div>'
-        +priceTag
+        +'<div class="gz-marker '+(isGarage?'garage':'mec')+(lvl?' lvl'+lvl:'')+'">'+ini+'</div>'
+        + priceTag
         +'</div>',
       className:'',
-      iconSize:[52,68],
-      iconAnchor:[26,68],
-      popupAnchor:[0,-70],
+      iconSize:[38,38],
+      iconAnchor:[19,19],
+      popupAnchor:[0,-22],
     });
 
     var marker = L.marker([lat,lng], {icon:icon}).addTo(leafletMap);
