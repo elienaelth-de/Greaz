@@ -1066,6 +1066,7 @@ var currentProfile = null;
 var leafletMap = null;
 var leafletMarkers = [];
 var currentView = "map";
+var _deeplinkGarage = null;   // garage ciblé par un QR (bloque le recentrage auto de la carte)
 
 var _urgency = "", _contact_pref = "both", _selProblem = "";
 var _bookingProblem = "", selSlot = "", reviewRating = 0;
@@ -1209,6 +1210,7 @@ function switchView(v){
 function fitAllMarkers(){
   if(!leafletMap || !leafletMarkers.length) return;
   if(_refPoint) return;   // une adresse est active : on garde la vue centrée dessus
+  if(_deeplinkGarage) return;   // un QR a ciblé un garage : on ne recentre pas par-dessus
   try {
     var group = L.featureGroup(leafletMarkers);
     leafletMap.fitBounds(group.getBounds().pad(0.15), { maxZoom:13, animate:false });
@@ -1280,6 +1282,7 @@ function loadDirectory(){
 
     applyFilters();
     checkReviewMode();
+    checkGarageDeeplink();
     countUp(document.getElementById('hero-count'), allPros.length);
   }).catch(function(e){
     console.error('Firestore:', e);
@@ -1523,6 +1526,7 @@ function addSingleMarker(p){
     { className:'gz-popup', maxWidth:260, minWidth:220 }
   );
   marker.on('popupopen', function(){ loadRatingSummary(p.id, 'map-rating-'+p.id); });
+  marker._proId = p.id;
   leafletMarkers.push(marker);
 }
 
@@ -2419,6 +2423,66 @@ function checkReviewMode(){
     var bookingId=params.get('booking'), code=params.get('code'), mecId=params.get('mec');
     if(bookingId&&code&&mecId) openReviewModal(bookingId,code,mecId);
   }
+}
+
+/* ══════════ DEEPLINK GARAGE (autocollants QR) ══════════
+   Un QR imprimé sur un autocollant pointe vers :
+     greaz.ca/?garage=<ID_DU_DOC>
+   ou en secours, par nom :
+     greaz.ca/?g=<nom-encodé>
+   Au chargement, on retrouve le bon garage, on centre la carte dessus
+   et on ouvre directement sa fiche — le client scanne, il est rendu. */
+function checkGarageDeeplink(){
+  var params = new URLSearchParams(window.location.search);
+  var gid = params.get('garage') || params.get('g_id');
+  var gname = params.get('g') || params.get('garage_name');
+  if(!gid && !gname) return;
+
+  var target = null;
+  if(gid){
+    target = allPros.find(function(p){ return p.id === gid; });
+  }
+  if(!target && gname){
+    var needle = decodeURIComponent(gname).toLowerCase().replace(/[-_]+/g,' ').trim();
+    target = allPros.find(function(p){ return (p.name||'').toLowerCase() === needle; })
+          || allPros.find(function(p){ return (p.name||'').toLowerCase().indexOf(needle) !== -1; });
+  }
+
+  if(!target){
+    toast('🔍 Ce garage n\'a pas été trouvé. Voici tout le répertoire.', 'err', 4200);
+    return;
+  }
+
+  // On mémorise la cible : fitAllMarkers ne recentrera pas par-dessus
+  _deeplinkGarage = target;
+
+  // On bascule sur la carte + on scrolle vers l'annuaire
+  var section = document.getElementById('annuaire');
+  if(section) section.scrollIntoView({ behavior:'smooth' });
+  if(typeof switchView === 'function') switchView('map');
+
+  // Fonction qui centre fermement sur le garage et ouvre sa fiche.
+  // On l'appelle plusieurs fois pour être sûr de passer APRÈS invalidateSize/fitAllMarkers.
+  function lockOnGarage(openCard){
+    var hasGPS = target.lat && target.lng && !isNaN(parseFloat(target.lat));
+    if(typeof leafletMap !== 'undefined' && leafletMap && hasGPS){
+      leafletMap.setView([parseFloat(target.lat), parseFloat(target.lng)], 15, { animate:true });
+    }
+    var mk = (typeof leafletMarkers !== 'undefined')
+      ? leafletMarkers.find(function(m){ return m._proId === target.id; })
+      : null;
+    if(mk && mk.openPopup){ try { mk.openPopup(); } catch(e){} }
+    if(openCard) openProfile(target.id);
+  }
+
+  // Plusieurs passages : 500ms (après le switchView), 900ms (après fit), 1400ms (sécurité)
+  setTimeout(function(){ lockOnGarage(false); }, 500);
+  setTimeout(function(){ lockOnGarage(false); }, 950);
+  setTimeout(function(){
+    lockOnGarage(true);   // ce dernier ouvre la fiche
+    toast('📍 Voici <b>'+target.name+'</b> !', 'ok', 3400);
+    _deeplinkGarage = null;   // on relâche le verrou une fois posé
+  }, 1450);
 }
 
 function openReviewModal(bookingId,code,mecId){
