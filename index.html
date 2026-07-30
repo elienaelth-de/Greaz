@@ -292,6 +292,21 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 @media(prefers-reduced-motion:reduce){.gz-marker-wrap{animation:none}.gz-marker.lvl3{animation:none}}
 @media(hover:none){.gz-price-tag{opacity:.92;transform:translateX(-50%) translateY(0)}}
 
+/* ═══ PINS PARTENAIRES (pubs géolocalisées) ═══
+   Carrés colorés pour les distinguer des garages (ronds).
+   Un badge « Partenaire » les identifie clairement. */
+.gz-partner-wrap{position:relative;width:40px;height:40px;animation:pinIn .42s var(--ease) both;animation-delay:calc(var(--i,0) * 20ms)}
+.gz-partner{position:relative;width:38px;height:38px;margin:1px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:19px;color:#fff;box-shadow:0 3px 10px rgba(23,26,32,.28), 0 1px 3px rgba(23,26,32,.2);
+  transition:transform .22s var(--ease)}
+.gz-partner-badge{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  white-space:nowrap;font-size:9px;font-weight:700;letter-spacing:.02em;color:#fff;
+  padding:2px 8px;border-radius:20px;box-shadow:0 2px 6px rgba(23,26,32,.2);
+  pointer-events:none}
+.gz-partner-wrap:hover{z-index:650}
+.gz-partner-wrap:hover .gz-partner{transform:scale(1.15)}
+@media(prefers-reduced-motion:reduce){.gz-partner-wrap{animation:none}}
+
 /* Popups clairs */
 .gz-popup .leaflet-popup-content-wrapper{background:#fff;border:1px solid rgba(23,26,32,.08);border-radius:12px;box-shadow:0 16px 44px rgba(23,26,32,.18), 0 2px 8px rgba(23,26,32,.08);padding:0}
 .gz-popup .leaflet-popup-tip{background:#fff;border:1px solid rgba(23,26,32,.08);box-shadow:none}
@@ -1082,6 +1097,8 @@ var leafletMap = null;
 var leafletMarkers = [];
 var currentView = "map";
 var _deeplinkGarage = null;   // garage ciblé par un QR (bloque le recentrage auto de la carte)
+var allPartners = [];         // commerces partenaires (pubs géolocalisées)
+var partnerMarkers = [];      // leurs marqueurs Leaflet (layer séparé des garages)
 
 var _urgency = "", _contact_pref = "both", _selProblem = "";
 var _bookingProblem = "", selSlot = "", reviewRating = 0;
@@ -1299,10 +1316,119 @@ function loadDirectory(){
     checkReviewMode();
     checkGarageDeeplink();
     countUp(document.getElementById('hero-count'), allPros.length);
+    loadPartners();
   }).catch(function(e){
     console.error('Firestore:', e);
     document.getElementById('cards-grid').innerHTML = '<div class="pro-empty"><div class="pro-empty-icon">⚠️</div>Erreur de chargement</div>';
   });
+}
+
+/* ══════════ COMMERCES PARTENAIRES (pubs géolocalisées) ══════════
+   Un partenaire n'apparaît que s'il est PROCHE de la zone regardée :
+   soit sa ville correspond à ce qu'on regarde, soit il est dans le
+   rayon (km) autour du centre de la carte. Ça garde la carte pertinente
+   localement — à Saint-Jean, on voit les partenaires de Saint-Jean. */
+function loadPartners(){
+  db.collection('partners').get().then(function(snap){
+    allPartners = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
+      .filter(function(p){ return p.active !== false; });
+    console.log(allPartners.length + ' partenaire(s) chargé(s)');
+    // Géocodage des partenaires sans GPS mais avec adresse/ville
+    allPartners.forEach(function(p){
+      var hasGPS = p.lat && p.lng && !isNaN(parseFloat(p.lat));
+      if(!hasGPS){
+        var ref = CITY_COORDS[p.city];
+        if(ref){ p.lat = ref[0]; p.lng = ref[1]; p._approxCity = true; }
+      }
+    });
+    renderPartners();
+  }).catch(function(e){
+    console.log('Partenaires (collection absente ou vide):', e.message);
+  });
+}
+
+/* Distance de recherche par défaut pour matcher un partenaire à la vue.
+   On prend le max(rayon du partenaire, rayon de la vue courante). */
+function partnerVisibleHere(p, viewCenter, viewCity){
+  var pLat = parseFloat(p.lat), pLng = parseFloat(p.lng);
+  if(!pLat || !pLng || isNaN(pLat)) return false;
+
+  // 1) Match par ville : le partenaire cible cette ville explicitement
+  var targetCities = [];
+  if(p.city) targetCities.push(p.city);
+  if(Array.isArray(p.cities)) targetCities = targetCities.concat(p.cities);
+  if(viewCity && targetCities.indexOf(viewCity) !== -1) return true;
+
+  // 2) Match par rayon : le partenaire est assez proche du centre regardé
+  if(viewCenter){
+    var radius = parseFloat(p.radius_km) || 15;   // rayon par défaut : 15 km
+    var d = _kmBetween(viewCenter.lat, viewCenter.lng, pLat, pLng);
+    if(d <= radius) return true;
+  }
+  return false;
+}
+
+/* Quelle ville regarde-t-on ? On déduit la ville la plus proche du centre carte. */
+function currentViewCity(center){
+  if(!center) return null;
+  var best = null, bestD = 25;   // à moins de 25 km du centre-ville
+  for(var city in CITY_COORDS){
+    var c = CITY_COORDS[city];
+    var d = _kmBetween(center.lat, center.lng, c[0], c[1]);
+    if(d < bestD){ bestD = d; best = city; }
+  }
+  return best;
+}
+
+function renderPartners(){
+  if(!leafletMap || currentView !== 'map') return;
+
+  // On efface les anciens marqueurs partenaires
+  partnerMarkers.forEach(function(m){ leafletMap.removeLayer(m); });
+  partnerMarkers = [];
+
+  var center = leafletMap.getCenter();
+  var viewCity = currentViewCity(center);
+  var shown = 0;
+
+  allPartners.forEach(function(p, idx){
+    if(!partnerVisibleHere(p, center, viewCity)) return;
+
+    var color = p.color || '#378ADD';
+    var emoji = p.icon || '🏬';
+    var label = p.badge || 'Partenaire';
+
+    var icon = L.divIcon({
+      html: '<div class="gz-partner-wrap" style="--i:'+Math.min(shown,20)+'">'
+        + '<span class="gz-partner-badge" style="background:'+color+'">'+label+'</span>'
+        + '<div class="gz-partner" style="background:'+color+'">'+emoji+'</div>'
+        + '</div>',
+      className:'', iconSize:[40,40], iconAnchor:[20,20], popupAnchor:[0,-24],
+    });
+
+    var marker = L.marker([parseFloat(p.lat), parseFloat(p.lng)], { icon:icon, zIndexOffset:-100 }).addTo(leafletMap);
+
+    var offer = p.offer ? '<div style="font-size:13.5px;font-weight:700;color:'+color+';margin:6px 0">'+p.offer+'</div>' : '';
+    var desc = p.description ? '<div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:8px">'+p.description+'</div>' : '';
+    var btn = p.link
+      ? '<a href="'+p.link+'" target="_blank" rel="noopener" class="gz-popup-btn" style="display:block;text-decoration:none;background:'+color+'">'+(p.cta||'En savoir plus')+' →</a>'
+      : (p.phone ? '<a href="tel:'+p.phone+'" class="gz-popup-btn" style="display:block;text-decoration:none;background:'+color+'">📞 '+p.phone+'</a>' : '');
+
+    marker.bindPopup(
+      '<div class="gz-popup-inner">'
+      + '<div style="font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:3px">📢 '+label+'</div>'
+      + '<div class="gz-popup-name">'+(p.name||'Commerce')+'</div>'
+      + '<div class="gz-popup-meta" style="margin-top:4px">📍 '+(p.city||'—')+'</div>'
+      + offer + desc + btn
+      + '</div>',
+      { className:'gz-popup', maxWidth:260, minWidth:220 }
+    );
+
+    partnerMarkers.push(marker);
+    shown++;
+  });
+
+  if(shown > 0) console.log(shown + ' partenaire(s) affiché(s) dans cette zone');
 }
 
 /* ══════════ RECHERCHE PAR ADRESSE ══════════ */
@@ -1573,6 +1699,13 @@ function initMap(){
     bounds: QC_BOUNDS,
   }).addTo(leafletMap);
 
+  // Rafraîchir les partenaires quand on se déplace vers une autre zone
+  // (debounce pour ne pas recalculer à chaque frame de déplacement)
+  leafletMap.on('moveend', function(){
+    clearTimeout(window._partnerTimer);
+    window._partnerTimer = setTimeout(renderPartners, 250);
+  });
+
   leafletMap.on('locationfound', function(e){
     var btn = document.getElementById('geo-btn');
     if(btn){ btn.textContent='📍'; btn.style.background=''; btn.title='Ma position'; }
@@ -1733,6 +1866,7 @@ function renderMap(){
     document.getElementById('results-count-map').textContent = 'Aucun pro avec coordonnées GPS';
   }
   fitAllMarkers();
+  renderPartners();
 }
 
 function renderGrid(){
