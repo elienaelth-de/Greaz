@@ -23,6 +23,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
 <style>
 /* ═══════════════════════════════════════════════════════
    GREAZ — THÈME CLAIR, INSPIRATION TESLA
@@ -138,6 +140,97 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 .gz-popup-btn:active,.acc-add:active,.hs-chip:active,.fab:active{transform:scale(.97)}
 
 /* ═══ Recherche façon Uber, habillage Tesla ═══ */
+/* ═══════════ VÉRIFICATEUR DE PRIX (écran d'accueil) ═══════════ */
+/* Bandeau de preuve sociale au-dessus du vérificateur */
+.pc-social{display:inline-flex;align-items:center;gap:9px;margin:0 auto 1.1rem;padding:8px 16px;
+  background:rgba(14,159,110,.1);border:1px solid rgba(14,159,110,.25);border-radius:30px;
+  font-size:13px;font-weight:600;color:#0B7D57;animation:pcIn .6s .1s var(--ease) both;backdrop-filter:blur(8px)}
+.pc-social-dot{width:8px;height:8px;border-radius:50%;background:#0E9F6E;box-shadow:0 0 0 0 rgba(14,159,110,.5);animation:pcLive 2s ease-in-out infinite}
+@keyframes pcLive{0%{box-shadow:0 0 0 0 rgba(14,159,110,.5)}70%{box-shadow:0 0 0 7px rgba(14,159,110,0)}100%{box-shadow:0 0 0 0 rgba(14,159,110,0)}}
+.pc-social b{font-weight:800}
+/* Bandeau de garanties (trust signals) */
+.pc-trust{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:0 auto 1.6rem;animation:pcIn .6s .2s var(--ease) both}
+.pc-trust-item{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:rgba(42,40,37,.75)}
+.pc-trust-item .ic{font-size:15px}
+
+.price-check{max-width:560px;margin:0 auto 1.25rem;background:rgba(252,251,249,.98);
+  border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:1.6rem 1.6rem 1.75rem;
+  box-shadow:0 24px 64px rgba(23,26,32,.20), 0 4px 14px rgba(23,26,32,.08);
+  backdrop-filter:blur(22px) saturate(1.4);text-align:left;position:relative;overflow:hidden;
+  animation:pcIn .6s var(--ease) both}
+.price-check::before{content:'';position:absolute;top:-40%;right:-15%;width:250px;height:250px;border-radius:50%;
+  background:radial-gradient(circle,rgba(69,104,214,.07),transparent 70%);pointer-events:none}
+@keyframes pcIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.pc-header-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:.35rem}
+.pc-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--blue);background:var(--bluelt);padding:5px 12px;border-radius:20px}
+.pc-free-tag{font-size:11px;font-weight:800;color:#0B7D57;background:rgba(14,159,110,.12);padding:5px 11px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+.pc-title{font-family:'Inter',sans-serif;font-size:clamp(1.35rem,3vw,1.7rem);font-weight:800;letter-spacing:-.03em;color:var(--txt);line-height:1.12;margin-bottom:.35rem;position:relative}
+.pc-sub{font-size:13.5px;color:var(--muted);line-height:1.55;margin-bottom:1.35rem;position:relative}
+.pc-fields{display:flex;flex-direction:column;gap:12px;position:relative}
+.pc-field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em}
+.pc-field select,.pc-field input{width:100%;padding:14px 15px;background:var(--graphite3);border:1.5px solid transparent;border-radius:12px;color:var(--txt);font-size:16px;font-family:inherit;outline:none;transition:border-color .2s,background .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.pc-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M5 7L0 2h10z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center;padding-right:36px;cursor:pointer}
+.pc-field select:focus,.pc-field input:focus{border-color:var(--blue);background:var(--graphite2);box-shadow:0 0 0 4px rgba(69,104,214,.1)}
+.pc-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc-field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.pc-price-wrap{position:relative}
+.pc-price-wrap::before{content:'$';position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--faint);font-weight:700;font-size:16px;pointer-events:none;z-index:1}
+.pc-price-wrap input{padding-left:30px!important;font-weight:700;font-size:17px}
+/* Champ localisation avec bouton géoloc */
+.pc-loc-wrap{position:relative;display:flex;align-items:center}
+.pc-loc-wrap input{width:100%;padding:14px 44px 14px 15px;background:var(--graphite3);border:1.5px solid transparent;border-radius:12px;color:var(--txt);font-size:16px;font-family:inherit;outline:none;transition:border-color .2s,background .2s,box-shadow .2s}
+.pc-loc-wrap input:focus{border-color:var(--blue);background:var(--graphite2);box-shadow:0 0 0 4px rgba(69,104,225,.1)}
+.pc-loc-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:none;background:var(--bluelt);color:var(--blue);border-radius:9px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .15s}
+.pc-loc-btn:hover{background:#DCE6FB}
+.pc-loc-btn:active{transform:translateY(-50%) scale(.9)}
+.pc-loc-btn.loading{animation:pcLocSpin 1s linear infinite}
+@keyframes pcLocSpin{to{transform:translateY(-50%) rotate(360deg)}}
+.pc-btn{width:100%;padding:16px;margin-top:.35rem;background:linear-gradient(135deg,var(--blue),#3457B2);color:#fff;border:none;border-radius:13px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(69,104,214,.35);transition:transform .2s var(--ease),box-shadow .2s var(--ease);position:relative;overflow:hidden}
+.pc-btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transition:left .6s}
+.pc-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(69,104,214,.45)}
+.pc-btn:hover::after{left:120%}
+.pc-btn:active{transform:scale(.98)}
+
+/* Résultat du verdict */
+.pc-result{margin-top:1.35rem;border-radius:18px;padding:1.5rem;text-align:center;animation:pcResult .5s var(--spring) both;display:none;position:relative}
+.pc-result.show{display:block}
+@keyframes pcResult{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.pc-result.green{background:linear-gradient(160deg,#E6F6EF,#F0FAF5);border:1.5px solid rgba(14,159,110,.3)}
+.pc-result.yellow{background:linear-gradient(160deg,#FBF4E0,#FDF9EF);border:1.5px solid rgba(184,134,11,.3)}
+.pc-result.red{background:linear-gradient(160deg,#FBEBEA,#FEF4F3);border:1.5px solid rgba(214,69,69,.3)}
+.pc-verdict-emoji{font-size:2.8rem;line-height:1;margin-bottom:.6rem;animation:pcPop .5s .1s var(--spring) both}
+@keyframes pcPop{from{transform:scale(0)}to{transform:scale(1)}}
+.pc-verdict-title{font-family:'Inter',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-bottom:.5rem}
+.pc-result.green .pc-verdict-title{color:#0B7D57}
+.pc-result.yellow .pc-verdict-title{color:#8A6508}
+.pc-result.red .pc-verdict-title{color:#B3261E}
+.pc-range{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:.85rem}
+.pc-range b{color:var(--txt)}
+.pc-economie{display:inline-block;background:rgba(255,255,255,.75);border-radius:14px;padding:12px 22px;font-size:14px;font-weight:700;color:#B3261E;margin-bottom:.5rem;box-shadow:0 3px 12px rgba(214,69,69,.12)}
+.pc-economie .big{font-size:1.9rem;display:block;margin-top:2px;letter-spacing:-.02em}
+.pc-cta-map{width:100%;padding:16px;margin-top:1.1rem;background:linear-gradient(135deg,#0E9F6E,#0B7D57);color:#fff;border:none;border-radius:14px;font-size:15.5px;font-weight:800;cursor:pointer;font-family:inherit;transition:transform .2s var(--ease),box-shadow .2s;box-shadow:0 8px 24px rgba(14,159,110,.4);position:relative;overflow:hidden;letter-spacing:-.01em}
+.pc-cta-map::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:pcShine 2.8s ease-in-out infinite}
+@keyframes pcShine{0%{left:-100%}45%,100%{left:130%}}
+.pc-cta-map:hover{box-shadow:0 12px 34px rgba(14,159,110,.5);transform:translateY(-2px)}
+.pc-cta-map:active{transform:scale(.98)}
+.pc-cta-sub{font-size:12px;font-weight:600;opacity:.9;display:block;margin-top:2px}
+.pc-cta-secondary{width:100%;padding:14px;margin-top:10px;background:var(--graphite2);border:1.5px solid var(--line2);color:var(--txt);font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;border-radius:14px;transition:all .2s var(--ease);display:flex;align-items:center;justify-content:center;gap:8px}
+.pc-cta-secondary:hover{border-color:var(--blue);background:var(--bluelt);color:var(--blue);transform:translateY(-1px)}
+.pc-cta-secondary .map-ico{font-size:16px}
+.pc-disclaimer{font-size:11px;color:var(--faint);line-height:1.5;margin-top:.9rem;font-style:italic}
+.pc-skip{display:block;margin:.5rem auto 0;background:none;border:none;color:rgba(255,255,255,.9);font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:3px;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+.pc-skip:hover{color:#fff}
+
+@media(max-width:600px){
+  .price-check{padding:1.3rem 1.15rem 1.5rem;border-radius:20px}
+  .pc-field-row{grid-template-columns:1fr}
+  .pc-field-row-3{gap:7px}
+  .pc-field-row-3 .pc-field label{font-size:9.5px}
+  .pc-field-row-3 select{padding:12px 8px;font-size:15px;background-position:right 8px center;padding-right:22px}
+  .pc-trust{gap:12px}
+  .pc-trust-item{font-size:12px}
+}
+
 .hero-search{display:flex;align-items:center;gap:8px;max-width:560px;margin:0 auto .9rem;
   padding:7px 7px 7px 18px;border-radius:40px;
   background:#fff;border:1px solid #D6D8DB;
@@ -264,10 +357,42 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 .map-controls{position:absolute;top:16px;left:16px;z-index:25;display:flex;flex-direction:column;gap:8px}
 .map-ctrl-btn{width:40px;height:40px;border-radius:8px;background:#fff;border:1px solid rgba(23,26,32,.08);color:var(--white);font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 3px 12px rgba(23,26,32,.12);transition:background .2s,border-color .2s}
 .map-ctrl-btn:hover{background:#F4F4F4;border-color:rgba(23,26,32,.16)}
+/* Bouton verrouiller : n'apparaît que quand la carte est déverrouillée */
+.map-lock-btn{display:none;background:var(--green);border-color:var(--green);color:#fff;
+  box-shadow:0 3px 12px rgba(14,159,110,.35);animation:lockBtnIn .35s var(--spring) both}
+.map-lock-btn svg{width:19px;height:19px}
+.map-lock-btn:hover{background:#0C875E;border-color:#0C875E}
+body.map-is-active .map-lock-btn{display:flex}
+@keyframes lockBtnIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
 .results-count-map{position:absolute;top:16px;right:16px;z-index:25;pointer-events:none;padding:8px 14px;border-radius:8px;background:#fff;border:1px solid rgba(23,26,32,.08);font-family:var(--data);font-size:11.5px;font-weight:500;color:var(--muted);box-shadow:0 3px 12px rgba(23,26,32,.1)}
 
 /* ═══ MARQUEURS — sur carte claire : blancs, bagues colorées ═══ */
 .gz-marker-wrap{position:relative;width:38px;height:38px;animation:pinIn .42s var(--ease) both;animation-delay:calc(var(--i,0) * 16ms)}
+/* ═══ CLUSTERS (regroupement des marqueurs, style Greaz) ═══ */
+.gz-cluster-wrap{background:transparent!important}
+.gz-cluster{width:100%;height:100%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:'Inter',sans-serif;font-weight:800;letter-spacing:-.02em;color:#fff;cursor:pointer;
+  border:2.5px solid #fff;transition:transform .2s var(--spring);line-height:1;text-align:center;padding:2px;
+  background:radial-gradient(circle at 35% 30%, #5A7CE0, var(--blue));
+  box-shadow:0 3px 10px rgba(69,104,214,.4), 0 6px 18px rgba(23,26,32,.14)}
+.gz-cluster:hover{transform:scale(1.08)}
+.gzc-city{position:relative;z-index:2;font-size:.62em;font-weight:700;opacity:.92;
+  max-width:94%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:1px;letter-spacing:-.01em}
+.gzc-n{position:relative;z-index:2;font-weight:800}
+.gz-cluster span{position:relative;z-index:2}
+.gz-cluster-sm{font-size:14px}
+.gz-cluster-md{font-size:17px;background:radial-gradient(circle at 35% 30%, #5A7CE0, #3457B2)}
+.gz-cluster-lg{font-size:19px;background:radial-gradient(circle at 35% 30%, #4568D6, #263C8A)}
+.gz-cluster-xl{font-size:21px;background:radial-gradient(circle at 35% 30%, #3457B2, #1B2C6B)}
+/* Halo animé autour des gros clusters pour attirer l'œil */
+.gz-cluster-lg::after,.gz-cluster-xl::after{content:'';position:absolute;inset:-6px;border-radius:50%;
+  border:2px solid rgba(69,104,214,.28);animation:clusterPulse 2.6s ease-in-out infinite}
+@keyframes clusterPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:0;transform:scale(1.18)}}
+@media(prefers-reduced-motion:reduce){.gz-cluster-lg::after,.gz-cluster-xl::after{animation:none}}
+/* Animation d'apparition douce des clusters */
+.marker-cluster{background:transparent}
+.leaflet-cluster-anim .leaflet-marker-icon,.leaflet-cluster-anim .leaflet-marker-shadow{transition:transform .3s var(--ease),opacity .3s var(--ease)}
+
 @keyframes pinIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
 .gz-marker{position:relative;width:34px;height:34px;margin:2px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;
   font-weight:600;font-size:12.5px;letter-spacing:-.02em;color:var(--white);background:#fff;
@@ -362,26 +487,57 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 .pricing-table td{padding:8px 4px;font-size:13px}
 .pricing-table .svc{color:var(--chrome)}
 .pricing-table .price{text-align:right;font-weight:700;color:#00794A}
-.profile-head{display:flex;align-items:center;gap:14px;margin-bottom:1.25rem}
-.profile-avatar{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;flex-shrink:0;color:var(--white)}
-.profile-avatar.mec{background:#E9F8F1;border:2.5px solid rgba(0,168,98,.4)}
-.profile-avatar.garage{background:#FDF0EB;border:2.5px solid rgba(228,87,46,.4)}
-.profile-bio{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:1.25rem}
-.profile-section-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid rgba(23,26,32,.07);margin-top:1.5rem}
-.avail-grid{display:grid;grid-template-columns:auto repeat(3,1fr);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;font-size:12px}
-.avail-head{background:#F4F4F4;padding:6px;text-align:center;font-size:9px;font-weight:700;color:var(--faint);text-transform:uppercase;border-bottom:1px solid var(--line)}
+/* ═══ FICHE PROFIL — version pro ═══ */
+/* Header avec fond dégradé façon carte de visite */
+.profile-hero{margin:-1.5rem -1.75rem 0;padding:1.75rem 1.75rem 1.4rem;
+  background:linear-gradient(160deg,#EEF3FE 0%,#F6F8FC 55%,var(--graphite2,#fff) 100%);
+  border-bottom:1px solid var(--line)}
+.profile-hero.mec{background:linear-gradient(160deg,#E9F8F1 0%,#F1FAF6 55%,var(--graphite2,#fff) 100%)}
+.profile-head{display:flex;align-items:center;gap:15px;margin-bottom:1.15rem}
+.profile-avatar{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;flex-shrink:0;color:var(--white);box-shadow:0 4px 14px rgba(60,50,40,.1)}
+.profile-avatar.mec{background:linear-gradient(135deg,#E9F8F1,#D6F2E6);border:2px solid rgba(0,168,98,.35)}
+.profile-avatar.garage{background:linear-gradient(135deg,#FDF0EB,#FCE4D9);border:2px solid rgba(228,87,46,.35)}
+.profile-name{font-family:'Inter',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.03em;color:var(--txt,#171A20);line-height:1.15}
+.profile-loc{font-size:13px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:5px}
+.profile-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+/* Rangée de statistiques clés dans le header */
+.profile-stats{display:flex;gap:0;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:14px;overflow:hidden;backdrop-filter:blur(6px)}
+.pstat{flex:1;padding:11px 8px;text-align:center;border-right:1px solid var(--line)}
+.pstat:last-child{border:none}
+.pstat-n{font-family:'Inter',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:-.02em;color:var(--txt,#171A20);line-height:1;display:flex;align-items:center;justify-content:center;gap:3px}
+.pstat-n .star{color:#F59E0B;font-size:.95rem}
+.pstat-l{font-size:10.5px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.03em}
+
+.profile-body-pad{padding-top:1.4rem;padding-bottom:5.5rem}
+.profile-bio{font-size:13.5px;color:var(--muted);line-height:1.7;margin:1.15rem 0 .25rem;padding:13px 15px;background:var(--graphite3,#F4F4F4);border-radius:12px;font-style:italic}
+.profile-section-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;padding-bottom:.55rem;border-bottom:1px solid rgba(23,26,32,.07);margin-top:1.75rem;display:flex;align-items:center;gap:7px}
+
+.avail-grid{display:grid;grid-template-columns:auto repeat(3,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:12px}
+.avail-head{background:#F4F4F4;padding:7px;text-align:center;font-size:9px;font-weight:700;color:var(--faint);text-transform:uppercase;border-bottom:1px solid var(--line)}
 .avail-head:first-child{text-align:left;padding-left:10px}
-.avail-day{padding:7px 10px;font-size:11px;color:var(--muted);border-top:1px solid var(--line)}
-.avail-cell{padding:5px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center}
-.avail-dot{width:8px;height:8px;border-radius:50%;background:rgba(23,26,32,.1)}
-.avail-dot.on{background:var(--green);box-shadow:0 0 5px rgba(0,168,98,.45)}
-.review-item{background:#FAFAFB;border:1px solid var(--line);border-radius:var(--r);padding:.875rem;margin-bottom:8px}
+.avail-day{padding:8px 10px;font-size:11px;color:var(--muted);border-top:1px solid var(--line);font-weight:600}
+.avail-cell{padding:6px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.avail-dot{width:9px;height:9px;border-radius:50%;background:rgba(23,26,32,.1)}
+.avail-dot.on{background:var(--green);box-shadow:0 0 6px rgba(0,168,98,.4)}
+.review-item{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;padding:.95rem;margin-bottom:9px}
 .review-stars{color:#B45309;font-size:13px;margin-bottom:4px}
 .review-text{font-size:13px;color:var(--chrome);line-height:1.55}
 .review-author{font-size:11px;color:var(--faint);margin-top:6px}
 .no-reviews{font-size:12.5px;color:var(--faint);text-align:center;padding:1.5rem 0}
-.btn-book{width:100%;padding:13px;border-radius:6px;border:none;background:var(--blue);color:#fff;font-size:14.5px;font-weight:600;cursor:pointer;margin-top:1.5rem;transition:background .2s}
+.btn-book{width:100%;padding:13px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:14.5px;font-weight:600;cursor:pointer;margin-top:1.5rem;transition:background .2s}
 .btn-book:hover{background:var(--blue2)}
+
+/* CTA sticky en bas de la fiche — ne bouge jamais */
+.profile-cta-bar{position:sticky;bottom:0;left:0;right:0;margin:0 -1.75rem -1.5rem;padding:.9rem 1.75rem calc(.9rem + env(safe-area-inset-bottom));
+  background:rgba(252,251,249,.92);backdrop-filter:blur(14px) saturate(1.4);border-top:1px solid var(--line);z-index:5}
+.profile-cta-bar .btn-book{margin-top:0;box-shadow:0 4px 16px rgba(69,104,214,.28)}
+.profile-review-cta{width:100%;padding:12px;border-radius:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#B45309;font-size:14px;font-weight:600;cursor:pointer;margin-top:1rem;font-family:inherit;transition:background .2s}
+.profile-review-cta:hover{background:rgba(245,158,11,.16)}
+
+/* Header de la fiche profil : sans bordure, X flottant par-dessus le hero */
+.profile-header-bare{position:absolute;top:0;left:0;right:0;border-bottom:none!important;padding:1rem 1.25rem;z-index:10;pointer-events:none}
+.profile-header-bare .drawer-title{display:none}
+.profile-header-bare .close-btn{pointer-events:auto;margin-left:auto;background:rgba(255,255,255,.75);backdrop-filter:blur(8px);box-shadow:0 2px 8px rgba(60,50,40,.12)}
 
 /* ═══ TIROIRS — blancs ═══ */
 .overlay{position:fixed;inset:0;background:rgba(23,26,32,.42);z-index:400;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(5px)}
@@ -467,21 +623,48 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 @keyframes radiusIn{from{opacity:0;stroke-width:0}to{opacity:1}}
 
 /* Bouton de navigation de la carte */
-.map-nav-btn{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:25;
-  display:inline-flex;align-items:center;gap:9px;padding:12px 22px;border-radius:8px;
-  background:rgba(255,255,255,.92);border:1px solid rgba(23,26,32,.09);backdrop-filter:blur(16px);
-  font-size:13px;font-weight:600;color:var(--white);cursor:pointer;
-  box-shadow:0 6px 22px rgba(23,26,32,.14);
-  transition:background .25s var(--ease),border-color .25s var(--ease),transform .25s var(--ease);
-  min-height:44px;white-space:nowrap}
-.map-nav-btn:hover{background:#fff;border-color:rgba(23,26,32,.16);transform:translateX(-50%) translateY(-2px)}
-.map-nav-btn:active{transform:translateX(-50%) scale(.97)}
-.mnb-ic{font-size:1.05rem;line-height:1}
-.map-nav-btn.on{background:rgba(0,168,98,.1);border-color:rgba(0,168,98,.4);color:#00794A}
-.map-nav-btn.on:hover{background:rgba(0,168,98,.16)}
-.map-nav-btn.on .mnb-ic{animation:navPulse 2s ease-in-out infinite}
-@keyframes navPulse{0%,100%{opacity:1}50%{opacity:.45}}
-@media(prefers-reduced-motion:reduce){.map-nav-btn.on .mnb-ic{animation:none}}
+/* ═══ OVERLAY DE VERROUILLAGE DE CARTE ═══
+   Voile doux + badge central. Se dissout au clic pour explorer. */
+.map-lock-overlay{position:absolute;inset:0;z-index:25;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,rgba(23,26,32,.10),rgba(23,26,32,.20));
+  backdrop-filter:blur(1.5px);
+  transition:opacity .45s var(--ease),visibility .45s var(--ease);
+  opacity:1;visibility:visible}
+.map-lock-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.mlo-badge{display:flex;align-items:center;gap:14px;padding:16px 24px 16px 18px;
+  background:rgba(252,251,249,.94);backdrop-filter:blur(16px) saturate(1.5);
+  border:1px solid rgba(255,255,255,.7);border-radius:18px;
+  box-shadow:0 12px 40px rgba(23,26,32,.22), 0 2px 8px rgba(23,26,32,.1);
+  transition:transform .3s var(--spring),box-shadow .3s var(--ease);
+  animation:mloFloat 3.5s ease-in-out infinite}
+.map-lock-overlay:hover .mlo-badge{transform:translateY(-3px) scale(1.02);
+  box-shadow:0 18px 50px rgba(23,26,32,.26), 0 3px 10px rgba(23,26,32,.12)}
+.map-lock-overlay:active .mlo-badge{transform:scale(.98)}
+@keyframes mloFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.mlo-icon{width:46px;height:46px;flex-shrink:0;border-radius:13px;
+  background:linear-gradient(135deg,var(--blue),#5A7CE0);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(69,104,214,.35)}
+.mlo-icon svg{width:23px;height:23px}
+.mlo-text{text-align:left}
+.mlo-title{font-family:'Inter',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--txt,#171A20);line-height:1.2}
+.mlo-sub{font-size:12px;color:var(--muted);margin-top:2px}
+/* Petit halo pulsant derrière le badge pour attirer l'œil */
+.mlo-badge::before{content:'';position:absolute;inset:-8px;border-radius:24px;
+  border:1.5px solid rgba(69,104,214,.25);opacity:0;
+  animation:mloPulse 2.8s ease-in-out infinite}
+@keyframes mloPulse{0%{opacity:.5;transform:scale(.96)}70%,100%{opacity:0;transform:scale(1.06)}}
+@media(prefers-reduced-motion:reduce){
+  .mlo-badge{animation:none}
+  .mlo-badge::before{animation:none}
+}
+@media(max-width:640px){
+  .mlo-badge{padding:13px 18px 13px 15px;gap:11px}
+  .mlo-icon{width:40px;height:40px}
+  .mlo-title{font-size:14px}
+  .mlo-sub{font-size:11px}
+}
 
 /* Recherche par adresse */
 .addr-bar{display:flex;gap:8px;align-items:center;max-width:900px;margin:0 auto 10px;background:var(--bluelt);border:1.5px solid rgba(62,106,225,.28);border-radius:12px;padding:.6rem .75rem;flex-wrap:wrap}
@@ -683,8 +866,6 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
   .map-ctrl-btn{width:44px;height:44px}
   .results-count-map{font-size:11px;padding:7px 11px;top:12px;right:12px}
   .map-controls{top:12px;left:12px}
-  .map-nav-btn{font-size:12.5px;padding:12px 18px;bottom:16px;max-width:calc(100% - 32px)}
-  .map-nav-btn .mnb-txt{overflow:hidden;text-overflow:ellipsis}
 
   #grid-view{padding:0 1rem 2rem}
   .cards-grid{grid-template-columns:1fr;gap:10px}
@@ -775,33 +956,82 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
     </div>
 
     <h1>
-      <span class="h1-l" style="--d:.08s">La mécanique,</span>
-      <span class="h1-l" style="--d:.16s">sans <span class="hl">mauvaise surprise</span>.</span>
+      <span class="h1-l" style="--d:.08s">As-tu payé</span>
+      <span class="h1-l" style="--d:.16s">le <span class="hl">juste prix</span> ?</span>
     </h1>
 
-    <p class="hero-tagline"><span class="hero-price">Soumission gratuite en 3 minutes</span></p>
-    <p class="hero-sub">Prix affichés d'avance · Avis vérifiés · Pros certifiés par notre équipe</p>
+    <p class="hero-sub">Vérifie en 10 secondes si ton garage t'a chargé trop cher — et trouve moins cher près de chez toi.</p>
 
-    <div class="hero-actions">
-      <button class="btn-primary" onclick="document.getElementById('annuaire').scrollIntoView({behavior:'smooth'})">Trouver un pro</button>
-      <button class="btn-ghost" onclick="openDrawer('client')">Décrire mon problème</button>
+    <!-- Preuve sociale (compteur vivant) -->
+    <div class="pc-social">
+      <span class="pc-social-dot"></span>
+      <span>Déjà <b id="pc-saved-counter">14 280 $</b> économisés par les Québécois cette semaine</span>
     </div>
 
-    <!-- Recherche façon Uber -->
-    <div class="hero-search" role="search">
-      <span class="hs-ic">📍</span>
-      <input type="text" id="hero-addr" placeholder="Ton adresse ou ta ville..."
-        aria-label="Chercher un pro près d'une adresse"
-        onkeydown="if(event.key==='Enter')heroSearch()">
-      <button class="hs-btn" onclick="heroSearch()">Chercher</button>
+    <!-- Garanties -->
+    <div class="pc-trust">
+      <span class="pc-trust-item"><span class="ic">⚡</span> 100% gratuit</span>
+      <span class="pc-trust-item"><span class="ic">🔒</span> Anonyme</span>
+      <span class="pc-trust-item"><span class="ic">⏱️</span> 10 secondes</span>
     </div>
-    <div class="hs-chips">
-      <span class="hs-chip-lbl">Populaires :</span>
-      <button class="hs-chip" onclick="quickCity('Montréal')">Montréal</button>
-      <button class="hs-chip" onclick="quickCity('Laval')">Laval</button>
-      <button class="hs-chip" onclick="quickCity('Longueuil')">Longueuil</button>
-      <button class="hs-chip" onclick="quickCity('Québec')">Québec</button>
+
+    <!-- VÉRIFICATEUR DE PRIX -->
+    <div class="price-check" id="price-check">
+      <div class="pc-header-row">
+        <span class="pc-eyebrow">🔍 Vérificateur de prix</span>
+        <span class="pc-free-tag">Gratuit</span>
+      </div>
+      <div class="pc-title">Combien as-tu payé ?</div>
+      <div class="pc-sub">Entre ta réparation et le prix. On te dit direct si c'est un bon deal. 👇</div>
+
+      <div class="pc-fields">
+        <div class="pc-field">
+        <label>Quelle réparation ?</label>
+        <select id="pc-repair">
+          <option value="">Choisis une réparation...</option>
+        </select>
+      </div>
+      <div class="pc-field-row-3">
+        <div class="pc-field">
+          <label>Marque</label>
+          <select id="pc-make"><option value="">Marque...</option></select>
+        </div>
+        <div class="pc-field">
+          <label>Année</label>
+          <select id="pc-year"><option value="">Année...</option></select>
+        </div>
+        <div class="pc-field">
+          <label>Kilométrage</label>
+          <select id="pc-km">
+            <option value="">Km...</option>
+            <option value="0-50">0 – 50 000 km</option>
+            <option value="50-100">50 – 100 000 km</option>
+            <option value="100-150">100 – 150 000 km</option>
+            <option value="150-200">150 – 200 000 km</option>
+            <option value="200+">200 000 km +</option>
+          </select>
+        </div>
+      </div>
+      <div class="pc-field-row">
+        <div class="pc-field">
+          <label>Prix payé (ou demandé)</label>
+          <div class="pc-price-wrap"><input type="number" id="pc-price" placeholder="0" inputmode="numeric"></div>
+        </div>
+        <div class="pc-field">
+          <label>Ta région</label>
+          <div class="pc-loc-wrap">
+            <input type="text" id="pc-city" placeholder="Ta ville..." autocomplete="off">
+            <button type="button" class="pc-loc-btn" onclick="detectCityForPriceCheck()" title="Utiliser ma position">📍</button>
+          </div>
+        </div>
+      </div>
+      <button class="pc-btn" onclick="checkPrice()">Vérifier mon prix gratuitement →</button>
+      </div>
+
+      <div class="pc-result" id="pc-result"></div>
     </div>
+
+    <button class="pc-skip" onclick="document.getElementById('annuaire').scrollIntoView({behavior:'smooth'})">Ou explore directement la carte des garages →</button>
 
     <div class="cert-strip">
       <div class="cert-line"></div>
@@ -879,11 +1109,21 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 
   <div id="map-view">
     <div id="greaz-map"></div>
-    <button class="map-nav-btn" id="map-nav-btn" onclick="toggleMapNav()">
-      <span class="mnb-ic">🖐️</span>
-      <span class="mnb-txt">Naviguer sur la carte</span>
-    </button>
+    <div class="map-lock-overlay" id="map-lock-overlay" onclick="activateMap()">
+      <div class="mlo-badge">
+        <div class="mlo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V7a3 3 0 0 1 6 0v4"/><rect x="5" y="11" width="14" height="9" rx="2"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <div class="mlo-text">
+          <div class="mlo-title">Explorer la carte</div>
+          <div class="mlo-sub">Cliquez pour zoomer et vous déplacer</div>
+        </div>
+      </div>
+    </div>
     <div class="map-controls">
+      <button class="map-ctrl-btn map-lock-btn" id="map-lock-btn" onclick="deactivateMap()" title="Verrouiller la carte (reprendre le défilement)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V7a3 3 0 0 1 6 0v4"/><rect x="5" y="11" width="14" height="9" rx="2"/></svg>
+      </button>
       <button class="map-ctrl-btn" id="geo-btn" onclick="geolocateMe()" title="Ma position">📍</button>
       <button class="map-ctrl-btn" onclick="leafletMap.zoomIn()" title="Zoom +">＋</button>
       <button class="map-ctrl-btn" onclick="leafletMap.zoomOut()" title="Zoom −">－</button>
@@ -915,7 +1155,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
       <div class="mb-perks">
         <div class="mb-perk"><span>🚗</span><div><b>Tes véhicules enregistrés</b><small>Réserve en 2 clics, sans tout retaper</small></div></div>
         <div class="mb-perk"><span>📋</span><div><b>Ton historique d'entretien</b><small>Tous tes rendez-vous au même endroit</small></div></div>
-        <div class="mb-perk"><span>🎁</span><div><b>50 points par réservation</b><small>200 points = 10 $ de rabais</small></div></div>
+        <div class="mb-perk"><span>🎁</span><div><b>10 points par réservation</b><small>200 points = 10 $ de rabais</small></div></div>
       </div>
       <button class="mb-cta" onclick="openAccount();renderAuth('signup')">Créer mon compte gratuit →</button>
     </div>
@@ -960,7 +1200,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
     <div class="feat-card reveal reveal-d2"><div class="feat-icon">⭐</div><div class="feat-title">Avis vérifiés</div><div class="feat-desc">Seuls les clients qui ont réellement eu un rendez-vous peuvent en laisser un.</div></div>
     <div class="feat-card reveal"><div class="feat-icon">📍</div><div class="feat-title">Carte interactive</div><div class="feat-desc">Ton adresse, ton rayon. Les pros s'affichent du plus proche au plus loin, avec la distance.</div></div>
     <div class="feat-card reveal reveal-d1"><div class="feat-icon">🚗</div><div class="feat-title">Tous véhicules</div><div class="feat-desc">Voitures, VUS, motos, vans, VR, bateaux. Si ça a un moteur, tu trouveras quelqu'un.</div></div>
-    <div class="feat-card reveal reveal-d2"><div class="feat-icon">🎁</div><div class="feat-title">Points et rabais</div><div class="feat-desc">50 points par réservation. Monte les niveaux et débloque des rabais chez nos pros certifiés.</div></div>
+    <div class="feat-card reveal reveal-d2"><div class="feat-icon">🎁</div><div class="feat-title">Points et rabais</div><div class="feat-desc">10 points par réservation. Monte les niveaux et débloque des rabais chez nos pros certifiés.</div></div>
   </div>
 </section>
 
@@ -981,7 +1221,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 </div>
 <div class="overlay" id="overlay-profile" onclick="if(event.target===this)closeDrawer('profile')">
   <div class="drawer"><div class="drawer-handle"></div>
-    <div class="drawer-header"><span class="drawer-title" id="profile-drawer-title">Profil</span><button class="close-btn" onclick="closeDrawer('profile')">✕</button></div>
+    <div class="drawer-header profile-header-bare"><span class="drawer-title" id="profile-drawer-title"></span><button class="close-btn" onclick="closeDrawer('profile')">✕</button></div>
     <div class="drawer-body" id="profile-drawer-body"></div>
   </div>
 </div>
@@ -1009,6 +1249,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 emailjs.init({ publicKey: "wVQqsSCjIEvcucyEc" });
 var EMAILJS_SERVICE_ID = "service_2v5zpll";
@@ -1090,11 +1331,319 @@ var PROBLEMS = [
 ];
 
 var allPros = [];
+
+/* ═══════════════════════════════════════════
+   VÉRIFICATEUR DE PRIX
+   Barème de fourchettes au Québec (base de départ).
+   À AFFINER avec les vraies données au fil du temps.
+   Chaque réparation : {min, max, label, emoji}
+   ═══════════════════════════════════════════ */
+var BAREME_PRIX = {
+  vidange:       { min:60,  max:110,  label:"🛢️ Changement d'huile" },
+  freins_av:     { min:200, max:400,  label:"🛑 Freins (avant)" },
+  freins_ar:     { min:200, max:400,  label:"🛑 Freins (arrière)" },
+  freins_full:   { min:400, max:750,  label:"🛑 Freins (4 roues)" },
+  pneus_pose:    { min:60,  max:120,  label:"🛞 Pose / balancement pneus" },
+  pneus_achat:   { min:400, max:1200, label:"🛞 Achat 4 pneus (pose incl.)" },
+  batterie:      { min:180, max:320,  label:"🔋 Batterie" },
+  demarreur:     { min:300, max:650,  label:"🔌 Démarreur" },
+  alternateur:   { min:400, max:800,  label:"⚡ Alternateur" },
+  climatisation: { min:150, max:500,  label:"❄️ Climatisation (recharge/répar.)" },
+  suspension:    { min:300, max:800,  label:"🔧 Suspension (par côté)" },
+  echappement:   { min:200, max:600,  label:"💨 Échappement / silencieux" },
+  courroie:      { min:400, max:1100, label:"⚙️ Courroie de distribution" },
+  transmission:  { min:600, max:3500, label:"⚙️ Transmission (répar. majeure)" },
+  moteur:        { min:500, max:5000, label:"🔩 Moteur (répar. majeure)" },
+  diagnostic:    { min:80,  max:180,  label:"🔍 Diagnostic électronique" },
+  inspection:    { min:80,  max:150,  label:"📋 Inspection" },
+  antirouille:   { min:100, max:250,  label:"🛡️ Traitement antirouille" },
+  pare_brise:    { min:250, max:600,  label:"🪟 Pare-brise" },
+  amortisseurs:  { min:300, max:700,  label:"🔧 Amortisseurs (paire)" },
+  radiateur:     { min:400, max:900,  label:"🌡️ Radiateur" },
+  bougies:       { min:150, max:400,  label:"🔥 Bougies d'allumage" },
+};
+
+/* Remplit le menu déroulant au chargement */
+function fillPriceCheckMenu(){
+  var sel = document.getElementById('pc-repair');
+  if(sel){
+    var html = '<option value="">Choisis une réparation...</option>';
+    for(var k in BAREME_PRIX){
+      html += '<option value="'+k+'">'+BAREME_PRIX[k].label+'</option>';
+    }
+    sel.innerHTML = html;
+  }
+
+  // Marques auto les plus courantes au Québec
+  var makes = ['Toyota','Honda','Ford','Hyundai','Nissan','Mazda','Chevrolet','Kia',
+    'Volkswagen','Subaru','Jeep','GMC','Dodge','RAM','BMW','Mercedes-Benz','Audi',
+    'Kia','Lexus','Acura','Volvo','Mitsubishi','Chrysler','Buick','Tesla','Autre'];
+  var mSel = document.getElementById('pc-make');
+  if(mSel){
+    var seen = {};
+    var mHtml = '<option value="">Marque...</option>';
+    makes.forEach(function(m){ if(!seen[m]){ seen[m]=1; mHtml += '<option value="'+m+'">'+m+'</option>'; } });
+    mSel.innerHTML = mHtml;
+  }
+
+  // Années : de l'année courante jusqu'à 2000
+  var ySel = document.getElementById('pc-year');
+  if(ySel){
+    var now = new Date().getFullYear();
+    var yHtml = '<option value="">Année...</option>';
+    for(var y = now+1; y >= 2000; y--){ yHtml += '<option value="'+y+'">'+y+'</option>'; }
+    ySel.innerHTML = yHtml;
+  }
+
+  animateSavedCounter();
+}
+
+/* Compteur d'économies — effet "live" qui monte doucement.
+   NOTE : valeur de démarrage à remplacer par la vraie somme
+   des économies calculées une fois la collecte de données branchée. */
+function animateSavedCounter(){
+  var el = document.getElementById('pc-saved-counter');
+  if(!el) return;
+  var base = 14280;   // valeur de départ (à connecter à Firebase plus tard)
+  var current = base;
+  function fmt(n){ return n.toLocaleString('fr-CA') + ' $'; }
+  el.textContent = fmt(current);
+  // Petit incrément occasionnel pour l'effet vivant
+  setInterval(function(){
+    current += Math.floor(Math.random() * 40) + 15;
+    el.textContent = fmt(current);
+    el.style.transition = 'none';
+    el.style.opacity = '.5';
+    setTimeout(function(){ el.style.transition = 'opacity .4s'; el.style.opacity = '1'; }, 40);
+  }, 4200);
+}
+
+function checkPrice(){
+  var repair = document.getElementById('pc-repair').value;
+  var prix = parseFloat(document.getElementById('pc-price').value);
+  var make = document.getElementById('pc-make').value;
+  var year = document.getElementById('pc-year').value;
+  var km = document.getElementById('pc-km').value;
+  var resultEl = document.getElementById('pc-result');
+
+  if(!repair){
+    resultEl.className = 'pc-result show red';
+    resultEl.innerHTML = '<div style="font-size:14px;color:#B3261E;font-weight:600">👆 Choisis d\'abord une réparation.</div>';
+    return;
+  }
+  if(!prix || prix <= 0){
+    resultEl.className = 'pc-result show red';
+    resultEl.innerHTML = '<div style="font-size:14px;color:#B3261E;font-weight:600">💵 Entre le prix que tu as payé.</div>';
+    return;
+  }
+
+  var b = BAREME_PRIX[repair];
+
+  // Ajustement de la fourchette selon le véhicule :
+  // les véhicules récents / de luxe coûtent plus cher en pièces & main-d'œuvre.
+  var factor = 1;
+  var LUXE = ['BMW','Mercedes-Benz','Audi','Lexus','Acura','Volvo','Tesla'];
+  if(make && LUXE.indexOf(make) !== -1) factor *= 1.35;   // marques premium
+  if(year){
+    var age = new Date().getFullYear() - parseInt(year);
+    if(age <= 3) factor *= 1.12;        // véhicule récent (garantie, pièces neuves)
+    else if(age >= 12) factor *= 0.92;  // vieux véhicule (pièces génériques)
+  }
+  var min = Math.round(b.min * factor);
+  var max = Math.round(b.max * factor);
+  var mid = (min + max) / 2;
+
+  var cls, emoji, title, economie = 0;
+  if(prix <= max * 0.9){
+    cls = 'green'; emoji = '🟢';
+    title = prix < min ? 'Excellent prix !' : 'Bon prix, tu es dans la norme';
+  } else if(prix <= max * 1.1){
+    cls = 'yellow'; emoji = '🟡';
+    title = 'Prix correct, mais tu peux comparer';
+  } else {
+    cls = 'red'; emoji = '🔴';
+    title = 'Tu payes probablement trop cher';
+    economie = Math.round(prix - mid);
+  }
+
+  var vehParts = [year, make].filter(Boolean).join(' ');
+  var vehTxt = vehParts ? ' sur une '+vehParts : '';
+  var fmt = function(n){ return n.toLocaleString('fr-CA'); };
+  var repairLabel = b.label.replace(/^[^\s]+\s/,'');
+
+  var html =
+    '<div class="pc-verdict-emoji">'+emoji+'</div>'
+    +'<div class="pc-verdict-title">'+title+'</div>'
+    +'<div class="pc-range">Pour <b>'+repairLabel+'</b>'+vehTxt+', le prix habituel au Québec est de <b>'+fmt(min)+' $ à '+fmt(max)+' $</b>.<br>Tu as payé <b>'+fmt(prix)+' $</b>.</div>';
+
+  if(economie > 0){
+    html += '<div class="pc-economie">Tu pourrais économiser environ<span class="big">~'+fmt(economie)+' $</span></div>';
+  }
+
+  // CTA principal : recevoir 3 soumissions gratuites
+  html += '<button class="pc-cta-map" onclick="openQuoteRequest(\''+repair+'\','+prix+','+economie+')">'
+    + '📩 Recevoir 3 soumissions gratuites'
+    + '<span class="pc-cta-sub">Des garages près de toi te rappellent avec leur prix</span>'
+    + '</button>'
+    +'<button class="pc-cta-secondary" onclick="document.getElementById(\'annuaire\').scrollIntoView({behavior:\'smooth\'})"><span class="map-ico">🗺️</span> Voir les garages sur la carte</button>'
+    +'<div class="pc-disclaimer">Estimation indicative basée sur les prix moyens au Québec. Les prix réels varient selon le véhicule, les pièces et la main-d\'œuvre. Compare toujours avec un devis.</div>';
+
+  resultEl.className = 'pc-result show '+cls;
+  resultEl.innerHTML = html;
+  resultEl.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  // ══════ COLLECTE DE DONNÉES (nourrit la base de prix + compteur) ══════
+  var cityInput = (document.getElementById('pc-city').value||'').trim();
+  savePriceCheck({
+    repair: repair, repair_label: repairLabel,
+    price: prix, make: make||null, year: year?parseInt(year):null, km: km||null,
+    range_min: min, range_max: max, verdict: cls, economie: economie,
+    city: cityInput || null,
+  });
+}
+
+/* Mapping réparation du vérificateur → problème du formulaire de soumission */
+var REPAIR_TO_PROBLEM = {
+  vidange:'oil', freins_av:'brakes', freins_ar:'brakes', freins_full:'brakes',
+  pneus_pose:'flat', pneus_achat:'flat', batterie:'battery', demarreur:'engine',
+  alternateur:'engine', climatisation:'ac', suspension:'other', echappement:'other',
+  courroie:'engine', transmission:'engine', moteur:'engine', diagnostic:'engine',
+  inspection:'other', antirouille:'other', pare_brise:'other', amortisseurs:'other',
+  radiateur:'engine', bougies:'engine',
+};
+/* Marques du vérificateur → options du select client (qui a moins de choix) */
+var MAKE_MAP = {
+  'Toyota':'Toyota','Honda':'Honda','Ford':'Ford','Chevrolet':'Chevrolet',
+  'BMW':'BMW','Mercedes-Benz':'Mercedes','Hyundai':'Hyundai','Kia':'Kia',
+  'Mazda':'Mazda','Subaru':'Subaru','Nissan':'Nissan',
+};
+
+/* Ouvre la demande de 3 soumissions à partir du vérificateur.
+   On réutilise le drawer client existant, on lui passe le contexte
+   ET on pré-remplit les champs déjà saisis (véhicule + problème). */
+function openQuoteRequest(repair, prix, economie){
+  window._quoteContext = {
+    repair: repair,
+    repairLabel: (BAREME_PRIX[repair] ? BAREME_PRIX[repair].label.replace(/^[^\s]+\s/,'') : ''),
+    price: prix, economie: economie,
+    make: document.getElementById('pc-make').value,
+    year: document.getElementById('pc-year').value,
+    km: document.getElementById('pc-km').value,
+    city: (document.getElementById('pc-city').value||'').trim(),
+  };
+  openDrawer('client');
+  setTimeout(function(){
+    var ctx = window._quoteContext;
+    var body = document.getElementById('drawer-client-body');
+
+    // 1) Bannière de contexte en haut du drawer
+    if(body && !document.getElementById('quote-context-banner')){
+      var banner = document.createElement('div');
+      banner.id = 'quote-context-banner';
+      banner.style.cssText = 'background:linear-gradient(135deg,#EEF3FE,#F6F8FC);border:1px solid rgba(69,104,214,.2);border-radius:12px;padding:13px 15px;margin-bottom:1.25rem';
+      banner.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">📩 Demande de soumissions</div>'
+        + '<div style="font-size:13.5px;color:var(--txt);line-height:1.5">'
+        + '<b>'+ctx.repairLabel+'</b>'+(ctx.year||ctx.make?' · '+[ctx.year,ctx.make].filter(Boolean).join(' '):'')
+        + (ctx.economie>0 ? '<br><span style="color:#0B7D57;font-weight:700">💰 Tu pourrais économiser ~'+ctx.economie.toLocaleString('fr-CA')+' $</span>' : '')
+        + '</div>';
+      body.insertBefore(banner, body.firstChild);
+    }
+
+    // 2) Pré-remplir les champs déjà connus (le client ne re-tape rien)
+    prefillQuoteFields(ctx);
+  }, 120);
+}
+
+/* Pré-remplit le formulaire client avec ce que l'utilisateur a déjà saisi */
+function prefillQuoteFields(ctx){
+  // Type de véhicule par défaut : Voiture / VUS
+  var vtype = document.getElementById('c_vtype');
+  if(vtype && !vtype.value) vtype.value = 'Voiture / VUS';
+
+  // Marque (mappée vers les options disponibles du select client)
+  if(ctx.make){
+    var makeSel = document.getElementById('c_make');
+    var mapped = MAKE_MAP[ctx.make] || 'Autre';
+    if(makeSel){
+      var found = false;
+      for(var i=0;i<makeSel.options.length;i++){
+        if(makeSel.options[i].value === mapped || makeSel.options[i].text === mapped){ makeSel.selectedIndex = i; found = true; break; }
+      }
+      if(!found) makeSel.value = 'Autre';
+    }
+  }
+
+  // Année
+  if(ctx.year){
+    var yearSel = document.getElementById('c_year');
+    if(yearSel){
+      for(var j=0;j<yearSel.options.length;j++){
+        if(yearSel.options[j].text === String(ctx.year)){ yearSel.selectedIndex = j; break; }
+      }
+    }
+  }
+
+  // Problème (sélection de la carte correspondante)
+  var probId = REPAIR_TO_PROBLEM[ctx.repair];
+  if(probId && typeof selProblem === 'function'){
+    selProblem(probId);
+  }
+
+  // Petit highlight visuel sur les champs pré-remplis pour rassurer
+  ['c_vtype','c_make','c_year'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && el.value){
+      el.style.transition = 'background .4s';
+      el.style.background = 'rgba(69,104,214,.08)';
+      setTimeout(function(){ el.style.background = ''; }, 1200);
+    }
+  });
+}
+
+/* Détecte la ville de l'utilisateur pour le vérificateur (géoloc navigateur) */
+function detectCityForPriceCheck(){
+  var btn = document.querySelector('.pc-loc-btn');
+  var input = document.getElementById('pc-city');
+  if(!navigator.geolocation){
+    if(input) input.placeholder = 'Géoloc non dispo — tape ta ville';
+    return;
+  }
+  if(btn){ btn.classList.add('loading'); btn.textContent = '⏳'; }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var lat = pos.coords.latitude, lng = pos.coords.longitude;
+    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=10&addressdetails=1', { headers:{'Accept-Language':'fr'} })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var a = data.address || {};
+        var city = a.city || a.town || a.village || a.municipality || a.county || '';
+        if(input && city) input.value = city;
+        if(btn){ btn.classList.remove('loading'); btn.textContent = '📍'; }
+      }).catch(function(){
+        if(btn){ btn.classList.remove('loading'); btn.textContent = '📍'; }
+      });
+  }, function(){
+    if(btn){ btn.classList.remove('loading'); btn.textContent = '📍'; }
+    if(input) input.placeholder = 'Autorise la position, ou tape ta ville';
+  }, { timeout:8000 });
+}
+
+/* Sauvegarde chaque vérification — c'est ça qui construit ta vraie
+   base de prix québécoise et alimente le compteur d'économies. */
+function savePriceCheck(data){
+  try {
+    data.created_at = firebase.firestore.FieldValue.serverTimestamp();
+    if(!data.city && _refPoint && _refPoint.label) data.city = _refPoint.label;
+    db.collection('price_checks').add(data).catch(function(e){
+      console.log('price_check non sauvé:', e.message);
+    });
+  } catch(e){ console.log('savePriceCheck:', e); }
+}
 var filteredPros = [];
 var _pendingFit = false;   // recadrer la vue au prochain filtrage
 var currentProfile = null;
 var leafletMap = null;
 var leafletMarkers = [];
+var _clusterGroup = null;     // regroupement des marqueurs (clustering)
 var currentView = "map";
 var _deeplinkGarage = null;   // garage ciblé par un QR (bloque le recentrage auto de la carte)
 var allPartners = [];         // commerces partenaires (pubs géolocalisées)
@@ -1651,7 +2200,7 @@ function addSingleMarker(p){
     className:'', iconSize:[38,38], iconAnchor:[19,19], popupAnchor:[0,-22],
   });
 
-  var marker = L.marker([lat,lng],{icon:icon}).addTo(leafletMap);
+  var marker = L.marker([lat,lng],{icon:icon});
   var certBadge = cert ? '<span style="background:rgba(0,0,0,.05);border:1px solid '+cert.color+';color:'+cert.color+';font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:4px">'+cert.stars+' '+cert.label+'</span>' : '';
   var priceHtml = price ? '<div style="font-size:14px;font-weight:700;color:#00C26F;margin:6px 0">À partir de '+price+'</div>' : '';
 
@@ -1668,7 +2217,9 @@ function addSingleMarker(p){
   );
   marker.on('popupopen', function(){ loadRatingSummary(p.id, 'map-rating-'+p.id); });
   marker._proId = p.id;
+  marker._city = p.city || '';
   leafletMarkers.push(marker);
+  if(_clusterGroup){ _clusterGroup.addLayer(marker); } else { marker.addTo(leafletMap); }
 }
 
 function initMap(){
@@ -1699,8 +2250,54 @@ function initMap(){
     bounds: QC_BOUNDS,
   }).addTo(leafletMap);
 
+  // ══════════ REGROUPEMENT DES MARQUEURS (clustering pro) ══════════
+  // Quand beaucoup de garages sont proches, ils se regroupent en un cercle
+  // avec le nombre. En zoomant, ils se séparent. Comme Airbnb / Uber.
+  if(typeof L.markerClusterGroup === 'function'){
+    _clusterGroup = L.markerClusterGroup({
+      showCoverageOnHover:false,       // pas de polygone bleu au survol
+      spiderfyOnMaxZoom:true,          // au zoom max, éclate les pins superposés
+      maxClusterRadius:52,             // rayon de regroupement (px)
+      spiderfyDistanceMultiplier:1.4,
+      iconCreateFunction: function(cluster){
+        var markers = cluster.getAllChildMarkers();
+        var n = cluster.getChildCount();
+
+        // Trouver la ville dominante du cluster
+        var cityCounts = {};
+        markers.forEach(function(m){
+          var c = m._city;
+          if(c){ cityCounts[c] = (cityCounts[c]||0) + 1; }
+        });
+        var topCity = '', topN = 0;
+        for(var c in cityCounts){ if(cityCounts[c] > topN){ topN = cityCounts[c]; topCity = c; } }
+        // On abrège les noms trop longs pour tenir dans la pastille
+        if(topCity.length > 16) topCity = topCity.slice(0,15) + '…';
+
+        // Taille du cercle selon le nombre
+        var size = n < 10 ? 42 : (n < 50 ? 54 : (n < 200 ? 66 : 78));
+        var cls = n < 10 ? 'gz-cluster-sm' : (n < 50 ? 'gz-cluster-md' : (n < 200 ? 'gz-cluster-lg' : 'gz-cluster-xl'));
+
+        // Petit cluster (<6) : juste le nombre. Sinon : ville + nombre.
+        var inner;
+        if(n < 6 || !topCity){
+          inner = '<span class="gzc-n">'+n+'</span>';
+        } else {
+          inner = '<span class="gzc-city">'+topCity+'</span><span class="gzc-n">'+n+'</span>';
+        }
+
+        return L.divIcon({
+          html: '<div class="gz-cluster '+cls+'">'+inner+'</div>',
+          className:'gz-cluster-wrap',
+          iconSize:[size,size],
+          iconAnchor:[size/2,size/2],
+        });
+      }
+    });
+    leafletMap.addLayer(_clusterGroup);
+  }
+
   // Rafraîchir les partenaires quand on se déplace vers une autre zone
-  // (debounce pour ne pas recalculer à chaque frame de déplacement)
   leafletMap.on('moveend', function(){
     clearTimeout(window._partnerTimer);
     window._partnerTimer = setTimeout(renderPartners, 250);
@@ -1742,11 +2339,10 @@ function initMap(){
 var _mapActive = false;
 
 function setNavBtn(on){
-  var b = document.getElementById('map-nav-btn');
-  if(!b) return;
-  b.classList.toggle('on', on);
-  b.querySelector('.mnb-ic').textContent = on ? '●' : '🖐️';
-  b.querySelector('.mnb-txt').textContent = on ? 'Navigation active — appuyer pour arrêter' : 'Naviguer sur la carte';
+  var ov = document.getElementById('map-lock-overlay');
+  if(ov) ov.classList.toggle('hidden', on);
+  // "on" = carte active → on montre le bouton verrouiller (via la classe body)
+  document.body.classList.toggle('map-is-active', on);
 }
 
 function toggleMapNav(){
@@ -1796,27 +2392,19 @@ function geolocateMe(){
 
 function renderMap(){
   if(!leafletMap) return;
-  leafletMarkers.forEach(function(m){ leafletMap.removeLayer(m); });
+  // Nettoyer : soit du cluster, soit direct de la map (fallback)
+  if(_clusterGroup){ _clusterGroup.clearLayers(); }
+  leafletMarkers.forEach(function(m){ if(!_clusterGroup) leafletMap.removeLayer(m); });
   leafletMarkers = [];
 
   var count = 0;
-  var coordsUsed = [];
+  var batch = [];   // on accumule pour ajouter au cluster en un coup (perf)
 
   filteredPros.forEach(function(p){
     var lat = parseFloat(p.lat);
     var lng = parseFloat(p.lng);
     if(!lat || !lng || isNaN(lat) || isNaN(lng)) return;
 
-    var nearby = coordsUsed.filter(function(c){
-      return Math.abs(c[0]-lat)<0.0008 && Math.abs(c[1]-lng)<0.0008;
-    });
-    if(nearby.length > 0){
-      var angle = (nearby.length / 8) * 2 * Math.PI;
-      var radius = 0.0025 + nearby.length * 0.0008;
-      lat = lat + radius * Math.cos(angle);
-      lng = lng + radius * Math.sin(angle);
-    }
-    coordsUsed.push([lat, lng]);
     count++;
     var cert = CERT[p.certification||0];
     var price = lowestPrice(p.pricing);
@@ -1837,7 +2425,7 @@ function renderMap(){
       popupAnchor:[0,-22],
     });
 
-    var marker = L.marker([lat,lng], {icon:icon}).addTo(leafletMap);
+    var marker = L.marker([lat,lng], {icon:icon});
 
     var certBadge = cert ? '<span style="background:rgba(0,0,0,.05);border:1px solid '+cert.color+';color:'+cert.color+';font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:4px">'+cert.stars+' '+cert.label+'</span>' : '';
     var priceHtml = price ? '<div style="font-size:14px;font-weight:700;color:#00C26F;margin:6px 0">À partir de '+price+'</div>' : '';
@@ -1858,8 +2446,13 @@ function renderMap(){
       loadRatingSummary(p.id, 'map-rating-'+p.id);
     });
 
+    marker._proId = p.id;
+    marker._city = p.city || '';
     leafletMarkers.push(marker);
+    if(_clusterGroup){ batch.push(marker); } else { marker.addTo(leafletMap); }
   });
+
+  if(_clusterGroup && batch.length){ _clusterGroup.addLayers(batch); }
 
   document.getElementById('results-count-map').textContent = count + ' pro'+(count!==1?'s':'')+' visible'+(count!==1?'s':'')+' sur la carte';
   if(count===0){
@@ -1962,34 +2555,76 @@ function openProfile(id){
   var avatarContent = p.photo_url ? '' : ini;
 
   document.getElementById('profile-drawer-title').textContent = p.name;
+
+  var distHtml = (p._dist!==undefined && p._dist!==null)
+    ? '<div class="pstat"><div class="pstat-n">'+distLabel(p._dist).replace(/[^0-9,.]/g,'').trim()+'</div><div class="pstat-l">km</div></div>'
+    : '';
+
   document.getElementById('profile-drawer-body').innerHTML =
-    '<div class="profile-head">'
+    '<div class="profile-hero '+(isGarage?'garage':'mec')+'">'
+    +'<div class="profile-head">'
     +'<div class="profile-avatar '+(isGarage?'garage':'mec')+'" style="'+avatarStyle+'">'+avatarContent+'</div>'
-    +'<div><div style="font-size:17px;font-weight:700">'+p.name+'</div>'
-    +'<div style="font-size:12.5px;color:#6B6E73;margin-top:2px">📍 '+(p.city||'—')+(p.rayon?' · Rayon '+p.rayon:'')+'</div>'
-    +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'" style="margin-top:5px">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
-    +(cert?'<div style="margin-top:5px">'+certBadgeHtml(p.certification)+'</div>':'')
+    +'<div style="flex:1;min-width:0">'
+    +'<div class="profile-name">'+p.name+'</div>'
+    +'<div class="profile-loc">📍 '+(p.city||'—')+(p.rayon?' · Rayon '+p.rayon:'')+'</div>'
+    +'<div class="profile-badges">'
+    +'<span class="pro-type-badge '+(isGarage?'garage':'mec')+'">'+(isGarage?'🏪 Garage':'🔧 Mécanicien mobile')+'</span>'
+    +(cert?certBadgeHtml(p.certification):'')
+    +'</div>'
     +'</div></div>'
-    +(p.bio?'<div class="profile-bio">"'+p.bio+'"</div>':'')
-    +'<div class="profile-section-title">Avis clients</div>'
+    +'<div class="profile-stats" id="phero-stats">'
+    +'<div class="pstat"><div class="pstat-n" id="phero-rating">—</div><div class="pstat-l">Note</div></div>'
+    +'<div class="pstat"><div class="pstat-n" id="phero-reviews">—</div><div class="pstat-l">Avis</div></div>'
+    + distHtml
+    +'<div class="pstat"><div class="pstat-n">'+(pricing.length?parsePricing(p.pricing).length:'—')+'</div><div class="pstat-l">Services</div></div>'
+    +'</div>'
+    +'</div>'
+
+    +'<div class="profile-body-pad">'
+    +(p.bio?'<div class="profile-bio">'+p.bio+'</div>':'')
+    +'<div class="profile-section-title">⭐ Avis clients</div>'
     +'<div id="prating-'+p.id+'"><div style="color:#A6A8AC;font-size:13px">Chargement...</div></div>'
     +'<div id="reviews-list-'+p.id+'"></div>'
-    +'<button class="btn-book" style="margin-top:1rem;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#B45309" onclick="openDirectReview(\''+p.id+'\')">⭐ Laisser un avis</button>'
-    +'<div class="profile-section-title">Tarifs</div>'
+    +'<button class="profile-review-cta" onclick="openDirectReview(\''+p.id+'\')">✍️ Laisser un avis</button>'
+    +'<div class="profile-section-title">💵 Tarifs</div>'
     +pricingTable
-    +(vehTags?'<div class="profile-section-title">Véhicules acceptés</div><div class="pro-tags">'+vehTags+'</div>':'')
-    +(svcTags?'<div class="profile-section-title">Services offerts</div><div class="pro-tags">'+svcTags+'</div>':'')
-    +'<div class="profile-section-title">Disponibilités habituelles</div>'
-    +(hasSchedule(p) ? '' : '<div style="font-size:12.5px;color:var(--muted);background:#F4F4F4;border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;margin-bottom:.75rem">Ce pro n\'a pas encore publié ses horaires. Tu peux quand même demander un rendez-vous — il te confirmera la plage.</div>')
+    +(vehTags?'<div class="profile-section-title">🚗 Véhicules acceptés</div><div class="pro-tags">'+vehTags+'</div>':'')
+    +(svcTags?'<div class="profile-section-title">🔧 Services offerts</div><div class="pro-tags">'+svcTags+'</div>':'')
+    +'<div class="profile-section-title">📅 Disponibilités habituelles</div>'
+    +(hasSchedule(p) ? '' : '<div style="font-size:12.5px;color:var(--muted);background:#F4F4F4;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:.75rem">Ce pro n\'a pas encore publié ses horaires. Tu peux quand même demander un rendez-vous — il te confirmera la plage.</div>')
     +'<div class="avail-grid">'
     +'<div class="avail-head">Jour</div><div class="avail-head">Mat.</div><div class="avail-head">P-M</div><div class="avail-head">Soir</div>'
     +availRows+'</div>'
-    +'<button class="btn-book" style="margin-top:1.5rem" onclick="openBooking(\''+p.id+'\')">📅 Demander un rendez-vous</button>';
+    +'</div>'
+
+    +'<div class="profile-cta-bar">'
+    +'<button class="btn-book" onclick="openBooking(\''+p.id+'\')">📅 Demander un rendez-vous</button>'
+    +'</div>';
 
   document.getElementById('overlay-profile').classList.add('open');
   document.body.style.overflow='hidden';
   loadFullRating(p.id);
   loadFullReviews(p.id);
+  loadHeroStats(p.id);
+}
+
+/* Remplit la note + nombre d'avis dans le header de la fiche */
+function loadHeroStats(id){
+  db.collection('reviews').where('mechanic_id','==',id).get().then(function(snap){
+    var rEl = document.getElementById('phero-rating');
+    var nEl = document.getElementById('phero-reviews');
+    if(!rEl || !nEl) return;
+    if(snap.empty){
+      rEl.innerHTML = '<span class="star">★</span>—';
+      nEl.textContent = '0';
+      return;
+    }
+    var total=0;
+    snap.forEach(function(d){ total += (d.data().rating||0); });
+    var avg = total/snap.size;
+    rEl.innerHTML = '<span class="star">★</span>'+avg.toFixed(1);
+    nEl.textContent = snap.size;
+  }).catch(function(){});
 }
 
 function loadFullRating(id){
@@ -2620,7 +3255,15 @@ function checkGarageDeeplink(){
     var mk = (typeof leafletMarkers !== 'undefined')
       ? leafletMarkers.find(function(m){ return m._proId === target.id; })
       : null;
-    if(mk && mk.openPopup){ try { mk.openPopup(); } catch(e){} }
+    if(mk){
+      // Si le marqueur est dans un cluster, on demande au cluster de le révéler
+      if(_clusterGroup && _clusterGroup.zoomToShowLayer){
+        try { _clusterGroup.zoomToShowLayer(mk, function(){ try{ mk.openPopup(); }catch(e){} }); }
+        catch(e){ try{ mk.openPopup(); }catch(e2){} }
+      } else if(mk.openPopup){
+        try { mk.openPopup(); } catch(e){}
+      }
+    }
     if(openCard) openProfile(target.id);
   }
 
@@ -2697,7 +3340,7 @@ var TIERS = [
   { id:'silver', label:'Argent',  min:150, cls:'tier-silver', icon:'🥈' },
   { id:'gold',   label:'Or',      min:500, cls:'tier-gold',   icon:'🥇' },
 ];
-var PTS_PER_BOOKING = 50;
+var PTS_PER_BOOKING = 10;
 
 function getTier(pts){
   var t = TIERS[0];
@@ -3001,13 +3644,21 @@ async function removeVehicle(idx){
 
 /* ── Points après réservation ── */
 async function awardPoints(){
-  if(!clientUser || !clientData) return;
+  if(!clientUser || !clientData){
+    console.log('Points non crédités : utilisateur non connecté (les points ne sont donnés qu\'aux comptes Greaz).');
+    return;
+  }
   try {
     var newPts = (clientData.points||0) + PTS_PER_BOOKING;
-    await db.collection('clients').doc(clientUser.uid).update({ points: newPts });
+    // set + merge est plus tolérant que update (crée le champ s'il manque)
+    await db.collection('clients').doc(clientUser.uid).set({ points: newPts }, { merge:true });
     clientData.points = newPts;
     updateNavAccount();
-  } catch(e){ console.log('Points:', e); }
+    console.log('✅ +'+PTS_PER_BOOKING+' points — total :', newPts);
+  } catch(e){
+    console.error('❌ Échec attribution des points :', e.code, e.message,
+      '\\n→ Vérifie que les règles Firestore autorisent le client à écrire son champ points dans clients/{uid}.');
+  }
 }
 
 /* ══════════ MOUVEMENT ══════════ */
@@ -3126,6 +3777,7 @@ function initBookingProgress(){
 }
 
 window.addEventListener('DOMContentLoaded', function(){
+  fillPriceCheckMenu();
   initMap();
   initMapGuards();
   loadDirectory();
