@@ -21,7 +21,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
@@ -53,7 +53,7 @@
   --line2:rgba(23,26,32,.14);
 
   /* Type */
-  --display:'Inter','Instrument Sans',-apple-system,sans-serif;
+  --display:'Space Grotesk','Inter',-apple-system,sans-serif;
   --body:'Inter','Instrument Sans',-apple-system,sans-serif;
   --data:'JetBrains Mono',monospace;
 
@@ -109,8 +109,8 @@ nav.nav-hide{transform:translateY(-100%)}
   box-shadow:0 0 0 3px rgba(0,168,98,.14);animation:breathe 2.4s ease-in-out infinite}
 @keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.82)}}
 
-h1{font-family:var(--display);font-size:clamp(2.6rem,6.5vw,4.6rem);font-weight:700;
-  line-height:1.02;letter-spacing:-.035em;margin-bottom:1.1rem;color:var(--white)}
+h1{font-family:var(--display);font-size:clamp(2.3rem,5vw,3.5rem);font-weight:700;
+  line-height:1.08;letter-spacing:-.03em;margin-bottom:1.1rem;color:var(--white)}
 .h1-l{display:block;animation:riseIn .9s var(--ease) both;animation-delay:var(--d)}
 h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 
@@ -140,6 +140,96 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 .gz-popup-btn:active,.acc-add:active,.hs-chip:active,.fab:active{transform:scale(.97)}
 
 /* ═══ Recherche façon Uber, habillage Tesla ═══ */
+/* ═══════════ FORMULAIRE CONCIERGERIE (hero) ═══════════ */
+.cc-open-wrap{margin:2.25rem auto 0;display:flex;flex-direction:column;align-items:center;gap:11px}
+.cc-open-btn{display:inline-flex;align-items:center;gap:11px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-family:var(--display);font-size:1.1rem;font-weight:600;padding:18px 40px;border:none;border-radius:15px;cursor:pointer;box-shadow:0 8px 26px rgba(62,106,225,.34);transition:transform .25s var(--ease),box-shadow .25s;letter-spacing:-.01em}
+.cc-open-btn:hover{transform:translateY(-2px);box-shadow:0 13px 36px rgba(62,106,225,.46)}
+.cc-open-btn:active{transform:translateY(0) scale(.99)}
+.cc-open-arrow{display:inline-block;transition:transform .25s var(--ease)}
+.cc-open-btn:hover .cc-open-arrow{transform:translateX(4px)}
+.cc-open-note{font-size:13px;color:var(--muted);font-weight:500}
+.cc-open-wrap.cc-gone{display:none}
+
+.cc-form{max-width:640px;margin:2.25rem auto 0;background:#fff;border:0.5px solid var(--line2);border-radius:24px;padding:30px;box-shadow:0 4px 34px rgba(23,26,32,.06);text-align:left}
+.cc-form-hidden{display:none}
+.cc-form.cc-reveal{display:block;animation:ccFormIn .45s var(--ease) both}
+@keyframes ccFormIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.cc-label{font-family:var(--display);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);margin-bottom:13px;display:block}
+.cc-prob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.cc-prob{border:1.5px solid var(--line2);background:var(--ink3);border-radius:14px;padding:15px 8px;text-align:center;cursor:pointer;transition:transform .2s var(--ease),border-color .2s,background .2s}
+.cc-prob:hover{border-color:var(--blue);transform:translateY(-2px)}
+.cc-prob.on{border-color:var(--blue);background:var(--bluelt)}
+.cc-prob-ic{font-size:24px;margin-bottom:6px;line-height:1}
+.cc-prob-t{font-size:13px;font-weight:600;color:var(--white)}
+.cc-prob.on .cc-prob-t{color:var(--blue2)}
+
+.cc-desc-wrap{position:relative;margin-bottom:24px}
+.cc-desc{width:100%;background:var(--ink3);border:1.5px solid var(--line2);border-radius:14px;padding:15px;padding-bottom:54px;font-family:var(--body);font-size:16px;color:var(--white);resize:none;min-height:92px;outline:none;transition:border-color .2s;line-height:1.55}
+.cc-desc:focus{border-color:var(--blue)}
+.cc-desc::placeholder{color:var(--faint)}
+.cc-mic{position:absolute;right:11px;bottom:11px;display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;border:none;padding:10px 16px;border-radius:22px;font-size:13px;font-weight:600;font-family:var(--body);cursor:pointer;transition:background .2s var(--ease)}
+.cc-mic:hover{background:var(--blue2)}
+.cc-mic.rec{background:var(--orange);animation:ccRec 1.2s infinite}
+@keyframes ccRec{0%,100%{box-shadow:0 0 0 0 rgba(228,87,46,.4)}50%{box-shadow:0 0 0 9px rgba(228,87,46,0)}}
+
+.cc-two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.cc-inp{width:100%;background:var(--ink3);border:1.5px solid var(--line2);border-radius:11px;padding:13px 14px;font-family:var(--body);font-size:16px;color:var(--white);outline:none;margin-bottom:10px;transition:border-color .2s}
+.cc-inp:focus{border-color:var(--blue)}
+.cc-inp::placeholder{color:var(--faint)}
+.cc-inp:last-child{margin-bottom:0}
+
+.cc-cta{width:100%;margin-top:26px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:17px;border-radius:14px;font-family:var(--display);font-weight:600;font-size:16px;cursor:pointer;box-shadow:0 6px 24px rgba(62,106,225,.32);transition:transform .25s var(--ease),box-shadow .25s;display:flex;align-items:center;justify-content:center;gap:9px}
+.cc-cta:hover{transform:translateY(-2px);box-shadow:0 11px 32px rgba(62,106,225,.44)}
+.cc-cta:active{transform:translateY(0) scale(.99)}
+.cc-cta:disabled{opacity:.6;cursor:default;transform:none}
+.cc-cta-arrow{transition:transform .25s var(--ease)}
+.cc-cta:hover .cc-cta-arrow{transform:translateX(4px)}
+.cc-note{text-align:center;font-size:12.5px;color:var(--faint);margin-top:12px}
+
+/* Bannière client connecté */
+.cc-logged-banner{background:linear-gradient(135deg,rgba(0,194,111,.12),rgba(62,106,225,.08));border:1px solid rgba(0,194,111,.28);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--chrome);line-height:1.5;margin-bottom:1.25rem}
+.cc-inp-highlight{border-color:var(--blue)!important;background:var(--bluelt)!important;box-shadow:0 0 0 3px rgba(62,106,225,.1)}
+
+/* Écran de succès */
+.cc-success{text-align:center;padding:1rem 0}
+.cc-succ-ic{font-size:3rem;margin-bottom:.75rem}
+.cc-succ-title{font-family:var(--display);font-size:1.5rem;font-weight:700;letter-spacing:-.02em;color:var(--white);margin-bottom:.6rem}
+.cc-succ-sub{font-size:14.5px;color:var(--muted);line-height:1.6;max-width:420px;margin:0 auto 1.5rem}
+.cc-succ-code{font-family:var(--data);font-size:1.35rem;font-weight:700;color:var(--blue);letter-spacing:.05em}
+.cc-succ-code-lbl{font-size:12px;color:var(--faint);margin-top:3px;margin-bottom:1.25rem}
+.cc-succ-pts{display:inline-block;background:rgba(184,134,11,.1);border:1px solid rgba(184,134,11,.3);border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;color:var(--gold);margin-bottom:1.5rem}
+.cc-succ-map-btn{display:block;width:100%;background:var(--ink3);border:1.5px solid var(--line2);color:var(--chrome);padding:14px;border-radius:12px;font-size:14px;font-weight:600;font-family:var(--body);cursor:pointer;transition:all .2s var(--ease)}
+.cc-succ-map-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* Map cachée jusqu'à la soumission */
+.cc-map-hidden{display:none}
+@keyframes ccToastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* Section vérificateur premium (en bas) */
+.verifier-sec{max-width:760px;margin:4rem auto;padding:0 1.5rem}
+.verifier-card{background:var(--white);border-radius:26px;padding:44px 36px;text-align:center;position:relative;overflow:hidden}
+.verifier-card::before{content:'';position:absolute;top:-30%;right:-8%;width:300px;height:300px;border-radius:50%;background:rgba(62,106,225,.16);pointer-events:none}
+.verifier-in{position:relative;z-index:1}
+.verifier-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:30px;padding:6px 15px;font-size:12px;color:rgba(255,255,255,.85);margin-bottom:18px}
+.verifier-card h2{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,3.5vw,2.1rem);letter-spacing:-.02em;color:#fff;margin-bottom:12px;line-height:1.1}
+.verifier-card .verifier-in p{font-size:14.5px;color:rgba(255,255,255,.65);max-width:420px;margin:0 auto 26px;line-height:1.6}
+.verifier-toggle{background:#fff;color:var(--white);border:none;padding:15px 30px;border-radius:13px;font-family:var(--display);font-weight:600;font-size:15px;cursor:pointer;transition:transform .2s var(--ease)}
+.verifier-toggle:hover{transform:translateY(-2px)}
+.verifier-body{max-width:560px;margin:1.5rem auto 0;text-align:left;display:none}
+.verifier-body.show{display:block;animation:ccSlide .4s var(--ease)}
+@keyframes ccSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+@media(max-width:640px){
+  .cc-open-btn{font-size:1rem;padding:16px 30px;width:100%;justify-content:center;max-width:340px}
+  .cc-form{padding:22px;border-radius:20px;margin-top:1.5rem}
+  .cc-prob-grid{gap:8px}
+  .cc-prob{padding:13px 6px}
+  .cc-prob-ic{font-size:21px}
+  .cc-prob-t{font-size:12px}
+  .cc-two{grid-template-columns:1fr;gap:0}
+  .cc-two>div:first-child{margin-bottom:10px}
+}
+
 /* ═══════════ VÉRIFICATEUR DE PRIX (écran d'accueil) ═══════════ */
 /* Bandeau de preuve sociale au-dessus du vérificateur */
 .pc-social{display:inline-flex;align-items:center;gap:9px;margin:0 auto 1.1rem;padding:8px 16px;
@@ -757,10 +847,13 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 
 /* ═══ NAV COMPTE ═══ */
 .nav-right{display:flex;align-items:center;gap:6px}
-.nav-account{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:8px;border:none;background:#F4F4F4;color:var(--white);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
-.nav-account:hover{background:#EAEBEC}
-.nav-account:active{transform:scale(.96)}
-.nav-account.logged{background:var(--bluelt);color:var(--blue2)}
+.nav-account{display:flex;align-items:center;gap:9px;padding:6px 15px 6px 7px;border-radius:30px;border:1px solid var(--line);background:#fff;color:var(--white);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .22s var(--ease);box-shadow:0 1px 3px rgba(23,26,32,.05)}
+.nav-account:hover{border-color:var(--line2);box-shadow:0 3px 10px rgba(23,26,32,.09);transform:translateY(-1px)}
+.nav-account:active{transform:translateY(0) scale(.98)}
+.nav-acc-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.nav-acc-avatar svg{width:16px;height:16px}
+.nav-account.logged{background:var(--bluelt);border-color:rgba(62,106,225,.25);color:var(--blue2)}
+.nav-account.logged .nav-acc-avatar{background:linear-gradient(135deg,var(--gold),#9A6F08)}
 .nav-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
 
 /* ═══ ESPACE CLIENT ═══ */
@@ -790,6 +883,26 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 .crdv-mec{font-size:14.5px;font-weight:700;color:var(--white)}
 .crdv-meta{font-size:12px;color:var(--muted);line-height:1.7}
 .crdv-status{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;white-space:nowrap}
+
+/* Demandes conciergerie en cours */
+.cdem{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem;margin-bottom:9px;border-left:3px solid var(--blue)}
+.cdem-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:7px}
+.cdem-prob{font-size:14.5px;font-weight:700;color:var(--white)}
+.cdem-status{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:8px;white-space:nowrap}
+.cdem-meta{font-size:12px;color:var(--muted);line-height:1.6}
+.cdem-desc{font-style:italic;color:var(--faint);margin:5px 0;font-size:12px}
+.cdem-code{font-family:var(--data);font-size:11px;color:#96989C;margin-top:5px}
+.acc-reassure{background:var(--bluelt);border-radius:11px;padding:12px 15px;font-size:12.5px;color:var(--blue2);line-height:1.5;margin-top:11px}
+
+/* États vides vivants */
+.acc-empty{text-align:center;padding:1.75rem 1.25rem;background:#FAFAFB;border:1px dashed var(--line2);border-radius:14px}
+.acc-empty-ic{font-size:2.25rem;margin-bottom:.6rem;opacity:.9}
+.acc-empty-t{font-size:14.5px;font-weight:700;color:var(--white);margin-bottom:4px}
+.acc-empty-d{font-size:12.5px;color:var(--muted);line-height:1.55;max-width:260px;margin:0 auto}
+.acc-empty-btn{margin-top:1rem;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:11px 20px;border-radius:11px;font-size:13px;font-weight:700;font-family:var(--body);cursor:pointer;transition:transform .2s var(--ease)}
+.acc-empty-btn:hover{transform:translateY(-1px)}
+.acc-empty-mini,.acc-loading{font-size:12.5px;color:#96989C;text-align:center;padding:1rem 0}
+
 .acc-section{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:1.5rem 0 .85rem;display:flex;justify-content:space-between;align-items:center}
 .acc-add{font-size:11px;font-weight:700;color:var(--blue);background:var(--bluelt);border:none;padding:5px 13px;border-radius:16px;cursor:pointer;letter-spacing:0;text-transform:none;transition:background .2s}
 .acc-add:hover{background:#DFE8FC}
@@ -816,6 +929,13 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
   .section-label{margin-bottom:.75rem}
   .section-sub{font-size:13.5px;margin-top:.7rem}
 
+  .hero-cta-main{font-size:1rem;padding:15px 26px;width:100%;justify-content:center;max-width:340px}
+  .hero-how{padding:1.2rem 1rem}
+  .hero-how-grid{gap:8px}
+  .hh-ic{width:40px;height:40px;font-size:19px;border-radius:11px}
+  .hh-step-t{font-size:12.5px}
+  .hh-step-d{font-size:11px}
+
   nav{padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:52px}
   .logo{font-size:1.25rem}
   .nav-badge{display:none}
@@ -826,7 +946,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
   /* Mobile : ajuster le cadrage vidéo */
   .hero-bg{background-position:center 42%}
   .hero-eyebrow{margin-bottom:1.4rem;font-size:11.5px;padding:6px 13px;gap:7px}
-  h1{font-size:clamp(2.1rem,9.5vw,2.9rem);line-height:1.06;letter-spacing:-.03em;margin-bottom:.9rem}
+  h1{font-size:clamp(1.9rem,8vw,2.5rem);line-height:1.1;letter-spacing:-.025em;margin-bottom:.9rem}
   .hero-tagline{font-size:14.5px}
   .hero-sub{font-size:13.5px;line-height:1.65;margin-bottom:1.75rem;max-width:100%}
   .hero-actions{flex-direction:column;width:100%;gap:10px;margin-bottom:1.25rem}
@@ -910,7 +1030,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 }
 
 @media(max-width:360px){
-  h1{font-size:1.95rem}
+  h1{font-size:1.7rem;line-height:1.12}
   .hero{padding:5.5rem 1rem 3rem}
   .cert-name{font-size:9px}
   .stat-num{font-size:1.25rem}
@@ -930,13 +1050,15 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 <nav>
   <div class="logo">Gre<span>az</span></div>
   <div class="nav-links">
-    <button class="nav-link" onclick="document.getElementById('annuaire').scrollIntoView({behavior:'smooth'})">Trouver un pro</button>
-    <button class="nav-link" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Comment ça marche</button>
+    <button class="nav-link" onclick="ccRevealMap('')">Carte</button>
     <button class="nav-link" onclick="document.getElementById('membership').scrollIntoView({behavior:'smooth'})">Programme</button>
   </div>
   <div class="nav-right">
     <div class="nav-badge">🇨🇦 Québec</div>
     <button class="nav-account" id="nav-account-btn" onclick="openAccount()">
+      <span class="nav-acc-avatar" id="nav-acc-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+      </span>
       <span id="nav-account-label">Mon espace</span>
     </button>
   </div>
@@ -956,107 +1078,61 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
     </div>
 
     <h1>
-      <span class="h1-l" style="--d:.08s">As-tu payé</span>
-      <span class="h1-l" style="--d:.16s">le <span class="hl">juste prix</span> ?</span>
+      <span class="h1-l" style="--d:.08s">Ton auto a un problème&nbsp;?</span>
+      <span class="h1-l" style="--d:.16s">On s'occupe <span class="hl">de tout.</span></span>
     </h1>
 
-    <p class="hero-sub">Vérifie en 10 secondes si ton garage t'a chargé trop cher — et trouve moins cher près de chez toi.</p>
+    <p class="hero-sub">Décris-nous ce qui se passe. On trouve le bon garage proche de chez toi, on compare, pis on organise ton rendez-vous.</p>
 
-    <!-- Preuve sociale (compteur vivant) -->
-    <div class="pc-social">
-      <span class="pc-social-dot"></span>
-      <span>Déjà <b id="pc-saved-counter">14 280 $</b> économisés par les Québécois cette semaine</span>
+    <!-- Bouton d'ouverture du formulaire -->
+    <div class="cc-open-wrap" id="cc-open-wrap">
+      <button class="cc-open-btn" onclick="ccOpenForm()">Décris ton problème <span class="cc-open-arrow">→</span></button>
+      <div class="cc-open-note">Ça prend 1 minute · on te rappelle avec les options</div>
     </div>
 
-    <!-- Garanties -->
-    <div class="pc-trust">
-      <span class="pc-trust-item"><span class="ic">⚡</span> 100% gratuit</span>
-      <span class="pc-trust-item"><span class="ic">🔒</span> Anonyme</span>
-      <span class="pc-trust-item"><span class="ic">⏱️</span> 10 secondes</span>
+    <!-- FORMULAIRE CONCIERGERIE (caché au départ) -->
+    <div class="cc-form cc-form-hidden" id="cc-form">
+      <label class="cc-label">C'est quoi le problème ?</label>
+      <div class="cc-prob-grid">
+        <div class="cc-prob" data-prob="Moteur" onclick="ccSelProb(this)"><div class="cc-prob-ic">🔧</div><div class="cc-prob-t">Moteur</div></div>
+        <div class="cc-prob" data-prob="Batterie" onclick="ccSelProb(this)"><div class="cc-prob-ic">🔋</div><div class="cc-prob-t">Batterie</div></div>
+        <div class="cc-prob" data-prob="Freins" onclick="ccSelProb(this)"><div class="cc-prob-ic">🛑</div><div class="cc-prob-t">Freins</div></div>
+        <div class="cc-prob" data-prob="Pneus" onclick="ccSelProb(this)"><div class="cc-prob-ic">🛞</div><div class="cc-prob-t">Pneus</div></div>
+        <div class="cc-prob" data-prob="Climatisation" onclick="ccSelProb(this)"><div class="cc-prob-ic">❄️</div><div class="cc-prob-t">Climatisation</div></div>
+        <div class="cc-prob" data-prob="Autre" onclick="ccSelProb(this)"><div class="cc-prob-ic">➕</div><div class="cc-prob-t">Autre</div></div>
+      </div>
+
+      <label class="cc-label">Décris en tes mots</label>
+      <div class="cc-desc-wrap">
+        <textarea class="cc-desc" id="cc-desc" placeholder="Ex. quand je freine ça fait un bruit de grincement pis le volant vibre un peu..."></textarea>
+        <button type="button" class="cc-mic" id="cc-mic" onclick="ccToggleMic()"><span>🎤</span> <span id="cc-mic-txt">Parler</span></button>
+      </div>
+
+      <div class="cc-two">
+        <div>
+          <label class="cc-label">Ton véhicule</label>
+          <input class="cc-inp" id="cc-vehicle" placeholder="Marque et modèle">
+          <input class="cc-inp" id="cc-year" placeholder="Année" inputmode="numeric">
+          <input class="cc-inp" id="cc-km" placeholder="Kilométrage" inputmode="numeric">
+        </div>
+        <div>
+          <label class="cc-label">Pour te rejoindre</label>
+          <input class="cc-inp" id="cc-name" placeholder="Ton nom">
+          <input class="cc-inp" id="cc-contact" placeholder="Téléphone ou courriel">
+          <input class="cc-inp" id="cc-address" placeholder="📍 Ton adresse">
+        </div>
+      </div>
+
+      <button class="cc-cta" id="cc-cta" onclick="ccSubmit()">Envoyer ma demande <span class="cc-cta-arrow">→</span></button>
+      <div class="cc-note">On magasine les garages pour toi pis on te revient avec les options</div>
     </div>
 
-    <!-- VÉRIFICATEUR DE PRIX -->
-    <div class="price-check" id="price-check">
-      <div class="pc-header-row">
-        <span class="pc-eyebrow">🔍 Vérificateur de prix</span>
-        <span class="pc-free-tag">Gratuit</span>
-      </div>
-      <div class="pc-title">Combien as-tu payé ?</div>
-      <div class="pc-sub">Entre ta réparation et le prix. On te dit direct si c'est un bon deal. 👇</div>
-
-      <div class="pc-fields">
-        <div class="pc-field">
-        <label>Quelle réparation ?</label>
-        <select id="pc-repair">
-          <option value="">Choisis une réparation...</option>
-        </select>
-      </div>
-      <div class="pc-field-row-3">
-        <div class="pc-field">
-          <label>Marque</label>
-          <select id="pc-make"><option value="">Marque...</option></select>
-        </div>
-        <div class="pc-field">
-          <label>Année</label>
-          <select id="pc-year"><option value="">Année...</option></select>
-        </div>
-        <div class="pc-field">
-          <label>Kilométrage</label>
-          <select id="pc-km">
-            <option value="">Km...</option>
-            <option value="0-50">0 – 50 000 km</option>
-            <option value="50-100">50 – 100 000 km</option>
-            <option value="100-150">100 – 150 000 km</option>
-            <option value="150-200">150 – 200 000 km</option>
-            <option value="200+">200 000 km +</option>
-          </select>
-        </div>
-      </div>
-      <div class="pc-field-row">
-        <div class="pc-field">
-          <label>Prix payé (ou demandé)</label>
-          <div class="pc-price-wrap"><input type="number" id="pc-price" placeholder="0" inputmode="numeric"></div>
-        </div>
-        <div class="pc-field">
-          <label>Ta région</label>
-          <div class="pc-loc-wrap">
-            <input type="text" id="pc-city" placeholder="Ta ville..." autocomplete="off">
-            <button type="button" class="pc-loc-btn" onclick="detectCityForPriceCheck()" title="Utiliser ma position">📍</button>
-          </div>
-        </div>
-      </div>
-      <button class="pc-btn" onclick="checkPrice()">Vérifier mon prix gratuitement →</button>
-      </div>
-
-      <div class="pc-result" id="pc-result"></div>
-    </div>
-
-    <button class="pc-skip" onclick="document.getElementById('annuaire').scrollIntoView({behavior:'smooth'})">Ou explore directement la carte des garages →</button>
-
-    <div class="cert-strip">
-      <div class="cert-line"></div>
-      <div class="cert-items">
-        <div class="cert-item" style="--d:.9s">
-          <span class="cert-mark bronze">✦</span>
-          <span class="cert-name">Certifié</span>
-        </div>
-        <div class="cert-item" style="--d:1.05s">
-          <span class="cert-mark silver">✦✦</span>
-          <span class="cert-name">Élite</span>
-        </div>
-        <div class="cert-item" style="--d:1.2s">
-          <span class="cert-mark gold">✦✦✦</span>
-          <span class="cert-name">Premium</span>
-        </div>
-      </div>
-      <p class="cert-note">Chaque pro est vérifié et noté par notre équipe.</p>
-    </div>
 
   </div>
   <div class="hero-scroll" aria-hidden="true"><span></span></div>
 </section>
 
-<section class="annuaire-section" id="annuaire">
+<section class="annuaire-section cc-map-hidden" id="annuaire">
   <div class="annuaire-header">
     <div class="section-label">Annuaire Greaz</div>
     <div class="section-title">Trouve ton pro</div>
@@ -1141,7 +1217,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
   <div class="stats-inner reveal">
     <div class="stat-item"><div class="stat-num blue">3 min</div><div class="stat-label">Pour recevoir une soumission</div></div>
     <div class="stat-item"><div class="stat-num green">100%</div><div class="stat-label">Mécaniciens certifiés</div></div>
-    <div class="stat-item"><div class="stat-num orange">0 $</div><div class="stat-label">Aucun frais pour toi</div></div>
+    <div class="stat-item"><div class="stat-num orange">+5</div><div class="stat-label">Garages comparés pour toi</div></div>
   </div>
 </div>
 
@@ -1183,24 +1259,55 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
   </div>
 </section>
 
-<section class="how" id="how">
-  <div style="text-align:center" class="reveal"><div class="section-label">Comment ça marche</div><div class="section-title">Trois étapes, pas plus</div></div>
-  <div class="steps-row">
-    <div class="step-card reveal"><div class="step-num">01</div><div class="step-icon">🗺️</div><div class="step-title">Tu compares</div><div class="step-desc">Les prix sont affichés, les avis sont vérifiés, et la certification te dit qui a fait ses preuves.</div></div>
-    <div class="step-card reveal reveal-d1"><div class="step-num">02</div><div class="step-icon">📅</div><div class="step-title">Tu réserves</div><div class="step-desc">Une date, une plage horaire, et c'est parti. Le pro confirme, tu reçois un courriel.</div></div>
-    <div class="step-card reveal reveal-d2"><div class="step-num">03</div><div class="step-icon">✅</div><div class="step-title">Tu suis tout dans ton espace</div><div class="step-desc">Statut de ton rendez-vous, historique de tes véhicules, et tes points qui s'accumulent.</div></div>
-  </div>
-</section>
+<!-- ═══════════ VÉRIFICATEUR DE PRIX (déplacé en bas) ═══════════ -->
+<section class="verifier-sec" id="verifier">
+  <div class="verifier-card">
+    <div class="verifier-in">
+      <div class="verifier-badge">🛡️ Protecteur de portefeuille</div>
+      <h2>As-tu payé le juste prix ?</h2>
+      <p>Un garage t'a donné un prix ? Vérifie en 10 secondes s'il est correct — avant de sortir ta carte.</p>
+      <button class="verifier-toggle" onclick="toggleVerifier()">Vérifier un prix →</button>
 
-<section class="features">
-  <div style="text-align:center" class="reveal"><div class="section-label">Pourquoi Greaz</div><div class="section-title">Ce qui rend<br>la différence</div></div>
-  <div class="feat-grid">
-    <div class="feat-card reveal"><div class="feat-icon">✦</div><div class="feat-title">Certification Greaz</div><div class="feat-desc">Notre équipe vérifie chaque pro avant de le publier. Trois paliers, du Certifié au Premium.</div></div>
-    <div class="feat-card reveal reveal-d1"><div class="feat-icon">💰</div><div class="feat-title">Prix visibles</div><div class="feat-desc">Vidange, freins, pneus : les tarifs sont là avant que tu appelles. Tu sais à quoi t'attendre.</div></div>
-    <div class="feat-card reveal reveal-d2"><div class="feat-icon">⭐</div><div class="feat-title">Avis vérifiés</div><div class="feat-desc">Seuls les clients qui ont réellement eu un rendez-vous peuvent en laisser un.</div></div>
-    <div class="feat-card reveal"><div class="feat-icon">📍</div><div class="feat-title">Carte interactive</div><div class="feat-desc">Ton adresse, ton rayon. Les pros s'affichent du plus proche au plus loin, avec la distance.</div></div>
-    <div class="feat-card reveal reveal-d1"><div class="feat-icon">🚗</div><div class="feat-title">Tous véhicules</div><div class="feat-desc">Voitures, VUS, motos, vans, VR, bateaux. Si ça a un moteur, tu trouveras quelqu'un.</div></div>
-    <div class="feat-card reveal reveal-d2"><div class="feat-icon">🎁</div><div class="feat-title">Points et rabais</div><div class="feat-desc">10 points par réservation. Monte les niveaux et débloque des rabais chez nos pros certifiés.</div></div>
+      <div class="verifier-body" id="verifier-body">
+        <div class="price-check" id="price-check">
+          <div class="pc-title">Combien as-tu payé ?</div>
+          <div class="pc-sub">Entre ta réparation et le prix. On te dit direct si c'est un bon deal.</div>
+          <div class="pc-fields">
+            <div class="pc-field">
+              <label>Quelle réparation ?</label>
+              <select id="pc-repair"><option value="">Choisis une réparation...</option></select>
+            </div>
+            <div class="pc-field-row-3">
+              <div class="pc-field"><label>Marque</label><select id="pc-make"><option value="">Marque...</option></select></div>
+              <div class="pc-field"><label>Année</label><select id="pc-year"><option value="">Année...</option></select></div>
+              <div class="pc-field"><label>Kilométrage</label>
+                <select id="pc-km">
+                  <option value="">Km...</option>
+                  <option value="0-50">0 – 50 000 km</option>
+                  <option value="50-100">50 – 100 000 km</option>
+                  <option value="100-150">100 – 150 000 km</option>
+                  <option value="150-200">150 – 200 000 km</option>
+                  <option value="200+">200 000 km +</option>
+                </select>
+              </div>
+            </div>
+            <div class="pc-field-row">
+              <div class="pc-field"><label>Prix payé (ou demandé)</label>
+                <div class="pc-price-wrap"><input type="number" id="pc-price" placeholder="0" inputmode="numeric"></div>
+              </div>
+              <div class="pc-field"><label>Ta région</label>
+                <div class="pc-loc-wrap">
+                  <input type="text" id="pc-city" placeholder="Ta ville..." autocomplete="off">
+                  <button type="button" class="pc-loc-btn" onclick="detectCityForPriceCheck()" title="Utiliser ma position">📍</button>
+                </div>
+              </div>
+            </div>
+            <button class="pc-btn" onclick="checkPrice()">Vérifier mon prix →</button>
+          </div>
+          <div class="pc-result" id="pc-result"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1211,7 +1318,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 </footer>
 
 <!-- FAB : retour rapide à l'annuaire quand on a défilé loin -->
-<button class="fab" id="fab-book" onclick="document.getElementById('annuaire').scrollIntoView({behavior:'smooth'})">🔧 Trouver un pro</button>
+
 
 <div class="overlay" id="overlay-client" onclick="if(event.target===this)closeDrawer('client')">
   <div class="drawer"><div class="drawer-handle"></div>
@@ -1521,6 +1628,211 @@ var MAKE_MAP = {
 /* Ouvre la demande de 3 soumissions à partir du vérificateur.
    On réutilise le drawer client existant, on lui passe le contexte
    ET on pré-remplit les champs déjà saisis (véhicule + problème). */
+/* CTA principal conciergerie : ouvre le drawer client avec le bon contexte */
+/* ═══════════ FORMULAIRE CONCIERGERIE (hero) ═══════════ */
+var _ccProblem = '';
+var _ccRec = null, _ccRecording = false;
+
+function ccOpenForm(){
+  var wrap = document.getElementById('cc-open-wrap');
+  var form = document.getElementById('cc-form');
+  if(wrap) wrap.classList.add('cc-gone');
+  if(form){
+    form.classList.remove('cc-form-hidden');
+    form.classList.add('cc-reveal');
+    ccPrefillIfLoggedIn();
+    setTimeout(function(){ form.scrollIntoView({behavior:'smooth',block:'center'}); }, 120);
+  }
+}
+
+/* Si le client a un compte, on pré-remplit tout — il met juste à jour
+   le kilométrage et confirme son adresse. Moins de friction. */
+function ccPrefillIfLoggedIn(){
+  if(typeof clientUser === 'undefined' || !clientUser || !clientData) return;
+  var set = function(id,val){ var e=document.getElementById(id); if(e && val) e.value=val; };
+  var fullName = [clientData.prenom, clientData.nom].filter(Boolean).join(' ');
+  set('cc-name', fullName);
+  set('cc-contact', clientData.phone || clientData.email || '');
+  set('cc-address', clientData.address || '');
+  var vehicles = clientData.vehicles || [];
+  if(vehicles.length){
+    var v = vehicles[0];
+    set('cc-vehicle', [v.make, v.model].filter(Boolean).join(' '));
+    set('cc-year', v.year || '');
+  }
+  // Bannière : dis-lui qu'il a juste le kilo + l'adresse à vérifier
+  var form = document.getElementById('cc-form');
+  if(form && !document.getElementById('cc-logged-banner')){
+    var banner = document.createElement('div');
+    banner.id = 'cc-logged-banner';
+    banner.className = 'cc-logged-banner';
+    banner.innerHTML = '✓ Salut <b>'+(clientData.prenom||'toi')+'</b> ! Tes infos sont déjà là. Vérifie juste ton <b>kilométrage</b> pis ton <b>adresse</b>.';
+    form.insertBefore(banner, form.firstChild);
+  }
+  // Mettre en évidence le champ kilométrage
+  var km = document.getElementById('cc-km');
+  if(km){ km.classList.add('cc-inp-highlight'); km.setAttribute('placeholder','Ton kilométrage actuel'); }
+}
+
+function ccSelProb(el){
+  document.querySelectorAll('.cc-prob').forEach(function(p){ p.classList.remove('on'); });
+  el.classList.add('on');
+  _ccProblem = el.getAttribute('data-prob') || '';
+}
+
+function ccToggleMic(){
+  var btn = document.getElementById('cc-mic'), txt = document.getElementById('cc-mic-txt');
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+    alert('La dictée vocale n\'est pas supportée par ce navigateur. Essaie Chrome ou Safari.');
+    return;
+  }
+  _ccRecording = !_ccRecording;
+  btn.classList.toggle('rec', _ccRecording);
+  txt.textContent = _ccRecording ? 'J\'écoute...' : 'Parler';
+  if(_ccRecording){
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    _ccRec = new SR();
+    _ccRec.lang = 'fr-CA'; _ccRec.continuous = true; _ccRec.interimResults = true;
+    var base = document.getElementById('cc-desc').value;
+    _ccRec.onresult = function(e){
+      var t = '';
+      for(var i=0;i<e.results.length;i++){ t += e.results[i][0].transcript; }
+      document.getElementById('cc-desc').value = (base ? base+' ' : '') + t;
+    };
+    _ccRec.onend = function(){ _ccRecording=false; btn.classList.remove('rec'); txt.textContent='Parler'; };
+    _ccRec.onerror = function(){ _ccRecording=false; btn.classList.remove('rec'); txt.textContent='Parler'; };
+    try{ _ccRec.start(); }catch(e){}
+  } else if(_ccRec){
+    try{ _ccRec.stop(); }catch(e){}
+  }
+}
+
+async function ccSubmit(){
+  var vehicle = (document.getElementById('cc-vehicle').value||'').trim();
+  var year = (document.getElementById('cc-year').value||'').trim();
+  var km = (document.getElementById('cc-km').value||'').trim();
+  var name = (document.getElementById('cc-name').value||'').trim();
+  var contact = (document.getElementById('cc-contact').value||'').trim();
+  var address = (document.getElementById('cc-address').value||'').trim();
+  var desc = (document.getElementById('cc-desc').value||'').trim();
+
+  // Validation minimale : il faut savoir quoi + comment rejoindre + où
+  if(!_ccProblem && !desc){ ccToast('Dis-nous au moins ton problème 🔧'); return; }
+  if(!name || !contact){ ccToast('On a besoin de ton nom pis un moyen de te rejoindre'); return; }
+  if(!address){ ccToast('Ton adresse nous aide à trouver les garages proches 📍'); return; }
+
+  var btn = document.getElementById('cc-cta');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi...';
+
+  // Détecter si le contact est un email ou un téléphone
+  var isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact);
+  var code = 'GZ-' + Math.floor(Math.random()*90000+10000);
+
+  try {
+    var leadData = {
+      type:'client', source:'conciergerie',
+      client_name:name,
+      client_phone: isEmail ? '' : contact,
+      client_email: isEmail ? contact : '',
+      address:address,
+      vehicle_make:vehicle, vehicle_year:year, vehicle_km:km,
+      problem:_ccProblem||'Non précisé',
+      description:desc,
+      booking_code:code, status:'nouveau',
+      client_uid: (typeof clientUser!=='undefined' && clientUser) ? clientUser.uid : '',
+      created_at:firebase.firestore.FieldValue.serverTimestamp(),
+    };
+    await db.collection('leads').add(leadData);
+    if(typeof notifierNouvelleDemandeClient === 'function'){
+      try{ notifierNouvelleDemandeClient(leadData); }catch(e){}
+    }
+    // Si connecté : mémoriser l'adresse mise à jour + créditer les points
+    if(typeof clientUser!=='undefined' && clientUser && clientData){
+      try{
+        if(address && address !== clientData.address){
+          await db.collection('clients').doc(clientUser.uid).update({ address:address });
+          clientData.address = address;
+        }
+        if(typeof awardPoints === 'function'){ await awardPoints(); }
+      }catch(e){}
+    }
+  } catch(e){
+    console.error('Sauvegarde demande:', e);
+  }
+
+  // Écran de confirmation : la demande est chez Greaz, le client est tranquille.
+  // La carte devient une OPTION, pas une obligation.
+  ccShowSuccess(code, address);
+}
+
+/* Écran de confirmation après envoi de la demande */
+function ccShowSuccess(code, address){
+  var form = document.getElementById('cc-form');
+  if(!form) return;
+  var loggedPts = (typeof clientUser!=='undefined' && clientUser)
+    ? '<div class="cc-succ-pts">🎁 +'+(typeof PTS_PER_BOOKING!=='undefined'?PTS_PER_BOOKING:10)+' points Greaz</div>' : '';
+  form.innerHTML =
+    '<div class="cc-success">'
+    + '<div class="cc-succ-ic">✅</div>'
+    + '<div class="cc-succ-title">Demande envoyée !</div>'
+    + '<p class="cc-succ-sub">On a tout ce qu\'il faut. Notre équipe magasine les meilleurs garages pour toi pis on te revient bientôt avec les options. T\'as rien d\'autre à faire.</p>'
+    + '<div class="cc-succ-code">'+code+'</div>'
+    + '<div class="cc-succ-code-lbl">Ton numéro de demande</div>'
+    + loggedPts
+    + '<button class="cc-succ-map-btn" onclick="ccRevealMap(\''+(address||'').replace(/'/g,"")+'\')">Ou explore les garages proches toi-même →</button>'
+    + '</div>';
+  form.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function ccRevealMap(address){
+  var section = document.getElementById('annuaire');
+  if(!section) return;
+  section.classList.remove('cc-map-hidden');
+
+  // Pré-remplir l'adresse dans le champ de recherche de la carte si présent
+  var addrInput = document.getElementById('addr-input') || document.querySelector('#annuaire input[type=text]');
+  if(addrInput && address){ addrInput.value = address; }
+
+  // La carte a été initialisée cachée → il FAUT recalculer sa taille
+  // sinon les tuiles restent grises (bug classique Leaflet).
+  setTimeout(function(){
+    section.scrollIntoView({ behavior:'smooth', block:'start' });
+    if(typeof leafletMap !== 'undefined' && leafletMap && typeof leafletMap.invalidateSize === 'function'){
+      try{ leafletMap.invalidateSize(true); }catch(e){}
+      // Deuxième passe après le scroll pour être certain que les tuiles chargent
+      setTimeout(function(){ try{ leafletMap.invalidateSize(true); }catch(e){} }, 350);
+    }
+    // Recherche par adresse si une fonction de géocodage existe
+    if(address){
+      if(typeof searchAddress === 'function'){ try{ searchAddress(); }catch(e){} }
+      else if(typeof geocodeAndShow === 'function'){ try{ geocodeAndShow(address); }catch(e){} }
+    }
+  }, 250);
+}
+
+/* Petit toast pour les validations du formulaire */
+function ccToast(msg){
+  var existing = document.getElementById('cc-toast');
+  if(existing) existing.remove();
+  var t = document.createElement('div');
+  t.id = 'cc-toast';
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#171A20;color:#fff;padding:13px 22px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,.22);max-width:90vw;text-align:center;animation:ccToastIn .3s ease';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){ t.remove(); }, 300); }, 3200);
+}
+
+/* Afficher / cacher le vérificateur de prix (section du bas) */
+function toggleVerifier(){
+  var body = document.getElementById('verifier-body');
+  if(body){
+    body.classList.toggle('show');
+    if(body.classList.contains('show')){
+      setTimeout(function(){ body.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
+    }
+  }
+}
+
 function openQuoteRequest(repair, prix, economie){
   window._quoteContext = {
     repair: repair,
@@ -3361,13 +3673,16 @@ firebase.auth().onAuthStateChanged(function(user){
 function updateNavAccount(){
   var btn = document.getElementById('nav-account-btn');
   var lbl = document.getElementById('nav-account-label');
+  var avatar = document.getElementById('nav-acc-avatar');
   if(!btn) return;
   if(clientData){
     var ini = (clientData.prenom||'?').charAt(0).toUpperCase();
     btn.classList.add('logged');
-    lbl.innerHTML = '<span class="nav-avatar">'+ini+'</span> '+(clientData.prenom||'Mon espace');
+    if(avatar) avatar.textContent = ini;
+    lbl.textContent = clientData.prenom || 'Mon espace';
   } else {
     btn.classList.remove('logged');
+    if(avatar) avatar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>';
     lbl.textContent = 'Mon espace';
   }
 }
@@ -3504,7 +3819,12 @@ function renderAccount(){
           +'<button class="close-btn" style="width:28px;height:28px;font-size:13px" onclick="removeVehicle('+i+')">✕</button>'
           +'</div>';
       }).join('')
-    : '<div style="font-size:13px;color:#8E9094;text-align:center;padding:1.5rem 0">Aucun véhicule enregistré.<br><span style="font-size:12px">Ajoute-le pour réserver en 2 clics la prochaine fois.</span></div>';
+    : '<div class="acc-empty">'
+        +'<div class="acc-empty-ic">🚗</div>'
+        +'<div class="acc-empty-t">Aucun véhicule enregistré</div>'
+        +'<div class="acc-empty-d">Ajoute ton char pour remplir tes demandes en 2 clics la prochaine fois.</div>'
+        +'<button class="acc-empty-btn" onclick="openVehicleForm()">+ Ajouter mon véhicule</button>'
+        +'</div>';
 
   document.getElementById('account-body').innerHTML =
     '<div class="acc-hero">'
@@ -3519,18 +3839,67 @@ function renderAccount(){
       : '🎉 Tu es au niveau maximum !')+'</div>'
     +'</div></div>'
 
-    +'<div class="acc-section">🎁 Mes récompenses</div>'
-    + renderRewards(pts)
+    +'<div class="acc-section">🔧 Mes demandes en cours</div>'
+    +'<div id="acc-demandes"><div class="acc-loading">Chargement...</div></div>'
+
+    +'<div class="acc-section">📅 Mes rendez-vous</div>'
+    +'<div id="acc-rdvs"><div class="acc-loading">Chargement...</div></div>'
 
     +'<div class="acc-section">🚗 Mes véhicules <button class="acc-add" onclick="openVehicleForm()">+ Ajouter</button></div>'
     + vehHtml
 
-    +'<div class="acc-section">📅 Mes rendez-vous</div>'
-    +'<div id="acc-rdvs"><div style="font-size:13px;color:#8E9094;text-align:center;padding:1rem 0">Chargement...</div></div>'
+    +'<div class="acc-section">🎁 Mes récompenses</div>'
+    + renderRewards(pts)
 
     +'<button class="btn-book" style="margin-top:2rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="clientLogout()">Me déconnecter</button>';
 
+  loadClientDemandes();
   loadClientRdvs();
+}
+
+/* Les demandes conciergerie envoyées par le client (collection leads) */
+function loadClientDemandes(){
+  var el = document.getElementById('acc-demandes');
+  if(!el || !clientUser) return;
+  db.collection('leads').where('client_uid','==',clientUser.uid).get().then(function(snap){
+    if(!el) return;
+    if(snap.empty){
+      el.innerHTML = '<div class="acc-empty">'
+        +'<div class="acc-empty-ic">📭</div>'
+        +'<div class="acc-empty-t">Aucune demande en cours</div>'
+        +'<div class="acc-empty-d">Ton auto fait des siennes ? Décris ton problème, on s\'occupe du reste.</div>'
+        +'<button class="acc-empty-btn" onclick="closeDrawer(\'account\');setTimeout(ccOpenForm,300)">Décris ton problème →</button>'
+        +'</div>';
+      return;
+    }
+    var list = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    list.sort(function(a,b){
+      var ta = a.created_at&&a.created_at.toDate?a.created_at.toDate().getTime():0;
+      var tb = b.created_at&&b.created_at.toDate?b.created_at.toDate().getTime():0;
+      return tb - ta;
+    });
+    var ST = {
+      nouveau:{l:'Reçue',c:'#3E6AE1',bg:'rgba(62,106,225,.13)'},
+      en_traitement:{l:'On magasine',c:'#B8860B',bg:'rgba(184,134,11,.13)'},
+      traite:{l:'Options prêtes',c:'#00A862',bg:'rgba(0,168,98,.13)'},
+      ferme:{l:'Fermée',c:'#8E9094',bg:'rgba(142,144,148,.13)'},
+    };
+    el.innerHTML = list.map(function(r){
+      var s = ST[r.status] || ST.nouveau;
+      var veh = [r.vehicle_year,r.vehicle_make].filter(Boolean).join(' ');
+      return '<div class="cdem" style="border-left-color:'+s.c+'">'
+        +'<div class="cdem-top"><div class="cdem-prob">'+(r.problem&&r.problem!=='Non précisé'?r.problem:'Demande')+'</div>'
+        +'<span class="cdem-status" style="background:'+s.bg+';color:'+s.c+'">'+s.l+'</span></div>'
+        +'<div class="cdem-meta">'
+        +(veh?'🚗 '+veh+' · ':'')+'📍 '+(r.address||'—')
+        +(r.description?'<div class="cdem-desc">"'+r.description.slice(0,90)+(r.description.length>90?'...':'')+'"</div>':'')
+        +'<div class="cdem-code">'+(r.booking_code||'')+'</div>'
+        +'</div></div>';
+    }).join('')
+    + '<div class="acc-reassure">💬 On magasine les garages pour toi — on te revient bientôt avec les options.</div>';
+  }).catch(function(e){
+    if(el) el.innerHTML = '<div class="acc-empty-mini">Impossible de charger tes demandes.</div>';
+  });
 }
 
 function renderRewards(pts){
@@ -3556,7 +3925,11 @@ function loadClientRdvs(){
   db.collection('appointments').where('client_email','==',clientData.email).get().then(function(snap){
     if(!el) return;
     if(snap.empty){
-      el.innerHTML = '<div style="font-size:13px;color:#8E9094;text-align:center;padding:1.5rem 0">Aucun rendez-vous encore.<br><span style="font-size:12px">Trouve un pro sur la carte pour commencer 🗺️</span></div>';
+      el.innerHTML = '<div class="acc-empty">'
+        +'<div class="acc-empty-ic">📅</div>'
+        +'<div class="acc-empty-t">Aucun rendez-vous encore</div>'
+        +'<div class="acc-empty-d">Tes rendez-vous confirmés apparaîtront ici une fois qu\'on aura organisé ça pour toi.</div>'
+        +'</div>';
       return;
     }
     var list = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
