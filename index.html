@@ -205,6 +205,63 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 .cc-map-hidden{display:none}
 @keyframes ccToastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
 
+/* Écran d'abonnement (paywall) */
+.pw{text-align:center;padding:1rem .5rem}
+.pw-ic{font-size:2.75rem;margin-bottom:.6rem}
+.pw-tag{display:inline-block;background:var(--greenlt);color:var(--green);font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:1.1rem}
+.pw-collection{font-family:var(--display);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:.5rem}
+.pw-title{font-family:var(--display);font-size:1.75rem;font-weight:700;letter-spacing:-.025em;color:var(--white);margin-bottom:.7rem;line-height:1.1}
+.pw-sub{font-size:14px;color:var(--muted);line-height:1.55;max-width:400px;margin:0 auto 1.5rem}
+.pw-price{margin-bottom:1.5rem}
+.pw-price-big{font-family:var(--display);font-size:2.6rem;font-weight:700;color:var(--blue);letter-spacing:-.02em}
+.pw-price-per{font-size:1rem;color:var(--muted);font-weight:500;margin-left:4px}
+.pw-perks{text-align:left;max-width:400px;margin:0 auto 1.5rem;display:flex;flex-direction:column;gap:11px}
+.pw-perk{display:flex;gap:11px;align-items:flex-start;font-size:13.5px;color:var(--white);line-height:1.45}
+.pw-check{width:22px;height:22px;border-radius:7px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.pw-btn{width:100%;max-width:400px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:17px;border-radius:14px;font-family:var(--display);font-weight:600;font-size:16px;cursor:pointer;box-shadow:0 8px 24px rgba(62,106,225,.32);transition:transform .22s var(--ease),box-shadow .22s;margin-bottom:8px}
+.pw-btn:hover{transform:translateY(-2px);box-shadow:0 13px 34px rgba(62,106,225,.44)}
+.pw-cond{font-size:11px;color:var(--faint);margin-bottom:14px}
+.pw-email{background:var(--bluelt);border-radius:11px;padding:12px 15px;font-size:12.5px;color:var(--blue2);line-height:1.5;max-width:400px;margin:0 auto 12px}
+.pw-secure{font-size:12px;color:var(--faint)}
+
+/* Offre soft à la 1re demande gratuite */
+.cc-offer{background:linear-gradient(135deg,var(--bluelt),#F3F7FE);border:1px solid rgba(62,106,225,.2);border-radius:18px;padding:22px;margin:1.5rem 0;text-align:center;animation:ccFormIn .5s var(--ease) both}
+.cc-offer-badge{display:inline-block;background:var(--greenlt);color:var(--green);font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:12px}
+.cc-offer-title{font-family:var(--display);font-size:1.15rem;font-weight:700;color:var(--white);letter-spacing:-.01em;margin-bottom:8px;line-height:1.2}
+.cc-offer-txt{font-size:13px;color:var(--muted);line-height:1.55;max-width:380px;margin:0 auto 16px}
+.cc-offer-txt b{color:var(--blue2)}
+.cc-offer-btn{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:15px;border-radius:13px;font-family:var(--display);font-weight:600;font-size:15px;cursor:pointer;box-shadow:0 6px 18px rgba(62,106,225,.28);transition:transform .2s var(--ease)}
+.cc-offer-btn:hover{transform:translateY(-2px)}
+.cc-offer-later{width:100%;background:transparent;border:none;color:var(--faint);padding:11px;font-size:13px;font-weight:600;font-family:var(--body);cursor:pointer;margin-top:6px}
+.cc-offer-later:hover{color:var(--muted)}
+.cc-offer-cond{font-size:10.5px;color:var(--faint);margin-top:6px}
+
+/* Modal conditions d'abonnement */
+.terms-overlay{position:fixed;inset:0;background:rgba(23,26,32,.55);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.terms-overlay.open{display:flex;animation:termsFade .25s ease both}
+@keyframes termsFade{from{opacity:0}to{opacity:1}}
+.terms-card{background:#fff;border-radius:24px;padding:30px;max-width:440px;width:100%;position:relative;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(23,26,32,.3);animation:termsPop .35s var(--spring) both}
+@keyframes termsPop{from{opacity:0;transform:scale(.94) translateY(14px)}to{opacity:1;transform:none}}
+.terms-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;border:none;background:var(--ink);color:#96989C;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.terms-close:hover{background:#EAE7E1;color:var(--white)}
+.terms-ic{font-size:2.5rem;text-align:center;margin-bottom:.5rem}
+.terms-title{font-family:var(--display);font-size:1.5rem;font-weight:700;letter-spacing:-.02em;color:var(--white);text-align:center;margin-bottom:.35rem}
+.terms-plan{font-size:13px;color:var(--gold);font-weight:700;text-align:center;margin-bottom:1.5rem}
+.terms-points{display:flex;flex-direction:column;gap:14px;margin-bottom:1.5rem}
+.terms-point{display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--muted);line-height:1.5}
+.terms-point b{color:var(--white)}
+.terms-pic{font-size:20px;flex-shrink:0}
+.terms-check{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--white);line-height:1.5;margin-bottom:1.25rem;cursor:pointer;background:var(--bluelt);padding:13px 15px;border-radius:12px}
+.terms-check input{width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--blue);cursor:pointer}
+.terms-check a{color:var(--blue);font-weight:600}
+.terms-continue{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:16px;border-radius:13px;font-family:var(--display);font-weight:600;font-size:15.5px;cursor:pointer;box-shadow:0 8px 24px rgba(62,106,225,.3);transition:all .2s var(--ease)}
+.terms-continue:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 13px 34px rgba(62,106,225,.44)}
+.terms-continue:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.terms-note{font-size:11px;color:var(--faint);text-align:center;margin-top:12px;line-height:1.5}
+.terms-wait{font-size:14px;color:var(--muted);line-height:1.6;text-align:center;margin-bottom:1.25rem}
+.terms-wait b{color:var(--white)}
+.terms-wait-box{background:var(--bluelt);border-radius:12px;padding:14px;font-size:13.5px;color:var(--blue2);text-align:center;line-height:1.5;margin-bottom:1.25rem;font-weight:500}
+
 /* Section vérificateur premium (en bas) */
 .verifier-sec{max-width:760px;margin:4rem auto;padding:0 1.5rem}
 .verifier-card{background:var(--white);border-radius:26px;padding:44px 36px;text-align:center;position:relative;overflow:hidden}
@@ -902,6 +959,14 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 .acc-empty-btn{margin-top:1rem;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:11px 20px;border-radius:11px;font-size:13px;font-weight:700;font-family:var(--body);cursor:pointer;transition:transform .2s var(--ease)}
 .acc-empty-btn:hover{transform:translateY(-1px)}
 .acc-empty-mini,.acc-loading{font-size:12.5px;color:#96989C;text-align:center;padding:1rem 0}
+
+/* Bannière deviens membre */
+.acc-join{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--blue),var(--blue2));border-radius:15px;padding:15px 17px;margin-bottom:12px;cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s;box-shadow:0 6px 20px rgba(62,106,225,.28)}
+.acc-join:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(62,106,225,.4)}
+.acc-join-l{flex:1}
+.acc-join-t{font-family:var(--display);font-weight:700;font-size:15px;color:#fff}
+.acc-join-d{font-size:12px;color:rgba(255,255,255,.85);margin-top:2px;line-height:1.4}
+.acc-join-btn{background:#fff;color:var(--blue2);font-weight:700;font-size:13px;padding:9px 15px;border-radius:10px;white-space:nowrap;flex-shrink:0}
 
 .acc-section{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:1.5rem 0 .85rem;display:flex;justify-content:space-between;align-items:center}
 .acc-add{font-size:11px;font-weight:700;color:var(--blue);background:var(--bluelt);border:none;padding:5px 13px;border-radius:16px;cursor:pointer;letter-spacing:0;text-transform:none;transition:background .2s}
@@ -1648,13 +1713,16 @@ function ccOpenForm(){
 /* Si le client a un compte, on pré-remplit tout — il met juste à jour
    le kilométrage et confirme son adresse. Moins de friction. */
 function ccPrefillIfLoggedIn(){
-  if(typeof clientUser === 'undefined' || !clientUser || !clientData) return;
-  var set = function(id,val){ var e=document.getElementById(id); if(e && val) e.value=val; };
-  var fullName = [clientData.prenom, clientData.nom].filter(Boolean).join(' ');
+  var cu = (typeof clientUser!=='undefined' && clientUser) || window.clientUser;
+  var cd = (typeof clientData!=='undefined' && clientData) || window.clientData;
+  if(!cu || !cd) return;
+  // Ne remplit que les champs VIDES (n'écrase jamais ce que le client a tapé)
+  var set = function(id,val){ var e=document.getElementById(id); if(e && val && !e.value) e.value=val; };
+  var fullName = [cd.prenom, cd.nom].filter(Boolean).join(' ');
   set('cc-name', fullName);
-  set('cc-contact', clientData.phone || clientData.email || '');
-  set('cc-address', clientData.address || '');
-  var vehicles = clientData.vehicles || [];
+  set('cc-contact', cd.phone || cd.email || '');
+  set('cc-address', cd.address || '');
+  var vehicles = cd.vehicles || [];
   if(vehicles.length){
     var v = vehicles[0];
     set('cc-vehicle', [v.make, v.model].filter(Boolean).join(' '));
@@ -1666,7 +1734,7 @@ function ccPrefillIfLoggedIn(){
     var banner = document.createElement('div');
     banner.id = 'cc-logged-banner';
     banner.className = 'cc-logged-banner';
-    banner.innerHTML = '✓ Salut <b>'+(clientData.prenom||'toi')+'</b> ! Tes infos sont déjà là. Vérifie juste ton <b>kilométrage</b> pis ton <b>adresse</b>.';
+    banner.innerHTML = '✓ Salut <b>'+(cd.prenom||'toi')+'</b> ! Tes infos sont déjà là. Vérifie juste ton <b>kilométrage</b> pis ton <b>adresse</b>.';
     form.insertBefore(banner, form.firstChild);
   }
   // Mettre en évidence le champ kilométrage
@@ -1707,6 +1775,105 @@ function ccToggleMic(){
   }
 }
 
+/* ════════════════════════════════════════════════════════════
+   ⬇️⬇️⬇️  COLLE TON LIEN D'ABONNEMENT SQUARE ICI  ⬇️⬇️⬇️
+   Mets ton lien entre les guillemets (garde les guillemets).
+   Exemple :  var SQUARE_SUB_LINK = 'https://checkout.square.site/xxxxx';
+   Tant qu'il est vide, le bouton ouvre un courriel de contact à la place.
+   ════════════════════════════════════════════════════════════ */
+var SQUARE_SUB_LINK = 'https://square.link/u/K2FEaljr';
+var GREAZ_PRICE = '14,99 $';
+/* ════════════════════════════════════════════════════════════ */
+
+// Le client est-il membre (abonné) ? On lit le champ "membre" du compte.
+function isMember(){
+  return !!(typeof clientData !== 'undefined' && clientData && clientData.membre === true);
+}
+
+// Relit le statut membre depuis Firestore (garde le cache à jour sans rafraîchir la page)
+async function refreshMemberStatus(){
+  var cu = (typeof clientUser!=='undefined' && clientUser) || window.clientUser;
+  if(!cu) return;
+  try {
+    var doc = await db.collection('clients').doc(cu.uid).get();
+    if(doc.exists){
+      var d = doc.data();
+      if(typeof clientData!=='undefined' && clientData){ clientData.membre = d.membre; }
+      if(window.clientData){ window.clientData.membre = d.membre; }
+    }
+  } catch(e){}
+}
+
+// Ouvre l'abonnement Square (ou un courriel si le lien pas encore configuré)
+// Le clic "Devenir membre" ouvre d'abord l'écran de conditions.
+function goToSubscribe(){
+  var ov = document.getElementById('terms-overlay');
+  if(ov){
+    ov.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    // Réinitialise la case et le bouton à chaque ouverture
+    var chk = document.getElementById('terms-agree'); if(chk) chk.checked = false;
+    var btn = document.getElementById('terms-continue'); if(btn) btn.disabled = true;
+    // Remet le contenu conditions (au cas où on aurait affiché le message d'activation avant)
+    renderTermsContent();
+  } else {
+    openSquareCheckout();
+  }
+}
+
+function closeTerms(){
+  var ov = document.getElementById('terms-overlay');
+  if(ov){ ov.classList.remove('open'); document.body.style.overflow = ''; }
+}
+
+function termsToggle(){
+  var chk = document.getElementById('terms-agree');
+  var btn = document.getElementById('terms-continue');
+  if(btn && chk) btn.disabled = !chk.checked;
+}
+
+// Contenu "conditions à accepter"
+function renderTermsContent(){
+  var card = document.getElementById('terms-card');
+  if(!card) return;
+  card.innerHTML =
+    '<button class="terms-close" onclick="closeTerms()">✕</button>'
+    + '<div class="terms-ic">🛡️</div>'
+    + '<div class="terms-title">Avant de t\'abonner</div>'
+    + '<div class="terms-plan">Greaz Collection · '+GREAZ_PRICE+'/mois</div>'
+    + '<div class="terms-points">'
+    +   '<div class="terms-point"><span class="terms-pic">⏱️</span><div><b>Activation sous 24h</b> après ton paiement. En attendant, tu peux explorer la carte des garages.</div></div>'
+    +   '<div class="terms-point"><span class="terms-pic">↩️</span><div><b>Remboursement possible</b> dans les 30 premiers jours si t\'es pas satisfait.</div></div>'
+    +   '<div class="terms-point"><span class="terms-pic">🚗</span><div><b>Remorquage</b> : après 3 mois de membre en continu, remboursé jusqu\'à 300$, 2 fois par an, pour le titulaire seulement.*</div></div>'
+    + '</div>'
+    + '<label class="terms-check"><input type="checkbox" id="terms-agree" onchange="termsToggle()"><span>J\'ai lu et j\'accepte la <a href="politique.html" target="_blank">politique d\'utilisation</a>.</span></label>'
+    + '<button class="terms-continue" id="terms-continue" onclick="openSquareCheckout()" disabled>Continuer vers le paiement →</button>'
+    + '<div class="terms-note">*Certaines conditions s\'appliquent · 🔒 Paiement sécurisé par Square</div>';
+}
+
+// Ouvre Square et affiche le message d'activation 24h
+function openSquareCheckout(){
+  if(SQUARE_SUB_LINK){
+    window.open(SQUARE_SUB_LINK, '_blank');
+  } else {
+    var email = (typeof clientData!=='undefined' && clientData && clientData.email) ? clientData.email : '';
+    window.location.href = 'mailto:contact@greaz.ca?subject=Je%20veux%20devenir%20membre%20Greaz&body=Bonjour,%20je%20veux%20m%27abonner%20au%20service%20Greaz%20(14,99$/mois).' + (email?'%20Mon%20courriel%20:%20'+encodeURIComponent(email):'');
+    return;
+  }
+  // Transforme l'écran en message d'attente (activation 24h)
+  var card = document.getElementById('terms-card');
+  if(card){
+    card.innerHTML =
+      '<button class="terms-close" onclick="closeTerms()">✕</button>'
+      + '<div class="terms-ic">🎉</div>'
+      + '<div class="terms-title">Merci !</div>'
+      + '<p class="terms-wait">Ton abonnement <b>Greaz Collection</b> sera <b>activé dans les 24h</b> après confirmation de ton paiement. On t\'envoie un courriel dès que c\'est prêt.</p>'
+      + '<div class="terms-wait-box">🗺️ En attendant, explore la carte des garages proches de toi !</div>'
+      + '<button class="terms-continue" onclick="closeTerms();ccRevealMap(\'\')">Voir la carte →</button>'
+      + '<div class="terms-note">Une question ? Écris-nous à contact@greaz.ca</div>';
+  }
+}
+
 async function ccSubmit(){
   var vehicle = (document.getElementById('cc-vehicle').value||'').trim();
   var year = (document.getElementById('cc-year').value||'').trim();
@@ -1727,6 +1894,16 @@ async function ccSubmit(){
   // Détecter si le contact est un email ou un téléphone
   var isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact);
   var code = 'GZ-' + Math.floor(Math.random()*90000+10000);
+  // On relit le statut membre à jour depuis Firestore (au cas où il vient d'être activé)
+  await refreshMemberStatus();
+  var member = isMember();
+
+  // Combien de demandes cette personne a-t-elle DÉJÀ faites (avant celle-ci) ?
+  var priorCount = await getDemandeCount(isEmail ? contact : '');
+  var isFirstFree = (priorCount === 0);   // 1re demande = gratuite
+
+  // Statut : membre OU 1re demande → on traite. Sinon → en attente d'abonnement.
+  var willProcess = member || isFirstFree;
 
   try {
     var leadData = {
@@ -1738,7 +1915,10 @@ async function ccSubmit(){
       vehicle_make:vehicle, vehicle_year:year, vehicle_km:km,
       problem:_ccProblem||'Non précisé',
       description:desc,
-      booking_code:code, status:'nouveau',
+      booking_code:code,
+      status: willProcess ? 'nouveau' : 'attente_abonnement',
+      is_member: member,
+      is_first_free: isFirstFree && !member,
       client_uid: (typeof clientUser!=='undefined' && clientUser) ? clientUser.uid : '',
       created_at:firebase.firestore.FieldValue.serverTimestamp(),
     };
@@ -1746,31 +1926,107 @@ async function ccSubmit(){
     if(typeof notifierNouvelleDemandeClient === 'function'){
       try{ notifierNouvelleDemandeClient(leadData); }catch(e){}
     }
-    // Si connecté : mémoriser l'adresse mise à jour + créditer les points
     if(typeof clientUser!=='undefined' && clientUser && clientData){
       try{
         if(address && address !== clientData.address){
           await db.collection('clients').doc(clientUser.uid).update({ address:address });
           clientData.address = address;
         }
-        if(typeof awardPoints === 'function'){ await awardPoints(); }
+        if(member && typeof awardPoints === 'function'){ await awardPoints(); }
       }catch(e){}
     }
   } catch(e){
     console.error('Sauvegarde demande:', e);
   }
 
-  // Écran de confirmation : la demande est chez Greaz, le client est tranquille.
-  // La carte devient une OPTION, pas une obligation.
-  ccShowSuccess(code, address);
+  // Incrémente le compteur local (pour les gens pas connectés)
+  bumpLocalDemandeCount();
+
+  // Décision d'affichage :
+  if(member){
+    ccShowSuccess(code, address, false);              // membre → confirmation simple
+  } else if(isFirstFree){
+    ccShowSuccess(code, address, true);               // 1re demande gratuite → confirmation + offre soft
+  } else {
+    ccShowPaywall(name, isEmail ? contact : '');      // 2e+ → abonnement bloquant
+  }
 }
 
-/* Écran de confirmation après envoi de la demande */
-function ccShowSuccess(code, address){
+/* Compte les demandes déjà faites : Firestore si connecté, sinon compteur local */
+async function getDemandeCount(email){
+  var cu = (typeof clientUser!=='undefined' && clientUser) || window.clientUser;
+  if(cu){
+    try{
+      var snap = await db.collection('leads').where('client_uid','==',cu.uid).get();
+      return snap.size;
+    }catch(e){ return 0; }
+  }
+  // Pas connecté : on se fie au compteur stocké sur l'appareil
+  try{ return parseInt(localStorage.getItem('greaz_dem_count')||'0',10) || 0; }catch(e){ return 0; }
+}
+
+/* Incrémente le compteur local pour les gens pas connectés */
+function bumpLocalDemandeCount(){
+  var cu = (typeof clientUser!=='undefined' && clientUser) || window.clientUser;
+  if(cu) return;   // les connectés sont comptés via Firestore
+  try{
+    var n = parseInt(localStorage.getItem('greaz_dem_count')||'0',10) || 0;
+    localStorage.setItem('greaz_dem_count', String(n+1));
+  }catch(e){}
+}
+
+/* Écran d'abonnement : la personne doit devenir membre pour qu'on traite sa demande */
+function ccShowPaywall(name, email){
+  var form = document.getElementById('cc-form');
+  if(!form) return;
+  var firstName = (name||'').split(' ')[0] || 'toi';
+  var emailReminder = email
+    ? '<div class="pw-email">💡 Abonne-toi avec <b>'+email+'</b> (le même courriel) pour qu\'on relie ton paiement à ton compte.</div>'
+    : '<div class="pw-email">💡 Utilise le même courriel que ton compte Greaz au moment de payer.</div>';
+
+  form.innerHTML =
+    '<div class="pw">'
+    + '<div class="pw-ic">🛡️</div>'
+    + '<div class="pw-tag">✓ Ta demande est enregistrée, '+firstName+'</div>'
+    + '<div class="pw-collection">Greaz Collection</div>'
+    + '<div class="pw-title">Ta voiture.<br>Notre priorité.</div>'
+    + '<p class="pw-sub">Greaz t\'accompagne pour entretenir ton auto, trouver de meilleurs prix pis gérer les imprévus — pour t\'aider à la garder plus longtemps.</p>'
+    + '<div class="pw-price"><span class="pw-price-big">'+GREAZ_PRICE+'</span><span class="pw-price-per">/ mois</span></div>'
+    + '<div class="pw-perks">'
+    +   '<div class="pw-perk"><span class="pw-check">✓</span> On s\'occupe de ta voiture</div>'
+    +   '<div class="pw-perk"><span class="pw-check">✓</span> Entretien, rendez-vous pis suivi</div>'
+    +   '<div class="pw-perk"><span class="pw-check">✓</span> On t\'aide à trouver de meilleurs prix</div>'
+    +   '<div class="pw-perk"><span class="pw-check">✓</span> Jusqu\'à 80 % de remboursement sur 2 remorquages par an*</div>'
+    + '</div>'
+    + '<button class="pw-btn" onclick="goToSubscribe()">Devenir membre — '+GREAZ_PRICE+'/mois →</button>'
+    + '<div class="pw-cond">*Certaines conditions s\'appliquent.</div>'
+    + emailReminder
+    + '<div class="pw-secure">🔒 Paiement sécurisé par Square · annule quand tu veux</div>'
+    + '</div>';
+  form.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* Écran de confirmation après envoi de la demande.
+   showOffer = true → 1re demande gratuite, on propose l'abonnement en douceur. */
+function ccShowSuccess(code, address, showOffer){
   var form = document.getElementById('cc-form');
   if(!form) return;
   var loggedPts = (typeof clientUser!=='undefined' && clientUser)
     ? '<div class="cc-succ-pts">🎁 +'+(typeof PTS_PER_BOOKING!=='undefined'?PTS_PER_BOOKING:10)+' points Greaz</div>' : '';
+
+  // Offre soft (uniquement à la 1re demande gratuite d'un non-membre)
+  var offer = '';
+  if(showOffer){
+    offer = '<div class="cc-offer">'
+      + '<div class="cc-offer-badge">🎁 Ta 1re demande est offerte</div>'
+      + '<div class="cc-offer-title">Tu veux qu\'on s\'occupe de ton auto pour vrai ?</div>'
+      + '<div class="cc-offer-txt">Deviens membre <b>Greaz Collection</b> : demandes illimitées, suivi de tes entretiens, meilleurs prix, pis jusqu\'à 80% sur 2 remorquages par an.*</div>'
+      + '<button class="cc-offer-btn" onclick="goToSubscribe()">Devenir membre — '+GREAZ_PRICE+'/mois →</button>'
+      + '<button class="cc-offer-later" onclick="ccDismissOffer()">Plus tard</button>'
+      + '<div class="cc-offer-cond">*Certaines conditions s\'appliquent.</div>'
+      + '</div>';
+  }
+
   form.innerHTML =
     '<div class="cc-success">'
     + '<div class="cc-succ-ic">✅</div>'
@@ -1779,9 +2035,16 @@ function ccShowSuccess(code, address){
     + '<div class="cc-succ-code">'+code+'</div>'
     + '<div class="cc-succ-code-lbl">Ton numéro de demande</div>'
     + loggedPts
+    + offer
     + '<button class="cc-succ-map-btn" onclick="ccRevealMap(\''+(address||'').replace(/'/g,"")+'\')">Ou explore les garages proches toi-même →</button>'
     + '</div>';
   form.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* La personne ferme l'offre à la 1re demande (elle reste libre) */
+function ccDismissOffer(){
+  var o = document.querySelector('.cc-offer');
+  if(o){ o.style.transition='opacity .3s, transform .3s'; o.style.opacity='0'; o.style.transform='translateY(-8px)'; setTimeout(function(){ o.remove(); }, 300); }
 }
 
 function ccRevealMap(address){
@@ -3689,6 +3952,7 @@ function updateNavAccount(){
 
 async function loadClientProfile(user){
   clientUser = user;
+  window.clientUser = user;
   try {
     var doc = await db.collection('clients').doc(user.uid).get();
     if(doc.exists){ clientData = doc.data(); }
@@ -3698,15 +3962,26 @@ async function loadClientProfile(user){
         created_at: firebase.firestore.FieldValue.serverTimestamp()
       }));
     }
+    window.clientData = clientData;
     updateNavAccount();
     if(document.getElementById('overlay-account').classList.contains('open')) renderAccount();
+    // Si le formulaire conciergerie est déjà ouvert (profil chargé après l'ouverture),
+    // on pré-remplit maintenant que les infos sont prêtes.
+    var ccForm = document.getElementById('cc-form');
+    if(ccForm && !ccForm.classList.contains('cc-form-hidden') && typeof ccPrefillIfLoggedIn === 'function'){
+      ccPrefillIfLoggedIn();
+    }
   } catch(e){ console.log('Profil client:', e); }
 }
 
 function openAccount(){
   document.getElementById('overlay-account').classList.add('open');
   document.body.style.overflow = 'hidden';
-  if(clientUser && clientData) renderAccount();
+  if(clientUser && clientData){
+    renderAccount();
+    // Rafraîchit le statut membre puis re-render si ça a changé
+    refreshMemberStatus().then(function(){ if(clientUser && clientData) renderAccount(); });
+  }
   else renderAuth('login');
 }
 
@@ -3840,6 +4115,11 @@ function renderAccount(){
     +'</div></div>'
 
     +'<div class="acc-section">🔧 Mes demandes en cours</div>'
+    + (isMember() ? '' : '<div class="acc-join" onclick="goToSubscribe()">'
+        + '<div class="acc-join-l"><div class="acc-join-t">🛡️ Deviens membre Greaz</div>'
+        + '<div class="acc-join-d">Pour qu\'on s\'occupe de ton auto au complet — '+GREAZ_PRICE+'/mois</div></div>'
+        + '<div class="acc-join-btn">S\'abonner →</div>'
+        + '</div>')
     +'<div id="acc-demandes"><div class="acc-loading">Chargement...</div></div>'
 
     +'<div class="acc-section">📅 Mes rendez-vous</div>'
@@ -4160,5 +4440,10 @@ window.addEventListener('DOMContentLoaded', function(){
   initBookingProgress();
 });
 </script>
+<!-- Modal conditions d'abonnement -->
+<div class="terms-overlay" id="terms-overlay" onclick="if(event.target===this)closeTerms()">
+  <div class="terms-card" id="terms-card"></div>
+</div>
+
 </body>
 </html>
