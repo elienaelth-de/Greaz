@@ -262,6 +262,30 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 .terms-wait b{color:var(--white)}
 .terms-wait-box{background:var(--bluelt);border-radius:12px;padding:14px;font-size:13.5px;color:var(--blue2);text-align:center;line-height:1.5;margin-bottom:1.25rem;font-weight:500}
 
+/* Modal politique d'utilisation */
+.policy-overlay{position:fixed;inset:0;background:rgba(23,26,32,.6);backdrop-filter:blur(4px);z-index:1100;display:none;align-items:center;justify-content:center;padding:20px}
+.policy-overlay.open{display:flex;animation:termsFade .25s ease both}
+.policy-card{background:#fff;border-radius:22px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(23,26,32,.35);animation:termsPop .35s var(--spring) both}
+.policy-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--line);flex-shrink:0}
+.policy-head-title{font-family:var(--display);font-size:1.15rem;font-weight:700;letter-spacing:-.02em;color:var(--white)}
+.policy-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--ink);color:#96989C;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.policy-close:hover{background:#EAE7E1;color:var(--white)}
+.policy-body{padding:22px 24px;overflow-y:auto;flex:1}
+.policy-lead{font-size:13.5px;color:var(--muted);line-height:1.6;padding-bottom:1rem;margin-bottom:1rem;border-bottom:1px solid var(--line)}
+.policy-body h3{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--white);margin:1.4rem 0 .5rem}
+.policy-body h3:first-of-type{margin-top:0}
+.policy-body p{font-size:13.5px;color:#3A3D42;line-height:1.6;margin-bottom:.7rem}
+.policy-body ul{margin:0 0 .8rem 1.15rem}
+.policy-body li{font-size:13.5px;color:#3A3D42;line-height:1.55;margin-bottom:.45rem}
+.policy-body b{color:var(--white);font-weight:600}
+.policy-hl{background:var(--bluelt);border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:12px 15px;margin:1rem 0;font-size:13px;color:var(--blue2);line-height:1.55}
+.policy-callout{background:#FBF4E0;border:1px solid rgba(184,134,11,.25);border-radius:11px;padding:14px 16px;margin:1rem 0;font-size:12.5px;color:#6B5107;line-height:1.6}
+.policy-callout b{color:#4A3805}
+.policy-foot{font-size:12px;color:var(--faint);line-height:1.6;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--line)}
+.policy-actions{padding:16px 24px;border-top:1px solid var(--line);flex-shrink:0}
+.policy-ok{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:14px;border-radius:12px;font-family:var(--display);font-weight:600;font-size:15px;cursor:pointer;transition:transform .2s var(--ease)}
+.policy-ok:hover{transform:translateY(-2px)}
+
 /* Section vérificateur premium (en bas) */
 .verifier-sec{max-width:760px;margin:4rem auto;padding:0 1.5rem}
 .verifier-card{background:var(--white);border-radius:26px;padding:44px 36px;text-align:center;position:relative;overflow:hidden}
@@ -1826,6 +1850,19 @@ function closeTerms(){
   if(ov){ ov.classList.remove('open'); document.body.style.overflow = ''; }
 }
 
+// Ouvre/ferme la politique d'utilisation (intégrée, par-dessus les conditions)
+function showPolicy(){
+  var ov = document.getElementById('policy-overlay');
+  if(ov){ ov.classList.add('open'); document.body.style.overflow = 'hidden'; }
+}
+function closePolicy(){
+  var ov = document.getElementById('policy-overlay');
+  if(ov){ ov.classList.remove('open'); }
+  // Si le modal de conditions est encore ouvert, on garde le scroll bloqué
+  var terms = document.getElementById('terms-overlay');
+  if(!(terms && terms.classList.contains('open'))){ document.body.style.overflow = ''; }
+}
+
 function termsToggle(){
   var chk = document.getElementById('terms-agree');
   var btn = document.getElementById('terms-continue');
@@ -1846,7 +1883,7 @@ function renderTermsContent(){
     +   '<div class="terms-point"><span class="terms-pic">↩️</span><div><b>Remboursement possible</b> dans les 30 premiers jours si t\'es pas satisfait.</div></div>'
     +   '<div class="terms-point"><span class="terms-pic">🚗</span><div><b>Remorquage</b> : après 3 mois de membre en continu, remboursé jusqu\'à 300$, 2 fois par an, pour le titulaire seulement.*</div></div>'
     + '</div>'
-    + '<label class="terms-check"><input type="checkbox" id="terms-agree" onchange="termsToggle()"><span>J\'ai lu et j\'accepte la <a href="politique.html" target="_blank">politique d\'utilisation</a>.</span></label>'
+    + '<label class="terms-check"><input type="checkbox" id="terms-agree" onchange="termsToggle()"><span>J\'ai lu et j\'accepte la <a href="#" onclick="showPolicy();return false;">politique d\'utilisation</a>.</span></label>'
     + '<button class="terms-continue" id="terms-continue" onclick="openSquareCheckout()" disabled>Continuer vers le paiement →</button>'
     + '<div class="terms-note">*Certaines conditions s\'appliquent · 🔒 Paiement sécurisé par Square</div>';
 }
@@ -4443,6 +4480,68 @@ window.addEventListener('DOMContentLoaded', function(){
 <!-- Modal conditions d'abonnement -->
 <div class="terms-overlay" id="terms-overlay" onclick="if(event.target===this)closeTerms()">
   <div class="terms-card" id="terms-card"></div>
+</div>
+
+<!-- Modal politique d'utilisation (intégrée) -->
+<div class="policy-overlay" id="policy-overlay" onclick="if(event.target===this)closePolicy()">
+  <div class="policy-card">
+    <div class="policy-head">
+      <div class="policy-head-title">Politique d'utilisation</div>
+      <button class="policy-close" onclick="closePolicy()">✕</button>
+    </div>
+    <div class="policy-body">
+      <div class="policy-lead">Greaz Collection — 14,99 $/mois. Voici les conditions de ton abonnement, clairement.</div>
+
+      <h3>1. L'abonnement</h3>
+      <p>Greaz Collection est un abonnement mensuel à <b>14,99 $/mois</b> qui te donne accès au service de conciergerie automobile : on t'aide à trouver un garage, comparer les prix, organiser tes rendez-vous, suivre tes entretiens pis gérer certains imprévus. L'abonnement se renouvelle automatiquement chaque mois jusqu'à ce que tu l'annules. Le paiement est traité de façon sécurisée par Square.</p>
+      <div class="policy-hl">⏱️ <b>Activation :</b> ton abonnement est activé dans un délai maximal de <b>24 heures</b> après la confirmation de ton paiement. Tu reçois un courriel dès que ton compte est actif.</div>
+
+      <h3>2. Ce qui est inclus</h3>
+      <ul>
+        <li>Conciergerie : recherche de garages, comparaison de prix, prise de rendez-vous et suivi.</li>
+        <li>Rappels d'entretien pour ton véhicule.</li>
+        <li>Accès à ton historique et à ton espace membre.</li>
+        <li>Le programme d'assistance remorquage (section 4).</li>
+      </ul>
+
+      <h3>3. Remboursement et annulation</h3>
+      <p><b>Remboursement :</b> tu peux demander un remboursement complet dans les <b>30 premiers jours</b> suivant ton premier paiement si t'es pas satisfait. Passé ce délai, les paiements déjà faits ne sont pas remboursables.</p>
+      <p><b>Annulation :</b> tu peux annuler en tout temps. Ça met fin aux paiements futurs; ton accès reste actif jusqu'à la fin de la période déjà payée.</p>
+
+      <h3>4. Programme d'assistance remorquage</h3>
+      <p>Cet avantage est réservé aux membres actifs, selon ces conditions :</p>
+      <ul>
+        <li><b>Ancienneté :</b> tu dois être membre en règle, abonnement payé <b>en continu depuis au moins 3 mois</b>, avant d'y avoir droit.</li>
+        <li><b>Montant maximal :</b> remboursement <b>jusqu'à 300 $ par remorquage</b>. Toute somme au-delà reste à ta charge.</li>
+        <li><b>Fréquence :</b> jusqu'à <b>2 remorquages remboursables par année</b>.</li>
+        <li><b>Titulaire seulement :</b> l'avantage s'applique <b>uniquement au titulaire de l'abonnement</b>, pour un véhicule lui appartenant ou dont il est le conducteur principal. <b>Non transférable</b> à une autre personne.</li>
+        <li><b>Preuve requise :</b> tu dois fournir la facture originale du remorquage pour être remboursé.</li>
+        <li><b>Exclusions :</b> remorquages liés à des activités illégales, courses, usage commercial, ou survenus pendant que l'abonnement était suspendu ou impayé.</li>
+      </ul>
+      <div class="policy-callout"><b>Important :</b> le programme de remorquage est un avantage offert par Greaz, pas un contrat d'assurance. Il peut être modifié ou retiré moyennant un préavis raisonnable.</div>
+
+      <h3>5. Obligations du membre</h3>
+      <ul>
+        <li>Fournir des informations exactes (nom, courriel, véhicule, adresse).</li>
+        <li>Utiliser le même courriel pour ton compte Greaz et ton paiement Square.</li>
+        <li>Utiliser le service de bonne foi, pour un usage personnel.</li>
+      </ul>
+
+      <h3>6. Suspension ou résiliation</h3>
+      <p>Greaz peut suspendre ou résilier un abonnement en cas de non-paiement, d'usage frauduleux, d'abus du service ou du programme de remorquage, ou de non-respect de cette politique.</p>
+
+      <h3>7. Modifications</h3>
+      <p>Greaz peut mettre à jour cette politique. Les changements importants seront communiqués par courriel ou sur le site.</p>
+
+      <h3>8. Nous joindre</h3>
+      <p>Pour toute question sur ton abonnement, un remboursement ou le remorquage, écris-nous à <b>contact@greaz.ca</b>.</p>
+
+      <div class="policy-foot">En t'abonnant à Greaz Collection, tu confirmes avoir lu et accepté cette politique.</div>
+    </div>
+    <div class="policy-actions">
+      <button class="policy-ok" onclick="closePolicy()">J'ai compris</button>
+    </div>
+  </div>
 </div>
 
 </body>
