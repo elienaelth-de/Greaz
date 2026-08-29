@@ -1928,7 +1928,7 @@ function renderTermsContent(){
     + '<div class="terms-points">'
     +   '<div class="terms-point"><span class="terms-pic">⏱️</span><div><b>Activation sous 24h</b> après ton paiement. En attendant, tu peux explorer la carte des garages.</div></div>'
     +   '<div class="terms-point"><span class="terms-pic">↩️</span><div><b>Remboursement possible</b> dans les 30 premiers jours si t\'es pas satisfait.</div></div>'
-    +   '<div class="terms-point"><span class="terms-pic">🚗</span><div><b>Remorquage</b> : après 3 mois de membre en continu, remboursé jusqu\'à 300$, 2 fois par an, pour le titulaire seulement.*</div></div>'
+    +   '<div class="terms-point"><span class="terms-pic">🤝</span><div><b>On t\'accompagne</b> : on organise tes rendez-vous pis on te conseille avant d\'acheter une auto (coûts à prévoir selon le modèle pis ton budget).</div></div>'
     + '</div>'
     + '<label class="terms-check"><input type="checkbox" id="terms-agree" onchange="termsToggle()"><span>J\'ai lu et j\'accepte la <a href="#" onclick="showPolicy();return false;">politique d\'utilisation</a>.</span></label>'
     + '<button class="terms-continue" id="terms-continue" onclick="openSquareCheckout()" disabled>Continuer vers le paiement →</button>'
@@ -2079,9 +2079,9 @@ function ccShowPaywall(name, email){
     + '<div class="pw-price"><span class="pw-price-big">'+GREAZ_PRICE+'</span><span class="pw-price-per">/ mois</span></div>'
     + '<div class="pw-perks">'
     +   '<div class="pw-perk"><span class="pw-check">✓</span> On s\'occupe de ta voiture</div>'
-    +   '<div class="pw-perk"><span class="pw-check">✓</span> Entretien, rendez-vous pis suivi</div>'
+    +   '<div class="pw-perk"><span class="pw-check">✓</span> On organise tes rendez-vous pour toi</div>'
     +   '<div class="pw-perk"><span class="pw-check">✓</span> On t\'aide à trouver de meilleurs prix</div>'
-    +   '<div class="pw-perk"><span class="pw-check">✓</span> Jusqu\'à 80 % de remboursement sur 2 remorquages par an*</div>'
+    +   '<div class="pw-perk"><span class="pw-check">✓</span> Conseil avant d\'acheter une auto (coûts à prévoir + si ça vaut la peine)</div>'
     + '</div>'
     + '<button class="pw-btn" onclick="goToSubscribe()">Devenir membre — '+GREAZ_PRICE+'/mois →</button>'
     + '<div class="pw-cond">*Certaines conditions s\'appliquent.</div>'
@@ -2105,7 +2105,7 @@ function ccShowSuccess(code, address, showOffer){
     offer = '<div class="cc-offer">'
       + '<div class="cc-offer-badge">🎁 Ta 1re demande est offerte</div>'
       + '<div class="cc-offer-title">Tu veux qu\'on s\'occupe de ton auto pour vrai ?</div>'
-      + '<div class="cc-offer-txt">Deviens membre <b>Greaz Collection</b> : demandes illimitées, suivi de tes entretiens, meilleurs prix, pis jusqu\'à 80% sur 2 remorquages par an.*</div>'
+      + '<div class="cc-offer-txt">Deviens membre <b>Greaz Collection</b> : demandes illimitées, on organise tes rendez-vous, meilleurs prix, pis on te conseille avant d\'acheter une auto.</div>'
       + '<button class="cc-offer-btn" onclick="goToSubscribe()">Devenir membre — '+GREAZ_PRICE+'/mois →</button>'
       + '<button class="cc-offer-later" onclick="ccDismissOffer()">Plus tard</button>'
       + '<div class="cc-offer-cond">*Certaines conditions s\'appliquent.</div>'
@@ -4601,26 +4601,23 @@ window.addEventListener('DOMContentLoaded', function(){
       <h3>2. Ce qui est inclus</h3>
       <ul>
         <li>Conciergerie : recherche de garages, comparaison de prix, prise de rendez-vous et suivi.</li>
+        <li>Accompagnement pour organiser et gérer tes rendez-vous.</li>
+        <li>Conseil à l'achat d'un véhicule : estimation des coûts à prévoir selon le kilométrage et le modèle, et évaluation de la pertinence selon ton budget.</li>
         <li>Rappels d'entretien pour ton véhicule.</li>
         <li>Accès à ton historique et à ton espace membre.</li>
-        <li>Le programme d'assistance remorquage (section 4).</li>
       </ul>
 
       <h3>3. Remboursement et annulation</h3>
       <p><b>Remboursement :</b> tu peux demander un remboursement complet dans les <b>30 premiers jours</b> suivant ton premier paiement si t'es pas satisfait. Passé ce délai, les paiements déjà faits ne sont pas remboursables.</p>
       <p><b>Annulation :</b> tu peux annuler en tout temps. Ça met fin aux paiements futurs; ton accès reste actif jusqu'à la fin de la période déjà payée.</p>
 
-      <h3>4. Programme d'assistance remorquage</h3>
-      <p>Cet avantage est réservé aux membres actifs, selon ces conditions :</p>
+      <h3>4. Accompagnement et conseil</h3>
+      <p>Greaz t'accompagne dans tes décisions liées à ton véhicule :</p>
       <ul>
-        <li><b>Ancienneté :</b> tu dois être membre en règle, abonnement payé <b>en continu depuis au moins 3 mois</b>, avant d'y avoir droit.</li>
-        <li><b>Montant maximal :</b> remboursement <b>jusqu'à 300 $ par remorquage</b>. Toute somme au-delà reste à ta charge.</li>
-        <li><b>Fréquence :</b> jusqu'à <b>2 remorquages remboursables par année</b>.</li>
-        <li><b>Titulaire seulement :</b> l'avantage s'applique <b>uniquement au titulaire de l'abonnement</b>, pour un véhicule lui appartenant ou dont il est le conducteur principal. <b>Non transférable</b> à une autre personne.</li>
-        <li><b>Preuve requise :</b> tu dois fournir la facture originale du remorquage pour être remboursé.</li>
-        <li><b>Exclusions :</b> remorquages liés à des activités illégales, courses, usage commercial, ou survenus pendant que l'abonnement était suspendu ou impayé.</li>
+        <li><b>Rendez-vous :</b> on t'aide à planifier, organiser et faire le suivi de tes rendez-vous chez le garage.</li>
+        <li><b>Conseil à l'achat :</b> avant d'acheter une auto, on t'aide à estimer les coûts à prévoir (entretien, paiements) selon le kilométrage et le type de véhicule, et à évaluer si l'achat est raisonnable selon ton budget.</li>
+        <li><b>Nature du conseil :</b> nos conseils et estimations sont fournis à titre indicatif pour t'aider à décider. La décision finale te revient toujours. Greaz n'est pas un conseiller financier ni un mécanicien agréé, et ne garantit pas les coûts réels, qui varient selon le véhicule, le garage et le marché.</li>
       </ul>
-      <div class="policy-callout"><b>Important :</b> le programme de remorquage est un avantage offert par Greaz, pas un contrat d'assurance. Il peut être modifié ou retiré moyennant un préavis raisonnable.</div>
 
       <h3>5. Obligations du membre</h3>
       <ul>
@@ -4630,13 +4627,13 @@ window.addEventListener('DOMContentLoaded', function(){
       </ul>
 
       <h3>6. Suspension ou résiliation</h3>
-      <p>Greaz peut suspendre ou résilier un abonnement en cas de non-paiement, d'usage frauduleux, d'abus du service ou du programme de remorquage, ou de non-respect de cette politique.</p>
+      <p>Greaz peut suspendre ou résilier un abonnement en cas de non-paiement, d'usage frauduleux, d'abus du service, ou de non-respect de cette politique.</p>
 
       <h3>7. Modifications</h3>
       <p>Greaz peut mettre à jour cette politique. Les changements importants seront communiqués par courriel ou sur le site.</p>
 
       <h3>8. Nous joindre</h3>
-      <p>Pour toute question sur ton abonnement, un remboursement ou le remorquage, écris-nous à <b>contact@greaz.ca</b>.</p>
+      <p>Pour toute question sur ton abonnement ou un remboursement, écris-nous à <b>contact@greaz.ca</b>.</p>
 
       <div class="policy-foot">En t'abonnant à Greaz Collection, tu confirmes avoir lu et accepté cette politique.</div>
     </div>
