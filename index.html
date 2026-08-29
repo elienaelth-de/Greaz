@@ -376,6 +376,10 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 .pc-result.yellow .pc-verdict-title{color:#8A6508}
 .pc-result.red .pc-verdict-title{color:#B3261E}
 .pc-range{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:.85rem}
+.pc-source{display:inline-block;font-size:11.5px;font-weight:700;padding:5px 13px;border-radius:20px;margin-bottom:.85rem}
+.pc-source.real{background:#E4F7EE;color:#00794A}
+.pc-source.est{background:#F0F1F3;color:#6B7280}
+.pc-source b{font-weight:800}
 .pc-range b{color:var(--txt)}
 .pc-economie{display:inline-block;background:rgba(255,255,255,.75);border-radius:14px;padding:12px 22px;font-size:14px;font-weight:700;color:#B3261E;margin-bottom:.5rem;box-shadow:0 3px 12px rgba(214,69,69,.12)}
 .pc-economie .big{font-size:1.9rem;display:block;margin-top:2px;letter-spacing:-.02em}
@@ -959,6 +963,10 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 .veh-ic{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#EEF3FE,#E9F8F1);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
 .veh-name{font-size:14.5px;font-weight:700;color:var(--white)}
 .veh-plate{font-size:11.5px;color:#00794A;font-weight:600;letter-spacing:.06em;margin-top:1px}
+.veh-details{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+.veh-dsep{margin:0 6px;opacity:.4}
+.veh-details-empty{color:var(--blue);font-weight:500}
+.veh-card:hover{border-color:var(--line2);background:#fff}
 .crdv{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem;margin-bottom:9px;border-left:3px solid var(--blue)}
 .crdv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:7px}
 .crdv-mec{font-size:14.5px;font-weight:700;color:var(--white)}
@@ -1591,30 +1599,50 @@ function fillPriceCheckMenu(){
     ySel.innerHTML = yHtml;
   }
 
-  animateSavedCounter();
+  loadSavingsCounter();
 }
 
-/* Compteur d'économies — effet "live" qui monte doucement.
-   NOTE : valeur de démarrage à remplacer par la vraie somme
-   des économies calculées une fois la collecte de données branchée. */
-function animateSavedCounter(){
-  var el = document.getElementById('pc-saved-counter');
+/* Montant d'économies affiché dans le hero.
+   Lu depuis Firestore (settings/stats.savings), modifiable depuis le panel admin.
+   Valeur de base : 14 000 $. */
+function loadSavingsCounter(){
+  var el = document.getElementById('hero-savings');
   if(!el) return;
-  var base = 14280;   // valeur de départ (à connecter à Firebase plus tard)
-  var current = base;
-  function fmt(n){ return n.toLocaleString('fr-CA') + ' $'; }
-  el.textContent = fmt(current);
-  // Petit incrément occasionnel pour l'effet vivant
-  setInterval(function(){
-    current += Math.floor(Math.random() * 40) + 15;
-    el.textContent = fmt(current);
-    el.style.transition = 'none';
-    el.style.opacity = '.5';
-    setTimeout(function(){ el.style.transition = 'opacity .4s'; el.style.opacity = '1'; }, 40);
-  }, 4200);
+  var fmt = function(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; };
+  db.collection('settings').doc('stats').get().then(function(doc){
+    var val = 14000;
+    if(doc.exists && typeof doc.data().savings === 'number'){ val = doc.data().savings; }
+    // Animation count-up
+    var start = null, dur = 1200;
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts-start)/dur, 1);
+      var eased = 1 - Math.pow(1-p, 3);
+      el.textContent = fmt(val * eased);
+      if(p < 1) requestAnimationFrame(step);
+      else el.textContent = fmt(val);
+    }
+    requestAnimationFrame(step);
+  }).catch(function(){ el.textContent = '14 000 $'; });
 }
 
-function checkPrice(){
+/* Calcule une fourchette à partir des vrais prix soumis.
+   Filtre les valeurs aberrantes, prend l'intervalle 25e–75e percentile.
+   Retourne null si pas assez de données fiables. */
+function computeRealRange(prices){
+  var valid = prices.filter(function(p){ return typeof p==='number' && p>0 && p<100000; });
+  if(valid.length < 8) return null;   // seuil : au moins 8 vrais prix
+  var sorted = valid.slice().sort(function(a,b){ return a-b; });
+  var median = sorted[Math.floor(sorted.length/2)];
+  // Retire les erreurs de saisie évidentes (moins de 20% ou plus de 4x la médiane)
+  var clean = sorted.filter(function(p){ return p >= median*0.2 && p <= median*4; });
+  if(clean.length < 8) return null;
+  var p25 = clean[Math.floor(clean.length*0.25)];
+  var p75 = clean[Math.floor(clean.length*0.75)];
+  return { min:Math.round(p25), max:Math.round(p75), count:clean.length, median:median };
+}
+
+async function checkPrice(){
   var repair = document.getElementById('pc-repair').value;
   var prix = parseFloat(document.getElementById('pc-price').value);
   var make = document.getElementById('pc-make').value;
@@ -1635,18 +1663,34 @@ function checkPrice(){
 
   var b = BAREME_PRIX[repair];
 
-  // Ajustement de la fourchette selon le véhicule :
-  // les véhicules récents / de luxe coûtent plus cher en pièces & main-d'œuvre.
+  // Fourchette estimée (moyennes du marché) + ajustement véhicule
   var factor = 1;
   var LUXE = ['BMW','Mercedes-Benz','Audi','Lexus','Acura','Volvo','Tesla'];
-  if(make && LUXE.indexOf(make) !== -1) factor *= 1.35;   // marques premium
+  if(make && LUXE.indexOf(make) !== -1) factor *= 1.35;
   if(year){
     var age = new Date().getFullYear() - parseInt(year);
-    if(age <= 3) factor *= 1.12;        // véhicule récent (garantie, pièces neuves)
-    else if(age >= 12) factor *= 0.92;  // vieux véhicule (pièces génériques)
+    if(age <= 3) factor *= 1.12;
+    else if(age >= 12) factor *= 0.92;
   }
-  var min = Math.round(b.min * factor);
-  var max = Math.round(b.max * factor);
+  var estMin = Math.round(b.min * factor);
+  var estMax = Math.round(b.max * factor);
+
+  // On tente d'utiliser les VRAIS prix soumis pour cette réparation
+  var real = null;
+  try {
+    var snap = await db.collection('price_checks').where('repair','==',repair).limit(600).get();
+    var prices = snap.docs.map(function(d){ return d.data().price; });
+    real = computeRealRange(prices);
+  } catch(e){ console.log('Lecture price_checks:', e && e.message); }
+
+  var min, max, isReal, sourceHtml;
+  if(real){
+    min = real.min; max = real.max; isReal = true;
+    sourceHtml = '<div class="pc-source real">✓ Basé sur <b>'+real.count+' prix réels</b> soumis par des Québécois</div>';
+  } else {
+    min = estMin; max = estMax; isReal = false;
+    sourceHtml = '<div class="pc-source est">📊 Estimation basée sur les moyennes du marché</div>';
+  }
   var mid = (min + max) / 2;
 
   var cls, emoji, title, economie = 0;
@@ -1670,30 +1714,33 @@ function checkPrice(){
   var html =
     '<div class="pc-verdict-emoji">'+emoji+'</div>'
     +'<div class="pc-verdict-title">'+title+'</div>'
+    + sourceHtml
     +'<div class="pc-range">Pour <b>'+repairLabel+'</b>'+vehTxt+', le prix habituel au Québec est de <b>'+fmt(min)+' $ à '+fmt(max)+' $</b>.<br>Tu as payé <b>'+fmt(prix)+' $</b>.</div>';
 
   if(economie > 0){
     html += '<div class="pc-economie">Tu pourrais économiser environ<span class="big">~'+fmt(economie)+' $</span></div>';
   }
 
-  // CTA principal : recevoir 3 soumissions gratuites
   html += '<button class="pc-cta-map" onclick="openQuoteRequest(\''+repair+'\','+prix+','+economie+')">'
     + '📩 Recevoir 3 soumissions gratuites'
     + '<span class="pc-cta-sub">Des garages près de toi te rappellent avec leur prix</span>'
     + '</button>'
     +'<button class="pc-cta-secondary" onclick="document.getElementById(\'annuaire\').scrollIntoView({behavior:\'smooth\'})"><span class="map-ico">🗺️</span> Voir les garages sur la carte</button>'
-    +'<div class="pc-disclaimer">Estimation indicative basée sur les prix moyens au Québec. Les prix réels varient selon le véhicule, les pièces et la main-d\'œuvre. Compare toujours avec un devis.</div>';
+    +'<div class="pc-disclaimer">'+(isReal
+        ? 'Fourchette calculée à partir des prix réels soumis par les utilisateurs de Greaz. Compare toujours avec un devis.'
+        : 'Estimation indicative basée sur les prix moyens au Québec. Les prix réels varient selon le véhicule, les pièces et la main-d\'œuvre. Compare toujours avec un devis.')+'</div>';
 
   resultEl.className = 'pc-result show '+cls;
   resultEl.innerHTML = html;
   resultEl.scrollIntoView({ behavior:'smooth', block:'nearest' });
 
-  // ══════ COLLECTE DE DONNÉES (nourrit la base de prix + compteur) ══════
+  // ══════ COLLECTE DE DONNÉES (nourrit la base de prix) ══════
   var cityInput = (document.getElementById('pc-city').value||'').trim();
   savePriceCheck({
     repair: repair, repair_label: repairLabel,
     price: prix, make: make||null, year: year?parseInt(year):null, km: km||null,
     range_min: min, range_max: max, verdict: cls, economie: economie,
+    source: isReal ? 'real' : 'estimate',
     city: cityInput || null,
   });
 }
@@ -1956,6 +2003,7 @@ async function ccSubmit(){
       status: willProcess ? 'nouveau' : 'attente_abonnement',
       is_member: member,
       is_first_free: isFirstFree && !member,
+      referral_code: getReferralCode(),
       client_uid: (typeof clientUser!=='undefined' && clientUser) ? clientUser.uid : '',
       created_at:firebase.firestore.FieldValue.serverTimestamp(),
     };
@@ -3821,6 +3869,30 @@ function checkReviewMode(){
   }
 }
 
+/* ══════════ TRACKING AFFILIÉ ══════════
+   Quand quelqu'un arrive via greaz.ca/?ref=CODE, on retient le code
+   pendant 30 jours. Toutes ses demandes/inscriptions sont attribuées
+   à cet affilié (l'influenceuse touche son 1er mois). */
+function captureReferral(){
+  var params = new URLSearchParams(window.location.search);
+  var ref = params.get('ref') || params.get('aff');
+  if(ref){
+    try{
+      localStorage.setItem('greaz_ref', ref.trim().toUpperCase());
+      localStorage.setItem('greaz_ref_date', String(Date.now()));
+    }catch(e){}
+  }
+}
+function getReferralCode(){
+  try{
+    var ref = localStorage.getItem('greaz_ref');
+    var date = parseInt(localStorage.getItem('greaz_ref_date')||'0', 10);
+    // Expire après 30 jours
+    if(ref && date && (Date.now() - date) < 30*24*60*60*1000){ return ref; }
+  }catch(e){}
+  return '';
+}
+
 /* ══════════ DEEPLINK GARAGE (autocollants QR) ══════════
    Un QR imprimé sur un autocollant pointe vers :
      greaz.ca/?garage=<ID_DU_DOC>
@@ -4073,6 +4145,7 @@ async function doAuth(){
         email: email,
         phone: (document.getElementById('au-phone').value||'').trim(),
         vehicles: [], points: 0,
+        referral_code: getReferralCode(),
         created_at: firebase.firestore.FieldValue.serverTimestamp(),
       });
       await loadClientProfile(cred.user);
@@ -4124,11 +4197,20 @@ function renderAccount(){
 
   var vehHtml = vehicles.length
     ? vehicles.map(function(v,i){
-        return '<div class="veh-card">'
+        var title = [v.year,v.make,v.model].filter(Boolean).join(' ');
+        var details = [];
+        if(v.plate) details.push('🔖 '+v.plate);
+        if(v.km) details.push('📊 '+Number(v.km).toLocaleString('fr-CA')+' km');
+        if(v.color) details.push('🎨 '+v.color);
+        if(v.fuel) details.push('⛽ '+v.fuel);
+        var detailsHtml = details.length
+          ? '<div class="veh-details">'+details.join('<span class="veh-dsep">·</span>')+'</div>'
+          : '<div class="veh-details veh-details-empty">Clique pour ajouter le kilométrage, la plaque... →</div>';
+        return '<div class="veh-card" onclick="openVehicleForm('+i+')" style="cursor:pointer">'
           +'<div class="veh-ic">🚗</div>'
-          +'<div style="flex:1"><div class="veh-name">'+[v.year,v.make,v.model].filter(Boolean).join(' ')+'</div>'
-          +(v.plate?'<div class="veh-plate">'+v.plate+'</div>':'')+'</div>'
-          +'<button class="close-btn" style="width:28px;height:28px;font-size:13px" onclick="removeVehicle('+i+')">✕</button>'
+          +'<div style="flex:1;min-width:0"><div class="veh-name">'+(title||'Véhicule')+'</div>'
+          + detailsHtml + '</div>'
+          +'<button class="close-btn" style="width:28px;height:28px;font-size:13px;flex-shrink:0" onclick="event.stopPropagation();removeVehicle('+i+')">✕</button>'
           +'</div>';
       }).join('')
     : '<div class="acc-empty">'
@@ -4274,7 +4356,12 @@ function loadClientRdvs(){
         +'</div></div>';
     }).join('');
   }).catch(function(e){
-    if(el) el.innerHTML = '<div style="font-size:12.5px;color:#96989C;text-align:center;padding:1rem 0">Impossible de charger tes rendez-vous.</div>';
+    console.log('RDV client (probablement aucun ou permissions):', e);
+    if(el) el.innerHTML = '<div class="acc-empty">'
+      +'<div class="acc-empty-ic">📅</div>'
+      +'<div class="acc-empty-t">Aucun rendez-vous encore</div>'
+      +'<div class="acc-empty-d">Tes rendez-vous confirmés apparaîtront ici une fois qu\'on aura organisé ça pour toi.</div>'
+      +'</div>';
   });
 }
 function fmtRdvDate(d){
@@ -4284,32 +4371,46 @@ function fmtRdvDate(d){
 }
 
 /* ── Véhicules ── */
-function openVehicleForm(){
-  var yearsOpts=''; for(var y=2026;y>=1990;y--) yearsOpts+='<option>'+y+'</option>';
-  document.getElementById('account-title').textContent = 'Ajouter un véhicule';
+function openVehicleForm(idx){
+  var editing = (typeof idx === 'number');
+  var v = editing ? ((clientData.vehicles||[])[idx] || {}) : {};
+  var yearsOpts=''; for(var y=2026;y>=1990;y--){ yearsOpts+='<option'+(String(v.year)===String(y)?' selected':'')+'>'+y+'</option>'; }
+  var fuels = ['Essence','Hybride','Diesel','Électrique'];
+  var fuelOpts = '<option value="">Carburant...</option>' + fuels.map(function(f){ return '<option'+(v.fuel===f?' selected':'')+'>'+f+'</option>'; }).join('');
+  document.getElementById('account-title').textContent = editing ? 'Modifier le véhicule' : 'Ajouter un véhicule';
   document.getElementById('account-body').innerHTML =
     '<div class="alert-err" id="veh-err"></div>'
-    +'<div class="ff2"><div class="ff"><label>Marque *</label><input type="text" id="v-make" placeholder="Toyota"></div>'
+    +'<div class="ff2"><div class="ff"><label>Marque *</label><input type="text" id="v-make" placeholder="Toyota" value="'+(v.make||'')+'"></div>'
     +'<div class="ff"><label>Année</label><select id="v-year"><option value="">Année</option>'+yearsOpts+'</select></div></div>'
-    +'<div class="ff"><label>Modèle *</label><input type="text" id="v-model" placeholder="Corolla"></div>'
-    +'<div class="ff"><label>Plaque d\'immatriculation</label><input type="text" id="v-plate" placeholder="ABC 123" style="text-transform:uppercase"></div>'
-    +'<button class="btn-submit blue" id="veh-btn" onclick="saveVehicle()">✓ Enregistrer</button>'
+    +'<div class="ff"><label>Modèle *</label><input type="text" id="v-model" placeholder="Corolla" value="'+(v.model||'')+'"></div>'
+    +'<div class="ff2"><div class="ff"><label>Plaque</label><input type="text" id="v-plate" placeholder="ABC 123" style="text-transform:uppercase" value="'+(v.plate||'')+'"></div>'
+    +'<div class="ff"><label>Kilométrage</label><input type="number" id="v-km" inputmode="numeric" placeholder="85000" value="'+(v.km||'')+'"></div></div>'
+    +'<div class="ff2"><div class="ff"><label>Couleur</label><input type="text" id="v-color" placeholder="Noir" value="'+(v.color||'')+'"></div>'
+    +'<div class="ff"><label>Carburant</label><select id="v-fuel">'+fuelOpts+'</select></div></div>'
+    +'<div class="ff"><label>NIV / VIN <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="text" id="v-vin" placeholder="Numéro d\'identification" style="text-transform:uppercase" value="'+(v.vin||'')+'"></div>'
+    +'<button class="btn-submit blue" id="veh-btn" onclick="saveVehicle('+(editing?idx:'')+')">✓ Enregistrer</button>'
     +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Annuler</button>';
 }
 
-async function saveVehicle(){
+async function saveVehicle(idx){
+  var editing = (typeof idx === 'number');
   var make = (document.getElementById('v-make').value||'').trim();
   var model = (document.getElementById('v-model').value||'').trim();
   var errEl = document.getElementById('veh-err');
   var btn = document.getElementById('veh-btn');
   if(!make || !model){ errEl.textContent='La marque et le modèle sont obligatoires.'; errEl.style.display='block'; return; }
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Enregistrement...';
-  var vehicles = (clientData.vehicles||[]).slice();
-  vehicles.push({
+  var entry = {
     make: make, model: model,
     year: document.getElementById('v-year').value||'',
     plate: (document.getElementById('v-plate').value||'').trim().toUpperCase(),
-  });
+    km: (document.getElementById('v-km').value||'').trim(),
+    color: (document.getElementById('v-color').value||'').trim(),
+    fuel: document.getElementById('v-fuel').value||'',
+    vin: (document.getElementById('v-vin').value||'').trim().toUpperCase(),
+  };
+  var vehicles = (clientData.vehicles||[]).slice();
+  if(editing){ vehicles[idx] = entry; } else { vehicles.push(entry); }
   try {
     await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
     clientData.vehicles = vehicles;
@@ -4467,6 +4568,7 @@ function initBookingProgress(){
 }
 
 window.addEventListener('DOMContentLoaded', function(){
+  captureReferral();
   fillPriceCheckMenu();
   initMap();
   initMapGuards();
