@@ -254,6 +254,16 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 .terms-check{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--white);line-height:1.5;margin-bottom:1.25rem;cursor:pointer;background:var(--bluelt);padding:13px 15px;border-radius:12px}
 .terms-check input{width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--blue);cursor:pointer}
 .terms-check a{color:var(--blue);font-weight:600}
+/* Champ code de référence (conditions d'abonnement) */
+.terms-ref{margin-bottom:1rem}
+.terms-ref-lbl{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.terms-ref-lbl span{color:var(--faint);font-weight:400}
+.terms-ref-inp{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;font-size:15px;font-family:var(--data);letter-spacing:.05em;outline:none;transition:border-color .2s}
+.terms-ref-inp:focus{border-color:var(--blue)}
+/* Champ code de référence (formulaire conciergerie) */
+.cc-referral-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:1rem 0;padding:12px 15px;background:var(--greenlt,#E4F7EE);border:1px dashed rgba(0,168,98,.35);border-radius:12px}
+.cc-referral-label{font-size:13px;font-weight:600;color:var(--green,#00794A);white-space:nowrap}
+.cc-referral-inp{flex:1;min-width:120px;margin:0!important;font-family:var(--data);letter-spacing:.05em}
 .terms-continue{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:16px;border-radius:13px;font-family:var(--display);font-weight:600;font-size:15.5px;cursor:pointer;box-shadow:0 8px 24px rgba(62,106,225,.3);transition:all .2s var(--ease)}
 .terms-continue:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 13px 34px rgba(62,106,225,.44)}
 .terms-continue:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
@@ -1220,6 +1230,11 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
         </div>
       </div>
 
+      <div class="cc-referral-row">
+        <span class="cc-referral-label">🎁 T'as un code d'un partenaire ?</span>
+        <input class="cc-inp cc-referral-inp" id="cc-referral" placeholder="Ex. TINA2" style="text-transform:uppercase" oninput="ccApplyManualRef(this.value)">
+      </div>
+
       <button class="cc-cta" id="cc-cta" onclick="ccSubmit()">Envoyer ma demande <span class="cc-cta-arrow">→</span></button>
       <div class="cc-note">On magasine les garages pour toi pis on te revient avec les options</div>
     </div>
@@ -1777,7 +1792,31 @@ function ccOpenForm(){
     form.classList.remove('cc-form-hidden');
     form.classList.add('cc-reveal');
     ccPrefillIfLoggedIn();
+    ccUpdateReferralField();
     setTimeout(function(){ form.scrollIntoView({behavior:'smooth',block:'center'}); }, 120);
+  }
+}
+
+/* Le champ code sert SEULEMENT aux gens sans abonnement.
+   - Membre déjà abonné → on cache le champ (inutile)
+   - Sinon → on l'affiche, pré-rempli si un code est déjà connu (pas besoin de le remettre) */
+function ccUpdateReferralField(){
+  var row = document.querySelector('.cc-referral-row');
+  if(!row) return;
+  if(isMember()){
+    row.style.display = 'none';
+    return;
+  }
+  row.style.display = '';
+  var inp = document.getElementById('cc-referral');
+  if(inp && !inp.value){
+    var code = getReferralCode();
+    if(code){
+      inp.value = code;
+      // Petit signe que le code est déjà appliqué
+      var lbl = row.querySelector('.cc-referral-label');
+      if(lbl) lbl.innerHTML = '✓ Code partenaire appliqué';
+    }
   }
 }
 
@@ -1930,6 +1969,7 @@ function renderTermsContent(){
     +   '<div class="terms-point"><span class="terms-pic">↩️</span><div><b>Remboursement possible</b> dans les 30 premiers jours si t\'es pas satisfait.</div></div>'
     +   '<div class="terms-point"><span class="terms-pic">🤝</span><div><b>On t\'accompagne</b> : on organise tes rendez-vous pis on te conseille avant d\'acheter une auto (coûts à prévoir selon le modèle pis ton budget).</div></div>'
     + '</div>'
+    + '<div class="terms-ref"><label class="terms-ref-lbl">🎁 Code d\'un partenaire ? <span>(optionnel)</span></label><input class="terms-ref-inp" id="terms-referral" placeholder="Ex. TINA2" style="text-transform:uppercase" oninput="ccApplyManualRef(this.value)" value="'+(getReferralCode()||'')+'"></div>'
     + '<label class="terms-check"><input type="checkbox" id="terms-agree" onchange="termsToggle()"><span>J\'ai lu et j\'accepte la <a href="#" onclick="showPolicy();return false;">politique d\'utilisation</a>.</span></label>'
     + '<button class="terms-continue" id="terms-continue" onclick="openSquareCheckout()" disabled>Continuer vers le paiement →</button>'
     + '<div class="terms-note">*Certaines conditions s\'appliquent · 🔒 Paiement sécurisé par Square</div>';
@@ -1937,6 +1977,18 @@ function renderTermsContent(){
 
 // Ouvre Square et affiche le message d'activation 24h
 function openSquareCheckout(){
+  // On retient le code (saisi dans l'écran de conditions) pis on le relie au compte
+  var termsRef = document.getElementById('terms-referral');
+  var code = termsRef ? (termsRef.value||'').trim().toUpperCase() : getReferralCode();
+  if(code){
+    try{ localStorage.setItem('greaz_ref_manual', code); }catch(e){}
+    // Si connecté, on l'enregistre sur son compte pour créditer l'affilié après paiement
+    var cu = (typeof clientUser!=='undefined' && clientUser) || window.clientUser;
+    if(cu){
+      try{ db.collection('clients').doc(cu.uid).set({ referral_code: code }, { merge:true }); }catch(e){}
+      if(typeof clientData!=='undefined' && clientData){ clientData.referral_code = code; }
+    }
+  }
   if(SQUARE_SUB_LINK){
     window.open(SQUARE_SUB_LINK, '_blank');
   } else {
@@ -3884,13 +3936,29 @@ function captureReferral(){
   }
 }
 function getReferralCode(){
+  // 1. Un code tapé à la main dans le formulaire a la priorité
+  var manual = document.getElementById('cc-referral');
+  if(manual && manual.value && manual.value.trim()){ return manual.value.trim().toUpperCase(); }
+  var termsRef = document.getElementById('terms-referral');
+  if(termsRef && termsRef.value && termsRef.value.trim()){ return termsRef.value.trim().toUpperCase(); }
+  // 2. Un code déjà enregistré sur le compte du client (pas besoin de le remettre)
+  var cd = (typeof clientData!=='undefined' && clientData) || window.clientData;
+  if(cd && cd.referral_code){ return String(cd.referral_code).trim().toUpperCase(); }
+  // 3. Sinon, le code entré ailleurs et gardé en mémoire, ou le lien ?ref=CODE
   try{
+    var typed = localStorage.getItem('greaz_ref_manual');
+    if(typed && typed.trim()) return typed.trim().toUpperCase();
     var ref = localStorage.getItem('greaz_ref');
     var date = parseInt(localStorage.getItem('greaz_ref_date')||'0', 10);
-    // Expire après 30 jours
     if(ref && date && (Date.now() - date) < 30*24*60*60*1000){ return ref; }
   }catch(e){}
   return '';
+}
+
+// Quand quelqu'un tape un code à la main, on le retient (utile s'il s'abonne après)
+function ccApplyManualRef(val){
+  var code = (val||'').trim().toUpperCase();
+  try{ if(code){ localStorage.setItem('greaz_ref_manual', code); } }catch(e){}
 }
 
 /* ══════════ DEEPLINK GARAGE (autocollants QR) ══════════
@@ -4079,6 +4147,7 @@ async function loadClientProfile(user){
     var ccForm = document.getElementById('cc-form');
     if(ccForm && !ccForm.classList.contains('cc-form-hidden') && typeof ccPrefillIfLoggedIn === 'function'){
       ccPrefillIfLoggedIn();
+      if(typeof ccUpdateReferralField === 'function') ccUpdateReferralField();
     }
   } catch(e){ console.log('Profil client:', e); }
 }
