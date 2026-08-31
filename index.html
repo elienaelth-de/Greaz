@@ -1886,12 +1886,11 @@ function ccToggleMic(){
 }
 
 /* ════════════════════════════════════════════════════════════
-   ⬇️⬇️⬇️  COLLE TON LIEN D'ABONNEMENT SQUARE ICI  ⬇️⬇️⬇️
-   Mets ton lien entre les guillemets (garde les guillemets).
-   Exemple :  var SQUARE_SUB_LINK = 'https://checkout.square.site/xxxxx';
-   Tant qu'il est vide, le bouton ouvre un courriel de contact à la place.
+   ⬇️⬇️⬇️  LIEN D'ABONNEMENT STRIPE (récurrent 14,99$/mois)  ⬇️⬇️⬇️
+   Mets ton lien Stripe entre les guillemets (garde les guillemets).
+   Le client s'abonne de chez lui, facturé automatiquement chaque mois.
    ════════════════════════════════════════════════════════════ */
-var SQUARE_SUB_LINK = 'https://square.link/u/K2FEaljr';
+var SQUARE_SUB_LINK = 'https://buy.stripe.com/8x2aEQ1ehbZCdZ81JH0gw00';
 var GREAZ_PRICE = '14,99 $';
 /* ════════════════════════════════════════════════════════════ */
 
@@ -1972,7 +1971,7 @@ function renderTermsContent(){
     + '<div class="terms-ref"><label class="terms-ref-lbl">🎁 Code d\'un partenaire ? <span>(optionnel)</span></label><input class="terms-ref-inp" id="terms-referral" placeholder="Ex. TINA2" style="text-transform:uppercase" oninput="ccApplyManualRef(this.value)" value="'+(getReferralCode()||'')+'"></div>'
     + '<label class="terms-check"><input type="checkbox" id="terms-agree" onchange="termsToggle()"><span>J\'ai lu et j\'accepte la <a href="#" onclick="showPolicy();return false;">politique d\'utilisation</a>.</span></label>'
     + '<button class="terms-continue" id="terms-continue" onclick="openSquareCheckout()" disabled>Continuer vers le paiement →</button>'
-    + '<div class="terms-note">*Certaines conditions s\'appliquent · 🔒 Paiement sécurisé par Square</div>';
+    + '<div class="terms-note">*Certaines conditions s\'appliquent · 🔒 Paiement sécurisé par Stripe</div>';
 }
 
 // Ouvre Square et affiche le message d'activation 24h
@@ -2138,7 +2137,7 @@ function ccShowPaywall(name, email){
     + '<button class="pw-btn" onclick="goToSubscribe()">Devenir membre — '+GREAZ_PRICE+'/mois →</button>'
     + '<div class="pw-cond">*Certaines conditions s\'appliquent.</div>'
     + emailReminder
-    + '<div class="pw-secure">🔒 Paiement sécurisé par Square · annule quand tu veux</div>'
+    + '<div class="pw-secure">🔒 Paiement sécurisé par Stripe · annule quand tu veux</div>'
     + '</div>';
   form.scrollIntoView({behavior:'smooth',block:'center'});
 }
@@ -4664,7 +4663,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="policy-lead">Greaz Collection — 14,99 $/mois. Voici les conditions de ton abonnement, clairement.</div>
 
       <h3>1. L'abonnement</h3>
-      <p>Greaz Collection est un abonnement mensuel à <b>14,99 $/mois</b> qui te donne accès au service de conciergerie automobile : on t'aide à trouver un garage, comparer les prix, organiser tes rendez-vous, suivre tes entretiens pis gérer certains imprévus. L'abonnement se renouvelle automatiquement chaque mois jusqu'à ce que tu l'annules. Le paiement est traité de façon sécurisée par Square.</p>
+      <p>Greaz Collection est un abonnement mensuel à <b>14,99 $/mois</b> qui te donne accès au service de conciergerie automobile : on t'aide à trouver un garage, comparer les prix, organiser tes rendez-vous, suivre tes entretiens pis gérer certains imprévus. L'abonnement se renouvelle automatiquement chaque mois jusqu'à ce que tu l'annules. Le paiement est traité de façon sécurisée par Stripe.</p>
       <div class="policy-hl">⏱️ <b>Activation :</b> ton abonnement est activé dans un délai maximal de <b>24 heures</b> après la confirmation de ton paiement. Tu reçois un courriel dès que ton compte est actif.</div>
 
       <h3>2. Ce qui est inclus</h3>
