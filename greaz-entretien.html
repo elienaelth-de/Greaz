@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Greaz — Plan d'entretien</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root{
+  --ivory:#F7F5F1; --ivory2:#FFFFFF;
+  --blue:#3E6AE1; --blue2:#3457B2; --bluelt:#EDF2FE;
+  --mint:#00A862; --mintlt:#E4F7EE;
+  --peach:#F0803C; --peachlt:#FDEEE2;
+  --rose:#E85D6E; --roselt:#FCEAEC;
+  --lav:#7C6FE8; --lavlt:#EFEDFD;
+  --amber:#C99209; --amberlt:#FBF2D9;
+  --ink:#1E2128; --muted:#63666E; --faint:#9CA0A8;
+  --line:#ECE9E3; --line2:#E0DCD3;
+  --display:'Space Grotesk',sans-serif; --body:'Inter',sans-serif; --data:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.22,1,.36,1); --spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--body);background:var(--ivory);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:3rem;position:relative;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-140px;right:-120px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(62,106,225,.10),transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(0,168,98,.09),transparent 70%);pointer-events:none;z-index:0}
+.wrap{max-width:640px;margin:0 auto;padding:0 18px;position:relative;z-index:1}
+
+.top{text-align:center;padding:2.75rem 0 1.5rem;animation:dropIn .7s var(--spring) both}
+@keyframes dropIn{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+.logo-badge{display:inline-flex;align-items:center;gap:9px;background:#fff;border-radius:40px;padding:9px 18px 9px 11px;box-shadow:0 6px 22px rgba(30,33,40,.07);margin-bottom:14px}
+.logo-mark{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--lav));color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:1.05rem;box-shadow:0 3px 8px rgba(62,106,225,.35)}
+.logo-txt{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+.logo-txt span{color:var(--blue)}
+.top-title{font-family:var(--display);font-size:1.5rem;font-weight:700;letter-spacing:-.025em;margin-top:6px}
+.top-sub{font-size:13.5px;color:var(--muted);font-weight:500;margin-top:4px}
+
+.card{background:#fff;border-radius:28px;padding:28px;box-shadow:0 10px 40px rgba(30,33,40,.07);animation:riseUp .6s var(--spring) both;animation-delay:.1s}
+@keyframes riseUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.hello{display:flex;align-items:center;gap:12px;margin-bottom:1.4rem}
+.hello-emoji{font-size:2.2rem;animation:wave 2.5s ease-in-out infinite;transform-origin:70% 70%}
+@keyframes wave{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(-12deg)}20%{transform:rotate(12deg)}}
+.hello-txt .card-title{font-family:var(--display);font-size:1.35rem;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.hello-txt .card-sub{font-size:13px;color:var(--muted);margin-top:2px}
+
+.fld{margin-bottom:15px}
+.fld label{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin-bottom:8px}
+.fld-wrap{position:relative}
+.fld-ic{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:17px;pointer-events:none;opacity:.8}
+.fld input,.fld select{width:100%;padding:15px 15px 15px 44px;background:var(--ivory);border:2px solid transparent;border-radius:15px;font-size:16px;font-family:inherit;font-weight:500;color:var(--ink);outline:none;transition:border-color .2s,background .2s}
+.fld input:focus,.fld select:focus{border-color:var(--blue);background:#fff}
+.fld input::placeholder{color:var(--faint);font-weight:400}
+.fld select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA0A8' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center;padding-right:38px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;margin-top:12px;background:linear-gradient(135deg,var(--blue),var(--lav));color:#fff;border:none;padding:17px;border-radius:16px;font-family:var(--display);font-weight:600;font-size:16px;cursor:pointer;box-shadow:0 8px 24px rgba(62,106,225,.32);transition:transform .22s var(--spring),box-shadow .22s;display:flex;align-items:center;justify-content:center;gap:9px}
+.btn:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(62,106,225,.44)}
+.btn:active{transform:translateY(-1px) scale(.98)}
+.btn-arrow{transition:transform .22s var(--spring)}
+.btn:hover .btn-arrow{transform:translateX(4px)}
+.btn-spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#results{display:none}
+.reveal-stagger{animation:pop .5s var(--spring) both}
+@keyframes pop{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+
+.veh-hero{background:linear-gradient(135deg,#2A2E38,#1E2128);border-radius:26px;padding:26px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(30,33,40,.18)}
+.veh-hero::before{content:'';position:absolute;top:-50%;right:-15%;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,232,.35),transparent 70%)}
+.veh-hero::after{content:'🚗';position:absolute;bottom:-10px;right:14px;font-size:5rem;opacity:.10;transform:rotate(-8deg)}
+.veh-hero-in{position:relative;z-index:1}
+.veh-hero-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:7px;font-weight:600}
+.veh-name{font-family:var(--display);font-size:1.55rem;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.veh-meta{font-size:13.5px;color:rgba(255,255,255,.72);margin-top:7px}
+.veh-profile{display:inline-flex;align-items:center;gap:6px;margin-top:14px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:6px 14px;font-size:12px;font-weight:600;backdrop-filter:blur(4px)}
+.km-gauge{margin-top:16px}
+.km-gauge-bar{height:8px;background:rgba(255,255,255,.14);border-radius:10px;overflow:hidden}
+.km-gauge-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--mint),#5FE3A1);transition:width 1s var(--ease)}
+.km-gauge-lbl{font-size:11px;color:rgba(255,255,255,.6);margin-top:6px;display:flex;justify-content:space-between}
+
+.fin-toggle{display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,var(--amberlt),#FDF6E3);border:1.5px solid rgba(201,146,9,.2);border-radius:18px;padding:15px 17px;margin-bottom:18px;cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s}
+.fin-toggle:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,146,9,.14)}
+.fin-check{width:26px;height:26px;border-radius:9px;border:2px solid var(--amber);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .25s var(--spring);font-size:15px;color:#fff;background:#fff}
+.fin-toggle.on .fin-check{background:var(--amber);transform:scale(1.08)}
+.fin-txt{font-size:13px;color:#7A5C08;line-height:1.45}
+.fin-txt b{color:#5A4406}
+
+.sec{margin-top:26px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:0 4px}
+.sec-title{font-family:var(--display);font-size:1.2rem;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.sec-pill{font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:20px}
+.sec-pill.red{background:var(--roselt);color:var(--rose)}
+.sec-pill.amber{background:var(--amberlt);color:var(--amber)}
+.sec-pill.mint{background:var(--mintlt);color:var(--mint)}
+
+.item{background:#fff;border-radius:18px;padding:16px;margin-bottom:11px;display:flex;gap:14px;align-items:center;box-shadow:0 3px 14px rgba(30,33,40,.05);transition:transform .18s var(--ease),box-shadow .18s;animation:pop .38s var(--spring) both}
+.item:hover{transform:translateY(-3px) scale(1.005);box-shadow:0 10px 26px rgba(30,33,40,.11)}
+.item-ic{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;transition:transform .25s var(--spring)}
+.item:hover .item-ic{transform:scale(1.14) rotate(-6deg)}
+.item.due .item-ic{background:var(--roselt)}
+.item.soon .item-ic{background:var(--peachlt)}
+.item.ok .item-ic{background:var(--mintlt)}
+.item-main{flex:1;min-width:0}
+.item-name{font-family:var(--display);font-weight:600;font-size:14.5px;letter-spacing:-.01em}
+.item-why{font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:3px}
+.item-when{font-size:11.5px;font-weight:700;margin-top:7px;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:14px}
+.item-when.due{color:var(--rose);background:var(--roselt)}
+.item-when.soon{color:var(--peach);background:var(--peachlt)}
+.item-when.ok{color:var(--mint);background:var(--mintlt)}
+.item-cost{text-align:right;flex-shrink:0}
+.item-cost-val{font-family:var(--data);font-size:15px;font-weight:700;white-space:nowrap}
+.item-cost-lbl{font-size:10px;color:var(--faint);margin-top:1px;text-transform:uppercase;letter-spacing:.04em}
+.crit-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--rose);margin-left:6px;vertical-align:middle}
+
+.cost-block{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 6px 24px rgba(30,33,40,.07)}
+.cost-row{display:flex;justify-content:space-between;align-items:center;padding:17px 22px;border-bottom:1px solid var(--line)}
+.cost-row:last-child{border-bottom:none}
+.cost-ic{font-size:20px;margin-right:11px}
+.cost-row-l{font-size:14px;font-weight:600;display:flex;align-items:center}
+.cost-row-sub{font-size:12px;color:var(--muted);font-weight:400;margin-top:1px}
+.cost-row-v{font-family:var(--data);font-size:18px;font-weight:700}
+.cost-row.hero{background:linear-gradient(135deg,var(--mint),#00925A);color:#fff;position:relative;overflow:hidden}
+.cost-row.hero::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);animation:shine 3.2s ease-in-out infinite;animation-delay:1.2s}
+@keyframes shine{0%{left:-60%}30%,100%{left:130%}}
+.cost-row.hero .cost-row-v{font-size:24px}
+.cost-row.hero .cost-row-sub{color:rgba(255,255,255,.75)}
+
+.fin-note{background:linear-gradient(135deg,var(--amberlt),#FDF6E3);border:1.5px solid rgba(201,146,9,.2);border-radius:20px;padding:22px;margin-top:16px;display:none}
+.fin-note.show{display:block;animation:pop .45s var(--spring) both}
+.fin-note h4{font-family:var(--display);font-size:15px;font-weight:700;color:#5A4406;margin-bottom:9px;display:flex;align-items:center;gap:9px}
+.fin-note p{font-size:13px;color:#7A5C08;line-height:1.65}
+.fin-note p b{color:#4A3805}
+
+.pitch{background:linear-gradient(150deg,var(--bluelt),var(--lavlt));border-radius:26px;padding:28px;margin-top:26px;position:relative;overflow:hidden}
+.pitch::after{content:'🛡️';position:absolute;top:-14px;right:-6px;font-size:5.5rem;opacity:.09;transform:rotate(12deg)}
+.pitch-in{position:relative;z-index:1}
+.pitch-badge{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:22px;padding:6px 15px;font-size:11.5px;font-weight:700;color:var(--blue2);margin-bottom:15px;box-shadow:0 3px 10px rgba(62,106,225,.12)}
+.pitch h3{font-family:var(--display);font-size:1.45rem;font-weight:700;letter-spacing:-.025em;margin-bottom:16px;line-height:1.15}
+.pitch-point{display:flex;gap:12px;margin-bottom:13px;align-items:flex-start}
+.pitch-check{width:24px;height:24px;border-radius:8px;background:var(--mint);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;box-shadow:0 3px 8px rgba(0,168,98,.28)}
+.pitch-point-txt{font-size:13.5px;line-height:1.5;padding-top:1px}
+.pitch-point-txt b{color:var(--ink)}
+.pitch-price{background:#fff;border-radius:20px;padding:22px;margin-top:18px;text-align:center;box-shadow:0 6px 20px rgba(62,106,225,.10)}
+.pitch-price-big{font-family:var(--display);font-size:2.4rem;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-.02em}
+.pitch-price-big span{font-size:1rem;color:var(--muted);font-weight:500}
+.pitch-price-note{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.55}
+.pitch-price-note b{color:var(--ink)}
+
+.restart{width:100%;margin-top:22px;background:#fff;border:2px solid var(--line2);color:var(--muted);padding:15px;border-radius:15px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s var(--ease)}
+.restart:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-1px)}
+
+.disclaimer{font-size:11px;color:var(--faint);text-align:center;margin-top:20px;line-height:1.5;max-width:480px;margin-left:auto;margin-right:auto}
+
+/* Sélecteur de profil (propriétaire / acheteur) + mode de paiement */
+.profile-choice{margin-bottom:18px}
+.profile-lbl{font-size:12.5px;font-weight:600;color:var(--muted,#5C5E62);margin-bottom:8px}
+.profile-btns{display:flex;gap:10px}
+.profile-btn{flex:1;padding:13px 10px;border:1.5px solid var(--line,#EAE7E1);border-radius:12px;background:#fff;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted,#5C5E62);cursor:pointer;transition:all .2s}
+.profile-btn.active{border-color:var(--blue,#3E6AE1);background:var(--bluelt,#EDF2FE);color:var(--blue2,#3457B2)}
+.profile-btn:active{transform:scale(.98)}
+
+/* Bannière contextuelle selon la motorisation */
+.motor-banner{border-radius:14px;padding:15px 17px;margin:16px 0;font-size:13px;line-height:1.55;border:1px solid}
+.motor-banner b{font-weight:700}
+.motor-elec{background:linear-gradient(135deg,#EDF7FF,#E4F0FE);border-color:rgba(62,106,225,.3);color:#1E3A6E}
+.motor-hyb{background:var(--mintlt,#E4F7EE);border-color:rgba(0,168,98,.3);color:#065F46}
+.motor-dies{background:#FDF6E3;border-color:rgba(201,146,9,.3);color:#8A6508}
+
+/* Recommandation par marque */
+.brand-note{border-radius:16px;padding:16px 18px;margin:16px 0;border:1px solid}
+.brand-note-head{font-family:var(--display,'Space Grotesk');font-weight:700;font-size:14px;margin-bottom:5px}
+.brand-note-rating{font-size:13px;font-weight:700;padding:2px 10px;border-radius:12px;background:rgba(255,255,255,.6)}
+.brand-note-txt{font-size:13px;line-height:1.55}
+.brand-mint{background:var(--mintlt,#E4F7EE);border-color:rgba(0,168,98,.3);color:#065F46}
+.brand-blue{background:var(--bluelt,#EDF2FE);border-color:rgba(62,106,225,.25);color:#3457B2}
+.brand-amber{background:#FDF6E3;border-color:rgba(201,146,9,.3);color:#8A6508}
+.brand-rose{background:#FCEBEE;border-color:rgba(232,93,110,.3);color:#B3261E}
+
+/* Capture de prospect */
+.lead-capture{background:linear-gradient(135deg,#1E2128,#2A2F3A);border-radius:22px;padding:26px 22px;margin:22px 0;text-align:center;color:#fff}
+.lead-badge{display:inline-block;background:rgba(139,92,246,.25);color:#C4B5FD;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:12px}
+.lead-title{font-family:var(--display,'Space Grotesk');font-size:1.35rem;font-weight:700;letter-spacing:-.02em;line-height:1.15;margin-bottom:8px}
+.lead-sub{font-size:13.5px;color:rgba(255,255,255,.65);line-height:1.55;margin-bottom:18px;max-width:360px;margin-left:auto;margin-right:auto}
+.lead-inp{width:100%;padding:14px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.12);border-radius:12px;font-size:16px;color:#fff;font-family:inherit;outline:none;margin-bottom:10px}
+.lead-inp::placeholder{color:rgba(255,255,255,.4)}
+.lead-inp:focus{border-color:#8B5CF6;background:rgba(255,255,255,.12)}
+.lead-inp option{color:#1E2128}
+.lead-inp-row{display:flex;gap:10px}
+.lead-inp-row .lead-inp{flex:1}
+.lead-err{display:none;color:#FCA5A5;font-size:12.5px;margin-bottom:8px}
+.lead-btn{width:100%;background:linear-gradient(135deg,#8B5CF6,#7C3AED);color:#fff;border:none;padding:16px;border-radius:13px;font-family:var(--display,'Space Grotesk');font-weight:600;font-size:15.5px;cursor:pointer;box-shadow:0 8px 24px rgba(139,92,246,.35);transition:transform .2s;margin-top:4px}
+.lead-btn:hover{transform:translateY(-2px)}
+.lead-btn:disabled{opacity:.6}
+.lead-note{font-size:11.5px;color:rgba(255,255,255,.45);margin-top:10px}
+.lead-done-ic{font-size:2.5rem;margin-bottom:8px}
+.lead-upsell{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);border-radius:16px;padding:18px;margin-top:18px}
+.lead-upsell-title{font-family:var(--display,'Space Grotesk');font-weight:700;font-size:15px;margin-bottom:8px}
+.lead-upsell-txt{font-size:13px;color:rgba(255,255,255,.7);line-height:1.55;margin-bottom:14px}
+.lead-upsell-btn{display:block;background:#fff;color:#1E2128;text-decoration:none;padding:14px;border-radius:12px;font-family:var(--display,'Space Grotesk');font-weight:700;font-size:14.5px;transition:transform .2s}
+.lead-upsell-btn:hover{transform:translateY(-2px)}
+
+/* Section "tu penses acheter" dans le formulaire */
+.buy-section{margin-top:1.25rem;padding-top:1.25rem;border-top:1.5px dashed var(--line2)}
+.buy-head{font-family:var(--display);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.buy-head span{color:var(--faint);font-weight:500;font-size:12.5px}
+.buy-sub{font-size:12.5px;color:var(--muted);margin-bottom:1rem;line-height:1.5}
+
+/* Section plan de possession (résultat) */
+.own-hero{background:linear-gradient(135deg,var(--ink),#2C2F36);border-radius:20px;padding:22px;color:#fff;text-align:center;position:relative;overflow:hidden}
+.own-hero::after{content:'🛒';position:absolute;bottom:-14px;right:6px;font-size:4.5rem;opacity:.09}
+.own-hero-top{font-size:13px;color:rgba(255,255,255,.65);margin-bottom:6px;position:relative;z-index:1}
+.own-hero-big{font-family:var(--display);font-size:2.5rem;font-weight:700;letter-spacing:-.02em;line-height:1;position:relative;z-index:1}
+.own-hero-sub{font-size:12.5px;color:rgba(255,255,255,.6);margin-top:8px;position:relative;z-index:1}
+.own-note{background:var(--amberlt);border-radius:12px;padding:14px 16px;font-size:12px;color:#6B5107;line-height:1.55;margin-top:12px}
+.own-note b{color:#4A3805}
+
+@media(max-width:520px){
+  .card{padding:22px;border-radius:24px}
+  .veh-name{font-size:1.35rem}
+  .item-why{display:none}
+  .item-ic{width:44px;height:44px;font-size:21px}
+  .pitch{padding:22px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="logo-badge">
+      <span class="logo-mark">G</span>
+      <span class="logo-txt">Gre<span>az</span></span>
+    </div>
+    <div class="top-title">Ton plan d'entretien 💙</div>
+    <div class="top-sub">Découvre ce que ton char a besoin, pis combien ça coûte</div>
+  </div>
+
+  <div class="card" id="form-card">
+    <div class="hello">
+      <span class="hello-emoji">👋</span>
+      <div class="hello-txt">
+        <div class="card-title">C'est quoi ton char ?</div>
+        <div class="card-sub">Entre les infos, on s'occupe du reste.</div>
+      </div>
+    </div>
+
+    <div class="profile-choice">
+      <div class="profile-lbl">C'est pour...</div>
+      <div class="profile-btns">
+        <button type="button" class="profile-btn active" id="pf-own" onclick="setProfile('proprietaire')">🚗 Ma voiture actuelle</button>
+        <button type="button" class="profile-btn" id="pf-buy" onclick="setProfile('acheteur')">🛒 Une voiture à acheter</button>
+      </div>
+    </div>
+
+    <div class="fld">
+      <label>Marque</label>
+      <div class="fld-wrap"><span class="fld-ic">🏷️</span><select id="make" onchange="fillModels()"><option value="">Choisis ta marque...</option></select></div>
+    </div>
+    <div class="fld">
+      <label>Modèle</label>
+      <div class="fld-wrap"><span class="fld-ic">🚙</span><select id="model" onchange="autoDetectMotor()"><option value="">Choisis d'abord la marque...</option></select></div>
+    </div>
+    <div class="fld">
+      <label>Motorisation</label>
+      <div class="fld-wrap"><span class="fld-ic" id="motor-ic">⛽</span><select id="motor" onchange="updateMotorIcon()">
+        <option value="essence">Essence</option>
+        <option value="hybride">Hybride</option>
+        <option value="diesel">Diesel</option>
+        <option value="electrique">Électrique ⚡</option>
+      </select></div>
+    </div>
+    <div class="row2">
+      <div class="fld">
+        <label>Année</label>
+        <div class="fld-wrap"><span class="fld-ic">📅</span><select id="year"><option value="">Année...</option></select></div>
+      </div>
+      <div class="fld">
+        <label>Kilométrage</label>
+        <div class="fld-wrap"><span class="fld-ic">📊</span><input type="number" id="km" placeholder="85000" inputmode="numeric"></div>
+      </div>
+    </div>
+    <div class="fld">
+      <label>Type de conduite</label>
+      <div class="fld-wrap"><span class="fld-ic">🛣️</span><select id="usage">
+        <option value="mixte">Mixte (ville + autoroute)</option>
+        <option value="ville">Surtout en ville (trajets courts)</option>
+        <option value="autoroute">Surtout autoroute (longs trajets)</option>
+      </select></div>
+    </div>
+
+    <div class="buy-section">
+      <div class="buy-head" id="buy-head">💰 Tu penses acheter ce véhicule ? <span>(optionnel)</span></div>
+      <div class="buy-sub" id="buy-sub">Ajoute le prix pour voir ton <b>vrai coût total</b> — pas juste le char.</div>
+      <div class="fld">
+        <label id="buy-price-lbl">Prix d'achat</label>
+        <div class="fld-wrap"><span class="fld-ic">🏷️</span><input type="number" id="buy-price" placeholder="15000" inputmode="numeric"></div>
+      </div>
+      <div class="fld">
+        <label>Comment tu paies ?</label>
+        <div class="profile-btns">
+          <button type="button" class="profile-btn active" id="pay-credit" onclick="setPayMode('credit')">💳 À crédit</button>
+          <button type="button" class="profile-btn" id="pay-cash" onclick="setPayMode('comptant')">💵 Comptant</button>
+        </div>
+      </div>
+      <div id="credit-fields">
+        <div class="row2">
+          <div class="fld">
+            <label>Taux d'intérêt (%)</label>
+            <div class="fld-wrap"><span class="fld-ic">📈</span><input type="number" id="buy-rate" placeholder="7" inputmode="decimal" step="0.1"></div>
+          </div>
+          <div class="fld">
+            <label>Durée (années)</label>
+            <div class="fld-wrap"><span class="fld-ic">📆</span><select id="buy-term">
+              <option value="">—</option>
+              <option value="3">3 ans</option>
+              <option value="4">4 ans</option>
+              <option value="5" selected>5 ans</option>
+              <option value="6">6 ans</option>
+              <option value="7">7 ans</option>
+            </select></div>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Mise de fonds <span style="color:var(--faint);font-weight:400">(optionnel)</span></label>
+          <div class="fld-wrap"><span class="fld-ic">💵</span><input type="number" id="buy-down" placeholder="0" inputmode="numeric"></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="generate()">Voir mon plan <span class="btn-arrow">→</span></button>
+  </div>
+
+  <div id="results"></div>
+</div>
+
+<script>
+// ═══════════ FIREBASE (sauvegarde des prospects) ═══════════
+var firebaseConfig = {
+  apiKey: "AIzaSyAbvCBM1J-LL5B5_v5rqjbGcM8geufmbxs",
+  authDomain: "greaz-4b00c.firebaseapp.com",
+  projectId: "greaz-4b00c",
+  storageBucket: "greaz-4b00c.firebasestorage.app",
+  messagingSenderId: "165170790975",
+  appId: "1:165170790975:web:38fe20428046e6328b6e8a"
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e){}
+var _db = null;
+try { _db = firebase.firestore(); } catch(e){}
+
+// Lien d'abonnement Stripe (récurrent 14,99$/mois)
+var GREAZ_SUB_LINK = 'https://buy.stripe.com/8x2aEQ1ehbZCdZ81JH0gw00';
+
+// ═══════════ RECOMMANDATIONS PAR MARQUE ═══════════
+// Tendances générales connues par marque (fiabilité, points à surveiller).
+// Basé sur les tendances de l'industrie — à confirmer avec le manuel du véhicule.
+var BRAND_NOTES = {
+  'Toyota':   { rating:'Excellente', color:'mint', note:'Parmi les plus fiables. Entretien simple, pièces abordables. Un bon choix pour garder longtemps.' },
+  'Lexus':    { rating:'Excellente', color:'mint', note:'Fiabilité Toyota avec finition luxe. Entretien un peu plus cher mais très durable.' },
+  'Honda':    { rating:'Excellente', color:'mint', note:'Très fiable. Attention aux V6 (Odyssey, Pilot) qui ont une courroie à changer.' },
+  'Acura':    { rating:'Très bonne', color:'mint', note:'Fiabilité Honda avec plus de luxe. Entretien un peu plus cher.' },
+  'Mazda':    { rating:'Très bonne', color:'mint', note:'Fiable et agréable à conduire. Moteurs SkyActiv économiques.' },
+  'Subaru':   { rating:'Bonne', color:'blue', note:'Solide (traction intégrale). Surveille les fuites d\'huile sur les moteurs plus vieux.' },
+  'Hyundai':  { rating:'Bonne', color:'blue', note:'Bon rapport qualité-prix. Surveille la consommation d\'huile sur certains moteurs GDI récents.' },
+  'Kia':      { rating:'Bonne', color:'blue', note:'Bon rapport qualité-prix, comme Hyundai. Même point à surveiller (huile).' },
+  'Nissan':   { rating:'Correcte', color:'blue', note:'Attention à la transmission CVT sur certains modèles — informe-toi avant d\'acheter.' },
+  'Ford':     { rating:'Variable', color:'amber', note:'Dépend du modèle. Les EcoBoost peuvent coûter plus cher en entretien. Vérifie l\'historique.' },
+  'Chevrolet':{ rating:'Variable', color:'amber', note:'Dépend du modèle. Certains ont une bonne réputation, d\'autres moins. Vérifie l\'historique.' },
+  'GMC':      { rating:'Variable', color:'amber', note:'Surtout des camions/VUS. Entretien de camion = plus cher. Vérifie l\'usage précédent.' },
+  'RAM':      { rating:'Variable', color:'amber', note:'Camions. Entretien plus coûteux. Vérifie bien l\'historique (usage travail vs personnel).' },
+  'Dodge':    { rating:'Variable', color:'amber', note:'Dépend du modèle. Vérifie l\'historique d\'entretien de près.' },
+  'Jeep':     { rating:'Variable', color:'amber', note:'Le plaisir a un coût : entretien souvent plus élevé. Vérifie bien avant d\'acheter.' },
+  'Chrysler': { rating:'Variable', color:'amber', note:'Vérifie l\'historique d\'entretien attentivement.' },
+  'Volkswagen':{ rating:'À surveiller', color:'amber', note:'Agréable mais entretien européen = plus cher. Pièces et main-d\'œuvre plus dispendieuses.' },
+  'BMW':      { rating:'Coûteux', color:'rose', note:'Superbe à conduire, mais entretien CHER. Prévois un bon budget entretien avant d\'acheter.' },
+  'Mercedes-Benz':{ rating:'Coûteux', color:'rose', note:'Luxe et performance, mais entretien très cher. Budget entretien élevé à prévoir.' },
+  'Audi':     { rating:'Coûteux', color:'rose', note:'Belle voiture, entretien dispendieux. Prévois un budget entretien conséquent.' },
+  'Volvo':    { rating:'Coûteux', color:'amber', note:'Sécuritaire et durable, mais entretien européen plus cher.' },
+  'Infiniti': { rating:'Correcte', color:'blue', note:'Base Nissan avec luxe. Entretien un peu plus cher.' },
+  'Cadillac': { rating:'Variable', color:'amber', note:'Luxe américain. Entretien plus cher que la moyenne. Vérifie l\'historique.' },
+  'Buick':    { rating:'Correcte', color:'blue', note:'Généralement fiable pour du confort. Vérifie l\'historique.' },
+  'Lincoln':  { rating:'Variable', color:'amber', note:'Luxe américain. Entretien plus élevé. Vérifie bien avant.' },
+  'Mitsubishi':{ rating:'Correcte', color:'blue', note:'Abordable. Garantie souvent longue. Reste dans les modèles récents.' },
+  'Tesla':    { rating:'Différent', color:'blue', note:'Électrique : pas de vidange ni courroie. Mais surveille l\'état de la batterie (coûteuse à remplacer).' },
+};
+
+var MAKES = ['Acura','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Ford','GMC','Honda','Hyundai','Infiniti','Jeep','Kia','Lexus','Lincoln','Mazda','Mercedes-Benz','Mitsubishi','Nissan','RAM','Subaru','Tesla','Toyota','Volkswagen','Volvo','Autre'];
+var LUXE = ['Acura','Audi','BMW','Cadillac','Infiniti','Lexus','Lincoln','Mercedes-Benz','Tesla','Volvo'];
+
+// Profil de l'utilisateur : 'proprietaire' (a déjà l'auto) ou 'acheteur' (pense l'acheter)
+var _profile = 'proprietaire';
+var _payMode = 'credit';
+
+function setProfile(p){
+  _profile = p;
+  document.getElementById('pf-own').classList.toggle('active', p==='proprietaire');
+  document.getElementById('pf-buy').classList.toggle('active', p==='acheteur');
+  // Adapte les textes de la section prix
+  var head = document.getElementById('buy-head');
+  var sub = document.getElementById('buy-sub');
+  var priceLbl = document.getElementById('buy-price-lbl');
+  if(p==='acheteur'){
+    if(head) head.innerHTML = '🛒 Le véhicule que tu veux acheter <span>(optionnel)</span>';
+    if(sub) sub.innerHTML = 'Ajoute le prix pour voir ton <b>vrai coût total</b> avant d\'acheter.';
+    if(priceLbl) priceLbl.textContent = 'Prix demandé';
+  } else {
+    if(head) head.innerHTML = '💰 Ton véhicule actuel <span>(optionnel)</span>';
+    if(sub) sub.innerHTML = 'Ajoute le prix payé pour voir ton <b>vrai coût total</b>.';
+    if(priceLbl) priceLbl.textContent = 'Prix payé';
+  }
+}
+
+function setPayMode(m){
+  _payMode = m;
+  document.getElementById('pay-credit').classList.toggle('active', m==='credit');
+  document.getElementById('pay-cash').classList.toggle('active', m==='comptant');
+  var cf = document.getElementById('credit-fields');
+  if(cf) cf.style.display = (m==='comptant') ? 'none' : 'block';
+}
+
+// Modèles populaires par marque au Québec. Suffixe ⚡ = électrique, 🔋 = hybride branchable
+var MODELS_BY_MAKE = {
+  'Toyota':['Corolla','Camry','RAV4','RAV4 Prime 🔋','Prius 🔋','Highlander','4Runner','Tacoma','Tundra','Sienna','Corolla Cross','C-HR','Venza','GR86','bZ4X ⚡'],
+  'Honda':['Civic','Accord','CR-V','HR-V','Pilot','Odyssey','Ridgeline','Passport','Prologue ⚡'],
+  'Mazda':['Mazda3','CX-30','CX-5','CX-50','CX-70','CX-90','MX-5 Miata','MX-30 ⚡'],
+  'Nissan':['Versa','Sentra','Altima','Kicks','Rogue','Murano','Pathfinder','Frontier','Titan','Leaf ⚡','Ariya ⚡'],
+  'Hyundai':['Elantra','Sonata','Venue','Kona','Kona Electric ⚡','Tucson','Santa Fe','Palisade','Ioniq 5 ⚡','Ioniq 6 ⚡'],
+  'Kia':['Rio','Forte','K5','Soul','Seltos','Sportage','Sorento','Telluride','Carnival','Niro','EV6 ⚡','EV9 ⚡'],
+  'Subaru':['Impreza','Legacy','Crosstrek','Forester','Outback','Ascent','WRX','BRZ','Solterra ⚡'],
+  'Ford':['Fiesta','Focus','Fusion','Escape','Edge','Explorer','Expedition','Bronco','Bronco Sport','Ranger','Maverick','F-150','F-150 Lightning ⚡','Mustang','Mustang Mach-E ⚡'],
+  'Chevrolet':['Spark','Malibu','Trax','Trailblazer','Equinox','Equinox EV ⚡','Blazer','Blazer EV ⚡','Traverse','Colorado','Silverado','Camaro','Corvette','Bolt EV ⚡'],
+  'GMC':['Terrain','Acadia','Yukon','Canyon','Sierra','Hummer EV ⚡'],
+  'Dodge':['Charger','Challenger','Durango','Hornet'],
+  'Jeep':['Renegade','Compass','Cherokee','Grand Cherokee','Wrangler','Wrangler 4xe 🔋','Gladiator','Wagoneer'],
+  'RAM':['1500','2500','3500','ProMaster'],
+  'Volkswagen':['Jetta','Golf','GTI','Passat','Taos','Tiguan','Atlas','Atlas Cross Sport','ID.4 ⚡'],
+  'BMW':['Série 2','Série 3','Série 4','Série 5','Série 7','X1','X3','X4','X5','X6','X7','Z4','i4 ⚡','iX ⚡'],
+  'Mercedes-Benz':['Classe A','Classe C','Classe E','Classe S','GLA','GLB','GLC','GLE','GLS','EQB ⚡','EQE ⚡','EQS ⚡'],
+  'Audi':['A3','A4','A5','A6','A7','Q3','Q5','Q7','Q8','e-tron ⚡','Q4 e-tron ⚡'],
+  'Lexus':['IS','ES','LS','UX','NX','RX','GX','LX','RZ ⚡'],
+  'Acura':['Integra','TLX','RDX','MDX','ZDX ⚡'],
+  'Volvo':['S60','S90','V60','XC40','XC60','XC90','C40 Recharge ⚡','EX30 ⚡'],
+  'Tesla':['Model 3 ⚡','Model Y ⚡','Model S ⚡','Model X ⚡','Cybertruck ⚡'],
+  'Mitsubishi':['Mirage','RVR','Eclipse Cross','Outlander','Outlander PHEV 🔋'],
+  'Chrysler':['300','Pacifica','Grand Caravan'],
+  'Buick':['Encore GX','Envista','Envision','Enclave'],
+  'Cadillac':['CT4','CT5','XT4','XT5','XT6','Escalade','Lyriq ⚡'],
+  'Lincoln':['Corsair','Nautilus','Aviator','Navigator'],
+  'Infiniti':['Q50','QX50','QX55','QX60','QX80'],
+};
+
+// t = motorisations où l'entretien s'applique : g=essence, d=diesel, h=hybride, e=électrique
+var MAINTENANCE = [
+  { nom:'Vidange d\'huile + filtre', ic:'🛢️', km:10000, min:60, max:110, imp:'critique', t:['g','d','h'], why:'Sans huile propre, le moteur s\'use vite. Le plus important.' },
+  { nom:'Rotation des pneus', ic:'🔄', km:10000, min:30, max:55, imp:'recommande', t:['g','d','h','e'], why:'Fait durer tes pneus 2 fois plus longtemps.' },
+  { nom:'Inspection des freins', ic:'🔍', km:20000, min:0, max:45, imp:'recommande', t:['g','d','h','e'], why:'Détecte l\'usure avant que ça coûte cher.' },
+  { nom:'Filtre à air habitacle', ic:'🌬️', km:25000, min:40, max:70, imp:'preventif', t:['g','d','h','e'], why:'Air plus propre, système de ventilation protégé.' },
+  { nom:'Filtre à air moteur', ic:'💨', km:30000, min:40, max:75, imp:'recommande', t:['g','d','h'], why:'Un moteur qui respire mal consomme plus de carburant.' },
+  { nom:'Alignement des roues', ic:'📐', km:40000, min:80, max:130, imp:'recommande', t:['g','d','h','e'], why:'Mauvais alignement = pneus usés d\'un bord, char qui tire.' },
+  { nom:'Liquide de frein', ic:'🧪', km:45000, min:100, max:160, imp:'recommande', t:['g','d','h','e'], why:'Vieux liquide = freinage moins efficace, danger.' },
+  { nom:'Plaquettes de frein (avant)', ic:'🛑', km:50000, min:200, max:420, imp:'critique', t:['g','d','h'], why:'Négligées, elles abîment les disques (bien plus cher).' },
+  { nom:'Plaquettes de frein (avant)', ic:'🛑', km:90000, min:200, max:420, imp:'recommande', t:['e'], why:'Le freinage régénératif les use bien moins vite. Bonne nouvelle !' },
+
+  { nom:'Batterie de démarrage (12V)', ic:'🔋', km:70000, min:150, max:320, imp:'preventif', t:['g','d','h','e'], why:'La petite batterie qui démarre ton auto pis fait rouler l\'électronique (toutes les autos en ont une). Elle dure 4-6 ans pis lâche souvent l\'hiver au Québec.' },
+  { nom:'Bougies d\'allumage', ic:'⚡', km:100000, min:150, max:380, imp:'recommande', t:['g','h'], why:'Vieilles bougies = moteur qui broute, plus d\'essence.' },
+  { nom:'Liquide de refroidissement (moteur)', ic:'❄️', km:100000, min:110, max:200, imp:'critique', t:['g','d','h'], why:'Protège le moteur de la surchauffe (réparation à 2000$+).' },
+  { nom:'Liquide de transmission', ic:'⚙️', km:90000, min:180, max:350, imp:'critique', t:['g','d','h'], why:'Une transmission grillée = 3000 à 5000$. On l\'évite ici.' },
+  { nom:'Disques de frein', ic:'💿', km:95000, min:300, max:650, imp:'recommande', t:['g','d','h','e'], why:'Vibrations au freinage = disques voilés à changer.' },
+
+  { nom:'Pneus (jeu de 4)', ic:'🛞', km:60000, min:700, max:1500, imp:'critique', t:['e'], why:'Les électriques usent leurs pneus plus vite (poids + couple).' },
+  { nom:'Courroie de distribution', ic:'🔗', km:130000, min:600, max:1300, imp:'critique', t:['g','d'], why:'Si elle casse, le moteur est FINI. À faire absolument à temps.' },
+  // Spécifiques électriques
+  { nom:'Vérification système haute tension', ic:'⚡', km:30000, min:80, max:160, imp:'recommande', t:['e'], why:'Inspection de la batterie, du chargeur et de l\'onduleur.' },
+  { nom:'Liquide de refroidissement (batterie)', ic:'🔋', km:100000, min:150, max:300, imp:'critique', t:['e'], why:'Garde la batterie à bonne température = elle dure plus longtemps.' },
+];
+
+// Mots-clés pour auto-détecter un véhicule électrique d'après le modèle
+var EV_KEYWORDS = ['mach-e','mach e','tesla','model 3','model y','model s','model x','bolt','leaf','ioniq 5','ioniq5','ioniq 6','ev6','id.4','id4','ariya','e-tron','etron','i4','ix','eqs','eqb','eqe','taycan','polestar','lyriq','blazer ev','equinox ev','lightning','solterra','bz4x','kona electric','niro ev','soul ev'];
+var HYBRID_KEYWORDS = ['prius','hybrid','hybride','rav4 prime','phev'];
+
+(function(){
+  var mSel = document.getElementById('make');
+  MAKES.forEach(function(m){ mSel.innerHTML += '<option value="'+m+'">'+m+'</option>'; });
+  var ySel = document.getElementById('year');
+  var now = new Date().getFullYear();
+  for(var y=now+1; y>=2000; y--){ ySel.innerHTML += '<option value="'+y+'">'+y+'</option>'; }
+})();
+
+function money(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; }
+function kmFmt(n){ return Math.round(n).toLocaleString('fr-CA'); }
+var _isFinanced = false;
+var _motorManual = false;  // devient true si l'utilisateur choisit à la main
+
+var MOTOR_ICONS = { essence:'⛽', hybride:'🔋', diesel:'🛢️', electrique:'⚡' };
+function updateMotorIcon(){
+  _motorManual = true;
+  var v = document.getElementById('motor').value;
+  document.getElementById('motor-ic').textContent = MOTOR_ICONS[v] || '⛽';
+}
+
+// Remplit le menu des modèles selon la marque choisie
+function fillModels(){
+  _motorManual = false;
+  var make = document.getElementById('make').value;
+  var sel = document.getElementById('model');
+  var list = MODELS_BY_MAKE[make];
+  if(!make){
+    sel.innerHTML = '<option value="">Choisis d\'abord la marque...</option>';
+    return;
+  }
+  if(!list){
+    // Marque "Autre" ou sans liste : on laisse une saisie générique
+    sel.innerHTML = '<option value="">Modèle non listé</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">Choisis ton modèle...</option>';
+  list.forEach(function(m){ sel.innerHTML += '<option value="'+m+'">'+m+'</option>'; });
+  sel.innerHTML += '<option value="__autre__">Autre / pas dans la liste</option>';
+}
+
+// Détecte la motorisation d'après le modèle choisi (suffixe ⚡/🔋 ou mots-clés)
+function autoDetectMotor(){
+  if(_motorManual) return;
+  var model = document.getElementById('model').value.toLowerCase().trim();
+  if(!model) return;
+  var sel = document.getElementById('motor');
+  var found = null;
+  // Le suffixe dans la liste est le plus fiable
+  if(model.indexOf('⚡') !== -1){ found = 'electrique'; }
+  else if(model.indexOf('🔋') !== -1){ found = 'hybride'; }
+  else {
+    for(var i=0;i<EV_KEYWORDS.length;i++){ if(model.indexOf(EV_KEYWORDS[i])!==-1){ found='electrique'; break; } }
+    if(!found){ for(var j=0;j<HYBRID_KEYWORDS.length;j++){ if(model.indexOf(HYBRID_KEYWORDS[j])!==-1){ found='hybride'; break; } } }
+  }
+  if(found){
+    sel.value = found;
+    document.getElementById('motor-ic').textContent = MOTOR_ICONS[found];
+  }
+}
+
+// ═══════════ DISTRIBUTION : courroie vs chaîne ═══════════
+// Ce qui varie vraiment par modèle. Une chaîne se remplace pas, une courroie oui.
+// Basé sur des faits généraux : à confirmer avec le manuel / le mécano.
+var CHAIN_BRANDS = ['Toyota','Lexus','Mazda','BMW','Mercedes-Benz','Nissan','Infiniti','Chevrolet','GMC','Buick','Cadillac','Subaru'];
+var BELT_MODELS = ['odyssey','pilot','ridgeline','mdx','passport']; // Honda/Acura V6 = courroie
+
+function getDistributionType(make, model, year, motorCode){
+  if(motorCode === 'e') return 'aucune';          // électrique : pas de distribution
+  var m = (model||'').toLowerCase();
+  for(var i=0;i<BELT_MODELS.length;i++){ if(m.indexOf(BELT_MODELS[i])!==-1) return 'courroie'; }
+  if(year && year < 2008) return 'courroie';      // vieux véhicules : souvent courroie
+  if(year && year >= 2014 && CHAIN_BRANDS.indexOf(make)!==-1) return 'chaine';
+  return 'incertain';
+}
+var DISTRIB_ITEMS = {
+  courroie:  { nom:'Courroie de distribution', ic:'🔗', km:130000, min:600, max:1300, imp:'critique', why:'Si elle casse, le moteur est FINI. À remplacer à temps (souvent 100-160k km).' },
+  chaine:    { nom:'Chaîne de distribution (inspection)', ic:'🔗', km:150000, min:0, max:120, imp:'recommande', why:'Bonne nouvelle : une chaîne se remplace pas comme une courroie. Juste une inspection.' },
+  incertain: { nom:'Distribution — courroie ou chaîne ?', ic:'🔗', km:130000, min:0, max:1300, imp:'recommande', why:'Vérifie ton manuel : une chaîne se remplace pas, une courroie oui (~100-160k km, 600-1300$).' },
+};
+
+function generate(){
+  var make = document.getElementById('make').value;
+  var modelRaw = document.getElementById('model').value.trim();
+  // Enlève les suffixes ⚡/🔋 et la mention "Autre" pour l'affichage
+  var model = modelRaw.replace(/[⚡🔋]/g,'').replace('__autre__','').trim();
+  if(model === 'Autre / pas dans la liste' || modelRaw === '__autre__') model = '';
+  var year = parseInt(document.getElementById('year').value);
+  var km = parseInt(document.getElementById('km').value);
+
+  if(!make){ alert('Choisis une marque 🏷️'); return; }
+  if(!year){ alert('Choisis une année 📅'); return; }
+  if(isNaN(km) || km < 0){ alert('Entre un kilométrage valide 📊'); return; }
+
+  var isLuxe = LUXE.indexOf(make) !== -1;
+  var motor = document.getElementById('motor').value;
+  var motorCode = { essence:'g', diesel:'d', hybride:'h', electrique:'e' }[motor];
+  var usage = document.getElementById('usage').value;
+  // Ville = trajets courts = usure plus rapide → intervalles raccourcis de 25%
+  var usageFactor = usage==='ville' ? 0.75 : (usage==='autoroute' ? 1.1 : 1.0);
+
+  // Entretiens applicables à cette motorisation (on gère la distribution à part)
+  var applicable = MAINTENANCE.filter(function(m){
+    return m.t.indexOf(motorCode) !== -1 && m.nom.indexOf('Courroie de distribution') === -1;
+  });
+  // Ajoute le bon type de distribution (courroie / chaîne / incertain)
+  var distribType = getDistributionType(make, model, year, motorCode);
+  if(distribType !== 'aucune' && DISTRIB_ITEMS[distribType]){
+    var di = DISTRIB_ITEMS[distribType];
+    applicable.push({ nom:di.nom, ic:di.ic, km:di.km, min:di.min, max:di.max, imp:di.imp, t:[motorCode], why:di.why });
+  }
+
+  var now = new Date().getFullYear();
+  var age = Math.max(1, now - year);
+  var kmPerYear = Math.min(35000, Math.max(8000, Math.round(km / age)));
+  var costMult = isLuxe ? 1.4 : 1.0;
+
+  var dueNow = [], soon = [], upcoming = [];
+  var annualCost = 0;
+
+  applicable.forEach(function(m){
+    var avg = (m.min + m.max) / 2 * costMult;
+    // L'intervalle effectif tient compte du type de conduite
+    var effKm = Math.max(3000, Math.round(m.km * usageFactor));
+    annualCost += avg / effKm * kmPerYear;
+    var nextThreshold = Math.ceil((km + 1) / effKm) * effKm;
+    var kmUntil = nextThreshold - km;
+    var monthsUntil = Math.max(1, Math.round(kmUntil / (kmPerYear/12)));
+    var entry = { m:m, avg:avg, kmUntil:kmUntil, nextThreshold:nextThreshold, monthsUntil:monthsUntil };
+    if(kmUntil <= kmPerYear * 0.12){ dueNow.push(entry); }
+    else if(kmUntil <= kmPerYear * 0.6){ soon.push(entry); }
+    else { upcoming.push(entry); }
+  });
+
+  dueNow.sort(function(a,b){ return a.kmUntil - b.kmUntil; });
+  soon.sort(function(a,b){ return a.kmUntil - b.kmUntil; });
+  upcoming.sort(function(a,b){ return a.kmUntil - b.kmUntil; });
+
+  var cost5y = annualCost * 5;
+  var savings = annualCost * 0.32;
+  var lifePct = Math.min(100, Math.round(km / 250000 * 100));
+
+  // ═══════════ PLAN DE POSSESSION (si prix d'achat fourni) ═══════════
+  var buyPrice = parseFloat(document.getElementById('buy-price').value);
+  var ownership = null;
+  if(buyPrice && buyPrice > 0){
+    var rate = parseFloat(document.getElementById('buy-rate').value) || 0;
+    var term = parseInt(document.getElementById('buy-term').value) || 5;
+    var down = parseFloat(document.getElementById('buy-down').value) || 0;
+    var financed = Math.max(0, buyPrice - down);
+    var n = term * 12;
+    var r = rate / 100 / 12;
+    var monthly = r === 0 ? financed / n : financed * r * Math.pow(1+r,n) / (Math.pow(1+r,n) - 1);
+    var totalCar = monthly * n + down;          // total payé pour la voiture
+    var interest = totalCar - buyPrice;          // intérêts payés
+    var maintTotal = annualCost * term;          // entretien sur la durée du financement
+    var grandTotal = totalCar + maintTotal;      // vrai coût total
+    // Économie Greaz PRUDENTE : ~15% de l'entretien (magasinage + éviter urgences)
+    var greazSaves = Math.round(maintTotal * 0.15);
+    ownership = {
+      price: buyPrice, down: down, rate: rate, term: term,
+      monthly: monthly, totalCar: totalCar, interest: interest,
+      maintTotal: maintTotal, grandTotal: grandTotal, greazSaves: greazSaves,
+    };
+  }
+
+  // Petit feedback sur le bouton pour un rendu premium
+  var gBtn = document.querySelector('.btn');
+  if(gBtn){ gBtn.innerHTML = '<span class="btn-spin"></span> On calcule...'; gBtn.style.pointerEvents='none'; }
+
+  setTimeout(function(){
+    renderResults({
+      make:make, model:model, year:year, km:km, isLuxe:isLuxe, motor:motor,
+      kmPerYear:kmPerYear, dueNow:dueNow, soon:soon, upcoming:upcoming,
+      annualCost:annualCost, cost5y:cost5y, savings:savings, lifePct:lifePct,
+      usage:usage, distribType:distribType, ownership:ownership,
+    });
+    if(gBtn){ gBtn.innerHTML = 'Voir mon plan <span class="btn-arrow">→</span>'; gBtn.style.pointerEvents=''; }
+  }, 280);
+}
+
+function itemHtml(e, state, idx){
+  var m = e.m;
+  var whenTxt, whenCls;
+  if(state==='due'){ whenTxt = '⚠ À faire maintenant'; whenCls='due'; }
+  else if(state==='soon'){ whenTxt = 'Dans ~'+kmFmt(e.kmUntil)+' km · '+e.monthsUntil+' mois'; whenCls='soon'; }
+  else { whenTxt = 'Vers '+kmFmt(e.nextThreshold)+' km'; whenCls='ok'; }
+  var crit = m.imp==='critique' ? '<span class="crit-dot" title="critique"></span>' : '';
+  return '<div class="item '+whenCls+'" style="animation-delay:'+(idx*0.04)+'s">'
+    + '<div class="item-ic">'+m.ic+'</div>'
+    + '<div class="item-main">'
+    +   '<div class="item-name">'+m.nom+crit+'</div>'
+    +   '<div class="item-why">'+m.why+'</div>'
+    +   '<div class="item-when '+whenCls+'">'+whenTxt+'</div>'
+    + '</div>'
+    + '<div class="item-cost"><div class="item-cost-val">'+money(e.avg)+'</div><div class="item-cost-lbl">estimé</div></div>'
+    + '</div>';
+}
+
+function renderResults(d){
+  var vehName = [d.year, d.make, d.model].filter(Boolean).join(' ');
+  var MOTOR_LABEL = {
+    essence:'⛽ Essence', hybride:'🔋 Hybride', diesel:'🛢️ Diesel', electrique:'⚡ Électrique'
+  };
+  var motorBadge = MOTOR_LABEL[d.motor] || '⛽ Essence';
+  var profile = (d.isLuxe ? '💎 Premium' : '✨ Standard');
+
+  var html =
+    '<div class="veh-hero reveal-stagger"><div class="veh-hero-in">'
+    + '<div class="veh-hero-label">Ton plan d\'entretien</div>'
+    + '<div class="veh-name">'+vehName+'</div>'
+    + '<div class="veh-meta">'+kmFmt(d.km)+' km · environ '+kmFmt(d.kmPerYear)+' km par année</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">'
+    +   '<span class="veh-profile">'+motorBadge+'</span>'
+    +   '<span class="veh-profile">'+profile+'</span>'
+    +   (d.usage ? '<span class="veh-profile">'+({ville:'🏙️ Ville',autoroute:'🛣️ Autoroute',mixte:'🔀 Mixte'}[d.usage]||'')+'</span>' : '')
+    + '</div>'
+    + '<div class="km-gauge">'
+    +   '<div class="km-gauge-bar"><div class="km-gauge-fill" id="kmfill" style="width:0%"></div></div>'
+    +   '<div class="km-gauge-lbl"><span>0 km</span><span>aujourd\'hui</span><span>250k</span></div>'
+    + '</div>'
+    + '</div></div>';
+
+  // Bannière contextuelle selon la motorisation
+  if(d.motor === 'electrique'){
+    html += '<div class="motor-banner motor-elec">⚡ <b>Ton électrique, c\'est différent :</b> pas de vidange, pas de bougies, pas de courroie. On surveille surtout ta <b>batterie</b>, tes <b>freins</b> (qui durent plus longtemps grâce au freinage régénératif) pis tes <b>pneus</b> (qui s\'usent plus vite). Voici ton vrai plan.</div>';
+  } else if(d.motor === 'hybride'){
+    html += '<div class="motor-banner motor-hyb">🔋 <b>Ton hybride combine les deux :</b> il a un moteur à essence (vidange, bougies) ET une batterie. On surveille les deux côtés. Voici ton plan complet.</div>';
+  } else if(d.motor === 'diesel'){
+    html += '<div class="motor-banner motor-dies">🛢️ <b>Ton diesel :</b> vidanges plus espacées mais huile plus exigeante. Surveille aussi le système d\'échappement. Voici ton plan.</div>';
+  }
+
+  html += '<div class="fin-toggle'+(_isFinanced?' on':'')+' reveal-stagger" id="fin-toggle" onclick="toggleFin()" style="animation-delay:.06s">'
+    + '<div class="fin-check">'+(_isFinanced?'✓':'')+'</div>'
+    + '<div class="fin-txt"><b>Ta voiture est en financement ? 💳</b><br>Coche pour voir pourquoi l\'entretien est encore plus important.</div>'
+    + '</div>';
+
+  if(d.dueNow.length){
+    html += '<div class="sec"><div class="sec-head"><span class="sec-title">🔴 À faire maintenant</span><span class="sec-pill red">'+d.dueNow.length+' item(s)</span></div>';
+    html += d.dueNow.map(function(e,i){ return itemHtml(e,'due',i); }).join('');
+    html += '</div>';
+  }
+  if(d.soon.length){
+    html += '<div class="sec"><div class="sec-head"><span class="sec-title">🟠 Ça s\'en vient</span><span class="sec-pill amber">prochains mois</span></div>';
+    html += d.soon.map(function(e,i){ return itemHtml(e,'soon',i); }).join('');
+    html += '</div>';
+  }
+  if(d.upcoming.length){
+    html += '<div class="sec"><div class="sec-head"><span class="sec-title">🟢 À planifier</span><span class="sec-pill mint">'+d.upcoming.length+' item(s)</span></div>';
+    html += d.upcoming.map(function(e,i){ return itemHtml(e,'ok',i); }).join('');
+    html += '</div>';
+  }
+
+  html += '<div class="sec"><div class="sec-head"><span class="sec-title">💰 Ce que ça représente</span></div>'
+    + '<div class="cost-block">'
+    +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>Entretien bien fait</div><div class="cost-row-sub" style="margin-left:31px">par année, en moyenne</div></div><div class="cost-row-v" data-count="'+Math.round(d.annualCost)+'">0 $</div></div>'
+    +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">📆</span>Sur 5 ans</div><div class="cost-row-sub" style="margin-left:31px">durée typique d\'un financement</div></div><div class="cost-row-v" data-count="'+Math.round(d.cost5y)+'">0 $</div></div>'
+    +   '<div class="cost-row hero"><div><div class="cost-row-l"><span class="cost-ic">🎉</span>Greaz te fait économiser</div><div class="cost-row-sub" style="margin-left:31px">par année, en magasinant pour toi</div></div><div class="cost-row-v" data-count="'+Math.round(d.savings)+'">0 $</div></div>'
+    + '</div></div>';
+
+  // ═══════════ PLAN DE POSSESSION (si prix d'achat fourni) ═══════════
+  if(d.ownership){
+    var o = d.ownership;
+    var m2 = function(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; };
+    html += '<div class="sec"><div class="sec-head"><span class="sec-title">🛒 Ton vrai coût sur '+o.term+' ans</span></div>'
+      + '<div class="own-hero">'
+      +   '<div class="own-hero-top">Ce char te coûte pas '+m2(o.price)+'…</div>'
+      +   '<div class="own-hero-big">'+m2(o.grandTotal)+'</div>'
+      +   '<div class="own-hero-sub">c\'est ton vrai coût sur '+o.term+' ans, tout inclus</div>'
+      + '</div>'
+      + '<div class="cost-block" style="margin-top:12px">'
+      +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🚗</span>La voiture</div><div class="cost-row-sub" style="margin-left:31px">'+m2(o.monthly)+'/mois'+(o.interest>0?' · dont '+m2(o.interest)+' d\'intérêts':'')+'</div></div><div class="cost-row-v">'+m2(o.totalCar)+'</div></div>'
+      +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>L\'entretien prévu</div><div class="cost-row-sub" style="margin-left:31px">sur '+o.term+' ans</div></div><div class="cost-row-v">'+m2(o.maintTotal)+'</div></div>'
+      +   '<div class="cost-row hero"><div><div class="cost-row-l"><span class="cost-ic">🎉</span>Greaz t\'aide à économiser</div><div class="cost-row-sub" style="margin-left:31px">estimation prudente sur l\'entretien</div></div><div class="cost-row-v">~'+m2(o.greazSaves)+'</div></div>'
+      + '</div>'
+      + '<div class="own-note">💡 Le paiement de la voiture pis les intérêts sont des <b>calculs exacts</b>. L\'entretien est estimé selon les intervalles constructeurs. L\'économie Greaz est une estimation prudente (magasinage des prix + éviter les réparations d\'urgence).</div>'
+      + '</div>';
+  }
+
+  html += '<div class="fin-note'+(_isFinanced?' show':'')+'" id="fin-note">'
+    + '<h4>💳 Ta voiture est en financement</h4>'
+    + '<p>Tu la payes chaque mois, qu\'elle roule bien ou pas. Si tu négliges l\'entretien, elle brise avant la fin de tes paiements — pis tu te retrouves à payer un char qui vaut plus rien. <b>L\'entretien, c\'est protéger l\'argent que t\'as déjà investi.</b> Une transmission grillée ou un moteur surchauffé, c\'est 3000 à 5000 $ — assez pour couvrir des années d\'entretien préventif. 🛡️</p>'
+    + '</div>';
+
+  html += '<div class="pitch reveal-stagger"><div class="pitch-in">'
+    + '<div class="pitch-badge">🛡️ Pourquoi Greaz</div>'
+    + '<h3>Dépenser moins,<br>sans y penser. 💙</h3>'
+    + '<div class="pitch-point"><span class="pitch-check">✓</span><span class="pitch-point-txt"><b>On te rappelle avant</b> que ça devienne un problème. Pas d\'urgence, pas de surprise, pas de prix gonflé.</span></div>'
+    + '<div class="pitch-point"><span class="pitch-check">✓</span><span class="pitch-point-txt"><b>On magasine les garages pour toi</b> pis on compare les prix. Tu payes jamais le plein tarif.</span></div>'
+    + '<div class="pitch-point"><span class="pitch-check">✓</span><span class="pitch-point-txt"><b>On évite les grosses réparations.</b> Un entretien à 100 $ au bon moment évite une facture à 3000 $ plus tard.</span></div>'
+    + '<div class="pitch-point"><span class="pitch-check">✓</span><span class="pitch-point-txt"><b>Tout ton historique au même endroit.</b> Tu revends ton char ? Un dossier complet, ça vaut plus cher.</span></div>'
+    + '<div class="pitch-price">'
+    +   '<div class="pitch-price-big">14 $<span> / mois</span></div>'
+    +   '<div class="pitch-price-note">Soit <b>168 $ par année</b>. Une seule réparation évitée au bon prix, pis c\'est déjà payé. Le reste, c\'est de l\'argent dans tes poches. 🎉</div>'
+    + '</div>'
+    + '</div></div>';
+
+  html += '<button class="restart" onclick="restart()">↻ Faire un autre véhicule</button>';
+
+  // ═══════════ RECOMMANDATION PAR MARQUE ═══════════
+  var bn = BRAND_NOTES[d.make];
+  if(bn){
+    html += '<div class="brand-note brand-'+bn.color+'">'
+      + '<div class="brand-note-head"><span class="brand-note-rating">'+bn.rating+'</span> · Fiabilité '+d.make+'</div>'
+      + '<div class="brand-note-txt">'+bn.note+'</div>'
+      + '</div>';
+  }
+
+  // ═══════════ CAPTURE DE LEAD + ABONNEMENT ═══════════
+  var isBuyer = (_profile === 'acheteur');
+  html += '<div class="lead-capture" id="lead-capture">'
+    + '<div class="lead-badge">'+(isBuyer?'🛒 Tu penses acheter cette auto ?':'🚗 Tu veux qu\'on suive ton auto ?')+'</div>'
+    + '<div class="lead-title">'+(isBuyer?'On t\'accompagne de A à Z avant ton achat':'On s\'occupe de ton entretien pour toi')+'</div>'
+    + '<div class="lead-sub">'+(isBuyer
+        ?'On vérifie si c\'est un bon deal, on t\'aide à négocier, pis on organise ton inspection. Laisse tes infos, on te contacte.'
+        :'On te rappelle tes entretiens, on magasine les meilleurs prix, pis on organise tes rendez-vous. Laisse tes infos, on te contacte.')+'</div>'
+    + '<input class="lead-inp" id="lead-name" placeholder="Ton nom">'
+    + '<input class="lead-inp" id="lead-email" placeholder="Ton courriel" inputmode="email">'
+    + '<input class="lead-inp" id="lead-phone" placeholder="Ton téléphone (optionnel)" inputmode="tel">'
+    + (isBuyer
+        ? '<div class="lead-inp-row">'
+          +   '<select class="lead-inp" id="lead-timeline"><option value="">Tu achètes quand ?</option><option>Cette semaine</option><option>Ce mois-ci</option><option>Dans 1-3 mois</option><option>Je magasine</option></select>'
+          +   '<select class="lead-inp" id="lead-budget"><option value="">Ton budget ?</option><option>Moins de 10 000$</option><option>10 000$ - 20 000$</option><option>20 000$ - 35 000$</option><option>Plus de 35 000$</option></select>'
+          + '</div>'
+        : '')
+    + '<div class="lead-err" id="lead-err"></div>'
+    + '<button class="lead-btn" id="lead-btn" onclick="saveLead()">Recevoir mon accompagnement →</button>'
+    + '<div class="lead-note">Gratuit, sans engagement. On te répond vite.</div>'
+    + '</div>';
+
+  html += '<div class="disclaimer"><b>D\'où viennent ces chiffres ?</b> Les intervalles sont basés sur les recommandations moyennes des constructeurs et de l\'industrie'+(d.usage==='ville'?', ajustés pour la conduite en ville (trajets courts = usure plus rapide)':(d.usage==='autoroute'?', ajustés pour la conduite sur autoroute':''))+'. Les prix sont des moyennes observées au Québec. <b>La référence exacte reste le manuel de ton véhicule</b> — les intervalles varient selon le moteur, l\'année et les conditions. Confirme toujours avec ton mécano.</div>';
+
+  window._lastPlan = d;   // pour la sauvegarde du prospect
+
+  document.getElementById('results').innerHTML = html;
+  document.getElementById('form-card').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  window.scrollTo({ top:0, behavior:'smooth' });
+  setTimeout(function(){ var f=document.getElementById('kmfill'); if(f) f.style.width = d.lifePct + '%'; }, 300);
+  // Anime les montants qui montent (effet premium)
+  setTimeout(runCountUps, 450);
+}
+
+/* Enregistre le prospect dans Firebase pis propose l'abonnement Greaz.
+   Ces infos arrivent dans le dashboard admin (onglet Clients / leads). */
+async function saveLead(){
+  var name = (document.getElementById('lead-name').value||'').trim();
+  var email = (document.getElementById('lead-email').value||'').trim();
+  var phone = (document.getElementById('lead-phone').value||'').trim();
+  var tlEl = document.getElementById('lead-timeline');
+  var bgEl = document.getElementById('lead-budget');
+  var timeline = tlEl ? (tlEl.value||'') : '';
+  var budget = bgEl ? (bgEl.value||'') : '';
+  var err = document.getElementById('lead-err');
+  var btn = document.getElementById('lead-btn');
+  var isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  if(!name){ err.textContent='Mets ton nom.'; err.style.display='block'; return; }
+  if(!isEmail){ err.textContent='Mets un courriel valide.'; err.style.display='block'; return; }
+  err.style.display='none';
+  btn.disabled=true; btn.textContent='Envoi...';
+
+  var p = window._lastPlan || {};
+  var isBuyer = (_profile === 'acheteur');
+  var veh = [p.year,p.make,p.model].filter(Boolean).join(' ');
+  var payTxt = (p.ownership ? (_payMode==='comptant'?'comptant':'à crédit') : 'non précisé');
+  var priceTxt = (p.ownership ? Math.round(p.ownership.price)+'$' : 'non précisé');
+  var totalTxt = (p.ownership ? Math.round(p.ownership.grandTotal)+'$' : 'non calculé');
+
+  var desc = (isBuyer ? '🛒 VEUT ACHETER' : '🚗 PROPRIÉTAIRE ACTUEL') + '\n'
+    + 'Véhicule : '+(veh||'non précisé')+'\n'
+    + 'Kilométrage : '+(p.km?Number(p.km).toLocaleString('fr-CA')+' km':'non précisé')+'\n'
+    + 'Prix '+(isBuyer?'demandé':'payé')+' : '+priceTxt+' ('+payTxt+')\n'
+    + 'Entretien estimé : '+(p.annualCost?Math.round(p.annualCost)+'$/an':'—')+'\n'
+    + 'Coût total prévisionnel : '+totalTxt
+    + (isBuyer ? '\nAchat prévu : '+(timeline||'non précisé')+'\nBudget : '+(budget||'non précisé') : '');
+
+  var lead = {
+    type:'client', source:'simulateur',
+    profile: _profile,                       // 'acheteur' ou 'proprietaire'
+    client_name:name, client_email:email, client_phone:phone,
+    problem: isBuyer ? 'Accompagnement avant achat' : 'Suivi d\'entretien',
+    description: desc,
+    vehicle_make: veh, vehicle_year: p.year||'', vehicle_km: p.km||'',
+    buy_price: (p.ownership?Math.round(p.ownership.price):null),
+    pay_mode: (p.ownership?_payMode:null),
+    est_total: (p.ownership?Math.round(p.ownership.grandTotal):null),
+    est_annual: (p.annualCost?Math.round(p.annualCost):null),
+    buy_timeline: timeline, buy_budget: budget,
+    status:'nouveau',
+    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  try {
+    if(_db) await _db.collection('leads').add(lead);
+  } catch(e){ console.log('Sauvegarde prospect:', e && e.message); }
+
+  var cap = document.getElementById('lead-capture');
+  if(cap){
+    cap.innerHTML =
+      '<div class="lead-done-ic">✅</div>'
+      + '<div class="lead-title">Merci '+name.split(' ')[0]+' !</div>'
+      + '<div class="lead-sub">On a bien reçu ton'+(isBuyer?' projet':'es infos')+'. Notre équipe va te contacter bientôt.</div>'
+      + '<div class="lead-upsell">'
+      +   '<div class="lead-upsell-title">💜 Veux-tu l\'accompagnement complet ?</div>'
+      +   '<div class="lead-upsell-txt">Avec <b>Greaz Collection</b> (14,99$/mois), on '+(isBuyer
+            ?'te suit de A à Z avant ton achat : vérification du deal, aide à négocier, inspection'
+            :'s\'occupe de ton auto : rappels d\'entretien, meilleurs prix, organisation de tes rendez-vous')+', pis suivi de ton entretien. Annule quand tu veux.</div>'
+      +   '<a class="lead-upsell-btn" href="'+GREAZ_SUB_LINK+'" target="_blank">Devenir membre — 14,99$/mois →</a>'
+      + '</div>';
+  }
+}
+
+// Anime chaque nombre [data-count] de 0 jusqu'à sa valeur
+function runCountUps(){
+  var els = document.querySelectorAll('[data-count]');
+  els.forEach(function(el){
+    var target = parseInt(el.getAttribute('data-count')) || 0;
+    var dur = 900, start = null;
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      // easeOutCubic pour un ralenti élégant à la fin
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased).toLocaleString('fr-CA') + ' $';
+      if(p < 1){ requestAnimationFrame(step); }
+      else { el.textContent = target.toLocaleString('fr-CA') + ' $'; }
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+function toggleFin(){
+  _isFinanced = !_isFinanced;
+  var t = document.getElementById('fin-toggle');
+  var note = document.getElementById('fin-note');
+  var check = t.querySelector('.fin-check');
+  t.classList.toggle('on', _isFinanced);
+  check.textContent = _isFinanced ? '✓' : '';
+  note.classList.toggle('show', _isFinanced);
+  if(_isFinanced){ setTimeout(function(){ note.scrollIntoView({behavior:'smooth',block:'center'}); }, 100); }
+}
+
+function restart(){
+  _motorManual = false;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('form-card').style.display = 'block';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+</script>
+</body>
+</html>
