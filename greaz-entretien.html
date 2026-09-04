@@ -26,7 +26,6 @@ body{font-family:var(--body);background:var(--ivory);color:var(--ink);line-heigh
 body::before{content:'';position:fixed;top:-140px;right:-120px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(62,106,225,.10),transparent 70%);pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(0,168,98,.09),transparent 70%);pointer-events:none;z-index:0}
 .wrap{max-width:640px;margin:0 auto;padding:0 18px;position:relative;z-index:1}
-
 .top{text-align:center;padding:2.75rem 0 1.5rem;animation:dropIn .7s var(--spring) both}
 @keyframes dropIn{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
 .logo-badge{display:inline-flex;align-items:center;gap:9px;background:#fff;border-radius:40px;padding:9px 18px 9px 11px;box-shadow:0 6px 22px rgba(30,33,40,.07);margin-bottom:14px}
@@ -35,7 +34,6 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .logo-txt span{color:var(--blue)}
 .top-title{font-family:var(--display);font-size:1.5rem;font-weight:700;letter-spacing:-.025em;margin-top:6px}
 .top-sub{font-size:13.5px;color:var(--muted);font-weight:500;margin-top:4px}
-
 .card{background:#fff;border-radius:28px;padding:28px;box-shadow:0 10px 40px rgba(30,33,40,.07);animation:riseUp .6s var(--spring) both;animation-delay:.1s}
 @keyframes riseUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 .hello{display:flex;align-items:center;gap:12px;margin-bottom:1.4rem}
@@ -43,7 +41,6 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 @keyframes wave{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(-12deg)}20%{transform:rotate(12deg)}}
 .hello-txt .card-title{font-family:var(--display);font-size:1.35rem;font-weight:700;letter-spacing:-.02em;line-height:1.15}
 .hello-txt .card-sub{font-size:13px;color:var(--muted);margin-top:2px}
-
 .fld{margin-bottom:15px}
 .fld label{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin-bottom:8px}
 .fld-wrap{position:relative}
@@ -60,11 +57,9 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .btn:hover .btn-arrow{transform:translateX(4px)}
 .btn-spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 #results{display:none}
 .reveal-stagger{animation:pop .5s var(--spring) both}
 @keyframes pop{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
-
 .veh-hero{background:linear-gradient(135deg,#2A2E38,#1E2128);border-radius:26px;padding:26px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(30,33,40,.18)}
 .veh-hero::before{content:'';position:absolute;top:-50%;right:-15%;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(124,111,232,.35),transparent 70%)}
 .veh-hero::after{content:'🚗';position:absolute;bottom:-10px;right:14px;font-size:5rem;opacity:.10;transform:rotate(-8deg)}
@@ -77,14 +72,12 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .km-gauge-bar{height:8px;background:rgba(255,255,255,.14);border-radius:10px;overflow:hidden}
 .km-gauge-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--mint),#5FE3A1);transition:width 1s var(--ease)}
 .km-gauge-lbl{font-size:11px;color:rgba(255,255,255,.6);margin-top:6px;display:flex;justify-content:space-between}
-
 .fin-toggle{display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,var(--amberlt),#FDF6E3);border:1.5px solid rgba(201,146,9,.2);border-radius:18px;padding:15px 17px;margin-bottom:18px;cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s}
 .fin-toggle:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,146,9,.14)}
 .fin-check{width:26px;height:26px;border-radius:9px;border:2px solid var(--amber);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .25s var(--spring);font-size:15px;color:#fff;background:#fff}
 .fin-toggle.on .fin-check{background:var(--amber);transform:scale(1.08)}
 .fin-txt{font-size:13px;color:#7A5C08;line-height:1.45}
 .fin-txt b{color:#5A4406}
-
 .sec{margin-top:26px}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:0 4px}
 .sec-title{font-family:var(--display);font-size:1.2rem;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
@@ -92,7 +85,6 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .sec-pill.red{background:var(--roselt);color:var(--rose)}
 .sec-pill.amber{background:var(--amberlt);color:var(--amber)}
 .sec-pill.mint{background:var(--mintlt);color:var(--mint)}
-
 .item{background:#fff;border-radius:18px;padding:16px;margin-bottom:11px;display:flex;gap:14px;align-items:center;box-shadow:0 3px 14px rgba(30,33,40,.05);transition:transform .18s var(--ease),box-shadow .18s;animation:pop .38s var(--spring) both}
 .item:hover{transform:translateY(-3px) scale(1.005);box-shadow:0 10px 26px rgba(30,33,40,.11)}
 .item-ic{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;transition:transform .25s var(--spring)}
@@ -111,7 +103,6 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .item-cost-val{font-family:var(--data);font-size:15px;font-weight:700;white-space:nowrap}
 .item-cost-lbl{font-size:10px;color:var(--faint);margin-top:1px;text-transform:uppercase;letter-spacing:.04em}
 .crit-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--rose);margin-left:6px;vertical-align:middle}
-
 .cost-block{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 6px 24px rgba(30,33,40,.07)}
 .cost-row{display:flex;justify-content:space-between;align-items:center;padding:17px 22px;border-bottom:1px solid var(--line)}
 .cost-row:last-child{border-bottom:none}
@@ -124,13 +115,11 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 @keyframes shine{0%{left:-60%}30%,100%{left:130%}}
 .cost-row.hero .cost-row-v{font-size:24px}
 .cost-row.hero .cost-row-sub{color:rgba(255,255,255,.75)}
-
 .fin-note{background:linear-gradient(135deg,var(--amberlt),#FDF6E3);border:1.5px solid rgba(201,146,9,.2);border-radius:20px;padding:22px;margin-top:16px;display:none}
 .fin-note.show{display:block;animation:pop .45s var(--spring) both}
 .fin-note h4{font-family:var(--display);font-size:15px;font-weight:700;color:#5A4406;margin-bottom:9px;display:flex;align-items:center;gap:9px}
 .fin-note p{font-size:13px;color:#7A5C08;line-height:1.65}
 .fin-note p b{color:#4A3805}
-
 .pitch{background:linear-gradient(150deg,var(--bluelt),var(--lavlt));border-radius:26px;padding:28px;margin-top:26px;position:relative;overflow:hidden}
 .pitch::after{content:'🛡️';position:absolute;top:-14px;right:-6px;font-size:5.5rem;opacity:.09;transform:rotate(12deg)}
 .pitch-in{position:relative;z-index:1}
@@ -145,12 +134,9 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .pitch-price-big span{font-size:1rem;color:var(--muted);font-weight:500}
 .pitch-price-note{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.55}
 .pitch-price-note b{color:var(--ink)}
-
 .restart{width:100%;margin-top:22px;background:#fff;border:2px solid var(--line2);color:var(--muted);padding:15px;border-radius:15px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s var(--ease)}
 .restart:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-1px)}
-
 .disclaimer{font-size:11px;color:var(--faint);text-align:center;margin-top:20px;line-height:1.5;max-width:480px;margin-left:auto;margin-right:auto}
-
 /* Sélecteur de profil (propriétaire / acheteur) + mode de paiement */
 .profile-choice{margin-bottom:18px}
 .profile-lbl{font-size:12.5px;font-weight:600;color:var(--muted,#5C5E62);margin-bottom:8px}
@@ -158,14 +144,12 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .profile-btn{flex:1;padding:13px 10px;border:1.5px solid var(--line,#EAE7E1);border-radius:12px;background:#fff;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted,#5C5E62);cursor:pointer;transition:all .2s}
 .profile-btn.active{border-color:var(--blue,#3E6AE1);background:var(--bluelt,#EDF2FE);color:var(--blue2,#3457B2)}
 .profile-btn:active{transform:scale(.98)}
-
 /* Bannière contextuelle selon la motorisation */
 .motor-banner{border-radius:14px;padding:15px 17px;margin:16px 0;font-size:13px;line-height:1.55;border:1px solid}
 .motor-banner b{font-weight:700}
 .motor-elec{background:linear-gradient(135deg,#EDF7FF,#E4F0FE);border-color:rgba(62,106,225,.3);color:#1E3A6E}
 .motor-hyb{background:var(--mintlt,#E4F7EE);border-color:rgba(0,168,98,.3);color:#065F46}
 .motor-dies{background:#FDF6E3;border-color:rgba(201,146,9,.3);color:#8A6508}
-
 /* Recommandation par marque */
 .brand-note{border-radius:16px;padding:16px 18px;margin:16px 0;border:1px solid}
 .brand-note-head{font-family:var(--display,'Space Grotesk');font-weight:700;font-size:14px;margin-bottom:5px}
@@ -175,7 +159,6 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .brand-blue{background:var(--bluelt,#EDF2FE);border-color:rgba(62,106,225,.25);color:#3457B2}
 .brand-amber{background:#FDF6E3;border-color:rgba(201,146,9,.3);color:#8A6508}
 .brand-rose{background:#FCEBEE;border-color:rgba(232,93,110,.3);color:#B3261E}
-
 /* Capture de prospect */
 .lead-capture{background:linear-gradient(135deg,#1E2128,#2A2F3A);border-radius:22px;padding:26px 22px;margin:22px 0;text-align:center;color:#fff}
 .lead-badge{display:inline-block;background:rgba(139,92,246,.25);color:#C4B5FD;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:12px}
@@ -198,13 +181,11 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .lead-upsell-txt{font-size:13px;color:rgba(255,255,255,.7);line-height:1.55;margin-bottom:14px}
 .lead-upsell-btn{display:block;background:#fff;color:#1E2128;text-decoration:none;padding:14px;border-radius:12px;font-family:var(--display,'Space Grotesk');font-weight:700;font-size:14.5px;transition:transform .2s}
 .lead-upsell-btn:hover{transform:translateY(-2px)}
-
 /* Section "tu penses acheter" dans le formulaire */
 .buy-section{margin-top:1.25rem;padding-top:1.25rem;border-top:1.5px dashed var(--line2)}
 .buy-head{font-family:var(--display);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:3px}
 .buy-head span{color:var(--faint);font-weight:500;font-size:12.5px}
 .buy-sub{font-size:12.5px;color:var(--muted);margin-bottom:1rem;line-height:1.5}
-
 /* Section plan de possession (résultat) */
 .own-hero{background:linear-gradient(135deg,var(--ink),#2C2F36);border-radius:20px;padding:22px;color:#fff;text-align:center;position:relative;overflow:hidden}
 .own-hero::after{content:'🛒';position:absolute;bottom:-14px;right:6px;font-size:4.5rem;opacity:.09}
@@ -213,18 +194,30 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .own-hero-sub{font-size:12.5px;color:rgba(255,255,255,.6);margin-top:8px;position:relative;z-index:1}
 .own-note{background:var(--amberlt);border-radius:12px;padding:14px 16px;font-size:12px;color:#6B5107;line-height:1.55;margin-top:12px}
 .own-note b{color:#4A3805}
-
+/* ═══════════ NIV (décodage gratuit) ═══════════ */
+.niv-row{display:flex;gap:8px;align-items:stretch}
+.niv-row .fld-wrap{flex:1}
+.niv-row input{text-transform:uppercase}
+.niv-btn{flex-shrink:0;background:var(--ink);color:#fff;border:none;padding:0 20px;border-radius:15px;font-family:var(--display);font-weight:600;font-size:13.5px;cursor:pointer;transition:all .2s var(--ease);white-space:nowrap}
+.niv-btn:hover{background:var(--blue)}
+.niv-btn:disabled{opacity:.5;cursor:default}
+.niv-msg{font-size:12px;margin-top:9px;line-height:1.5;display:none;padding:10px 12px;border-radius:10px}
+.niv-msg.ok{display:block;color:#065F46;background:var(--mintlt)}
+.niv-msg.err{display:block;color:#B3261E;background:#FCEBEE}
+.niv-divider{display:flex;align-items:center;gap:10px;margin:20px 0 18px;color:var(--faint);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.niv-divider::before,.niv-divider::after{content:'';flex:1;height:1px;background:var(--line)}
 @media(max-width:520px){
   .card{padding:22px;border-radius:24px}
   .veh-name{font-size:1.35rem}
   .item-why{display:none}
   .item-ic{width:44px;height:44px;font-size:21px}
   .pitch{padding:22px}
+  .niv-row{flex-direction:column}
+  .niv-btn{padding:14px}
 }
 </style>
 </head>
 <body>
-
 <div class="wrap">
   <div class="top">
     <div class="logo-badge">
@@ -234,7 +227,6 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
     <div class="top-title">Ton plan d'entretien 💙</div>
     <div class="top-sub">Découvre ce que ton char a besoin, pis combien ça coûte</div>
   </div>
-
   <div class="card" id="form-card">
     <div class="hello">
       <span class="hello-emoji">👋</span>
@@ -243,7 +235,6 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
         <div class="card-sub">Entre les infos, on s'occupe du reste.</div>
       </div>
     </div>
-
     <div class="profile-choice">
       <div class="profile-lbl">C'est pour...</div>
       <div class="profile-btns">
@@ -251,7 +242,15 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
         <button type="button" class="profile-btn" id="pf-buy" onclick="setProfile('acheteur')">🛒 Une voiture à acheter</button>
       </div>
     </div>
-
+    <div class="fld">
+      <label>NIV <span style="color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">(optionnel — remplit tout automatiquement)</span></label>
+      <div class="niv-row">
+        <div class="fld-wrap"><span class="fld-ic">🔠</span><input type="text" id="niv" placeholder="Ex: 1HGCM82633A004352" maxlength="17"></div>
+        <button type="button" class="niv-btn" id="niv-btn" onclick="decodeNiv()">Décoder</button>
+      </div>
+      <div class="niv-msg" id="niv-msg"></div>
+    </div>
+    <div class="niv-divider">ou entre les infos toi-même</div>
     <div class="fld">
       <label>Marque</label>
       <div class="fld-wrap"><span class="fld-ic">🏷️</span><select id="make" onchange="fillModels()"><option value="">Choisis ta marque...</option></select></div>
@@ -287,7 +286,6 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
         <option value="autoroute">Surtout autoroute (longs trajets)</option>
       </select></div>
     </div>
-
     <div class="buy-section">
       <div class="buy-head" id="buy-head">💰 Tu penses acheter ce véhicule ? <span>(optionnel)</span></div>
       <div class="buy-sub" id="buy-sub">Ajoute le prix pour voir ton <b>vrai coût total</b> — pas juste le char.</div>
@@ -326,13 +324,10 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
         </div>
       </div>
     </div>
-
     <button class="btn" onclick="generate()">Voir mon plan <span class="btn-arrow">→</span></button>
   </div>
-
   <div id="results"></div>
 </div>
-
 <script>
 // ═══════════ FIREBASE (sauvegarde des prospects) ═══════════
 var firebaseConfig = {
@@ -346,10 +341,8 @@ var firebaseConfig = {
 try { firebase.initializeApp(firebaseConfig); } catch(e){}
 var _db = null;
 try { _db = firebase.firestore(); } catch(e){}
-
 // Lien d'abonnement Stripe (récurrent 14,99$/mois)
 var GREAZ_SUB_LINK = 'https://buy.stripe.com/8x2aEQ1ehbZCdZ81JH0gw00';
-
 // ═══════════ RECOMMANDATIONS PAR MARQUE ═══════════
 // Tendances générales connues par marque (fiabilité, points à surveiller).
 // Basé sur les tendances de l'industrie — à confirmer avec le manuel du véhicule.
@@ -382,14 +375,11 @@ var BRAND_NOTES = {
   'Mitsubishi':{ rating:'Correcte', color:'blue', note:'Abordable. Garantie souvent longue. Reste dans les modèles récents.' },
   'Tesla':    { rating:'Différent', color:'blue', note:'Électrique : pas de vidange ni courroie. Mais surveille l\'état de la batterie (coûteuse à remplacer).' },
 };
-
 var MAKES = ['Acura','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Ford','GMC','Honda','Hyundai','Infiniti','Jeep','Kia','Lexus','Lincoln','Mazda','Mercedes-Benz','Mitsubishi','Nissan','RAM','Subaru','Tesla','Toyota','Volkswagen','Volvo','Autre'];
 var LUXE = ['Acura','Audi','BMW','Cadillac','Infiniti','Lexus','Lincoln','Mercedes-Benz','Tesla','Volvo'];
-
 // Profil de l'utilisateur : 'proprietaire' (a déjà l'auto) ou 'acheteur' (pense l'acheter)
 var _profile = 'proprietaire';
 var _payMode = 'credit';
-
 function setProfile(p){
   _profile = p;
   document.getElementById('pf-own').classList.toggle('active', p==='proprietaire');
@@ -408,7 +398,6 @@ function setProfile(p){
     if(priceLbl) priceLbl.textContent = 'Prix payé';
   }
 }
-
 function setPayMode(m){
   _payMode = m;
   document.getElementById('pay-credit').classList.toggle('active', m==='credit');
@@ -416,7 +405,6 @@ function setPayMode(m){
   var cf = document.getElementById('credit-fields');
   if(cf) cf.style.display = (m==='comptant') ? 'none' : 'block';
 }
-
 // Modèles populaires par marque au Québec. Suffixe ⚡ = électrique, 🔋 = hybride branchable
 var MODELS_BY_MAKE = {
   'Toyota':['Corolla','Camry','RAV4','RAV4 Prime 🔋','Prius 🔋','Highlander','4Runner','Tacoma','Tundra','Sienna','Corolla Cross','C-HR','Venza','GR86','bZ4X ⚡'],
@@ -447,7 +435,6 @@ var MODELS_BY_MAKE = {
   'Lincoln':['Corsair','Nautilus','Aviator','Navigator'],
   'Infiniti':['Q50','QX50','QX55','QX60','QX80'],
 };
-
 // t = motorisations où l'entretien s'applique : g=essence, d=diesel, h=hybride, e=électrique
 var MAINTENANCE = [
   { nom:'Vidange d\'huile + filtre', ic:'🛢️', km:10000, min:60, max:110, imp:'critique', t:['g','d','h'], why:'Sans huile propre, le moteur s\'use vite. Le plus important.' },
@@ -459,24 +446,20 @@ var MAINTENANCE = [
   { nom:'Liquide de frein', ic:'🧪', km:45000, min:100, max:160, imp:'recommande', t:['g','d','h','e'], why:'Vieux liquide = freinage moins efficace, danger.' },
   { nom:'Plaquettes de frein (avant)', ic:'🛑', km:50000, min:200, max:420, imp:'critique', t:['g','d','h'], why:'Négligées, elles abîment les disques (bien plus cher).' },
   { nom:'Plaquettes de frein (avant)', ic:'🛑', km:90000, min:200, max:420, imp:'recommande', t:['e'], why:'Le freinage régénératif les use bien moins vite. Bonne nouvelle !' },
-
   { nom:'Batterie de démarrage (12V)', ic:'🔋', km:70000, min:150, max:320, imp:'preventif', t:['g','d','h','e'], why:'La petite batterie qui démarre ton auto pis fait rouler l\'électronique (toutes les autos en ont une). Elle dure 4-6 ans pis lâche souvent l\'hiver au Québec.' },
   { nom:'Bougies d\'allumage', ic:'⚡', km:100000, min:150, max:380, imp:'recommande', t:['g','h'], why:'Vieilles bougies = moteur qui broute, plus d\'essence.' },
   { nom:'Liquide de refroidissement (moteur)', ic:'❄️', km:100000, min:110, max:200, imp:'critique', t:['g','d','h'], why:'Protège le moteur de la surchauffe (réparation à 2000$+).' },
   { nom:'Liquide de transmission', ic:'⚙️', km:90000, min:180, max:350, imp:'critique', t:['g','d','h'], why:'Une transmission grillée = 3000 à 5000$. On l\'évite ici.' },
   { nom:'Disques de frein', ic:'💿', km:95000, min:300, max:650, imp:'recommande', t:['g','d','h','e'], why:'Vibrations au freinage = disques voilés à changer.' },
-
   { nom:'Pneus (jeu de 4)', ic:'🛞', km:60000, min:700, max:1500, imp:'critique', t:['e'], why:'Les électriques usent leurs pneus plus vite (poids + couple).' },
   { nom:'Courroie de distribution', ic:'🔗', km:130000, min:600, max:1300, imp:'critique', t:['g','d'], why:'Si elle casse, le moteur est FINI. À faire absolument à temps.' },
   // Spécifiques électriques
   { nom:'Vérification système haute tension', ic:'⚡', km:30000, min:80, max:160, imp:'recommande', t:['e'], why:'Inspection de la batterie, du chargeur et de l\'onduleur.' },
   { nom:'Liquide de refroidissement (batterie)', ic:'🔋', km:100000, min:150, max:300, imp:'critique', t:['e'], why:'Garde la batterie à bonne température = elle dure plus longtemps.' },
 ];
-
 // Mots-clés pour auto-détecter un véhicule électrique d'après le modèle
 var EV_KEYWORDS = ['mach-e','mach e','tesla','model 3','model y','model s','model x','bolt','leaf','ioniq 5','ioniq5','ioniq 6','ev6','id.4','id4','ariya','e-tron','etron','i4','ix','eqs','eqb','eqe','taycan','polestar','lyriq','blazer ev','equinox ev','lightning','solterra','bz4x','kona electric','niro ev','soul ev'];
 var HYBRID_KEYWORDS = ['prius','hybrid','hybride','rav4 prime','phev'];
-
 (function(){
   var mSel = document.getElementById('make');
   MAKES.forEach(function(m){ mSel.innerHTML += '<option value="'+m+'">'+m+'</option>'; });
@@ -484,19 +467,143 @@ var HYBRID_KEYWORDS = ['prius','hybrid','hybride','rav4 prime','phev'];
   var now = new Date().getFullYear();
   for(var y=now+1; y>=2000; y--){ ySel.innerHTML += '<option value="'+y+'">'+y+'</option>'; }
 })();
-
 function money(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; }
 function kmFmt(n){ return Math.round(n).toLocaleString('fr-CA'); }
 var _isFinanced = false;
-var _motorManual = false;  // devient true si l'utilisateur choisit à la main
-
+var _motorManual = false;  // devient true si l'utilisateur choisit à la main (ou si le NIV a trouvé la motorisation)
 var MOTOR_ICONS = { essence:'⛽', hybride:'🔋', diesel:'🛢️', electrique:'⚡' };
 function updateMotorIcon(){
   _motorManual = true;
   var v = document.getElementById('motor').value;
   document.getElementById('motor-ic').textContent = MOTOR_ICONS[v] || '⛽';
 }
-
+// ═══════════ DÉCODAGE NIV (gratuit — API vPIC du NHTSA, aucune clé requise) ═══════════
+// On décode SEULEMENT les specs du véhicule (marque/modèle/année/moteur) pour pré-remplir
+// le formulaire existant. Pas d'historique payant ici — juste ce qui alimente déjà le simulateur.
+(function(){
+  var nivInput = document.getElementById('niv');
+  if(!nivInput) return;
+  nivInput.addEventListener('input', function(){
+    // Un NIV n'utilise jamais les lettres I, O, Q — on les filtre au fur et à mesure
+    this.value = this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,'');
+  });
+  nivInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); decodeNiv(); }
+  });
+})();
+async function decodeNiv(){
+  var input = document.getElementById('niv');
+  var vin = input.value.trim();
+  var msg = document.getElementById('niv-msg');
+  var btn = document.getElementById('niv-btn');
+  msg.className = 'niv-msg';
+  if(vin.length !== 17){
+    msg.textContent = 'Un NIV a 17 caractères (t\'en as entré '+vin.length+'). Vérifie sur ton enregistrement ou dans le coin du pare-brise.';
+    msg.className = 'niv-msg err';
+    return;
+  }
+  btn.disabled = true;
+  var oldTxt = btn.textContent;
+  btn.textContent = '...';
+  try {
+    var res = await fetch('https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/' + encodeURIComponent(vin) + '?format=json');
+    if(!res.ok) throw new Error('http '+res.status);
+    var data = await res.json();
+    var r = data.Results && data.Results[0];
+    if(!r || !r.Make){
+      msg.textContent = 'On a pas réussi à décoder ce NIV. Vérifie-le, ou entre les infos à la main en dessous.';
+      msg.className = 'niv-msg err';
+      return;
+    }
+    var applied = applyDecodedVehicle(r);
+    if(applied.length){
+      msg.textContent = '✓ Rempli automatiquement : ' + applied.join(' · ') + '. Vérifie pis corrige au besoin en dessous.';
+      msg.className = 'niv-msg ok';
+    } else {
+      msg.textContent = 'Le NIV a été lu, mais on a rien pu remplir automatiquement. Entre les infos à la main en dessous.';
+      msg.className = 'niv-msg err';
+    }
+  } catch(e){
+    msg.textContent = 'Impossible de joindre le service de décodage en ce moment. Entre les infos à la main en dessous.';
+    msg.className = 'niv-msg err';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldTxt;
+  }
+}
+// Applique les valeurs décodées (marque/modèle/année/moteur) sur les champs existants du formulaire.
+// Retourne la liste des champs qu'on a réussi à remplir, pour le message de confirmation.
+function applyDecodedVehicle(r){
+  var applied = [];
+  var decMake = (r.Make || '').trim();
+  var decModel = (r.Model || '').trim();
+  var decYear = parseInt(r.ModelYear, 10) || null;
+  // --- Marque : match insensible à la casse avec notre liste ; sinon "Autre" ---
+  var makeSel = document.getElementById('make');
+  var matchedMake = null;
+  if(decMake){
+    for(var i=0;i<MAKES.length;i++){
+      if(MAKES[i].toLowerCase() === decMake.toLowerCase()){ matchedMake = MAKES[i]; break; }
+    }
+  }
+  if(matchedMake){
+    makeSel.value = matchedMake;
+    fillModels();
+    applied.push(matchedMake);
+  } else if(decMake){
+    makeSel.value = 'Autre';
+    fillModels();
+    applied.push(decMake + ' (marque pas dans notre liste — choisie comme "Autre")');
+  }
+  // --- Modèle : cherche dans la liste de la marque décodée, sinon on l'ajoute tel quel ---
+  if(matchedMake && decModel){
+    var modelSel = document.getElementById('model');
+    var list = MODELS_BY_MAKE[matchedMake] || [];
+    var matchedModel = null;
+    for(var j=0;j<list.length;j++){
+      var clean = list[j].replace(/[⚡🔋]/g,'').trim().toLowerCase();
+      if(clean === decModel.toLowerCase() || clean.indexOf(decModel.toLowerCase()) === 0 || decModel.toLowerCase().indexOf(clean) === 0){ matchedModel = list[j]; break; }
+    }
+    if(matchedModel){
+      modelSel.value = matchedModel;
+    } else {
+      // Modèle décodé absent de notre liste : on l'ajoute directement comme option
+      var opt = document.createElement('option');
+      opt.value = decModel;
+      opt.textContent = decModel + ' (via NIV)';
+      if(modelSel.options.length > 0){ modelSel.insertBefore(opt, modelSel.options[1] || null); }
+      else { modelSel.appendChild(opt); }
+      modelSel.value = decModel;
+    }
+    if(applied.indexOf(matchedMake) === -1 || true) applied.push(decModel);
+  }
+  // --- Année ---
+  if(decYear){
+    var yearSel = document.getElementById('year');
+    var hasYear = false;
+    for(var k=0;k<yearSel.options.length;k++){ if(parseInt(yearSel.options[k].value, 10) === decYear){ hasYear = true; break; } }
+    if(hasYear){ yearSel.value = String(decYear); applied.push(String(decYear)); }
+  }
+  // --- Motorisation : déduite du type de carburant / niveau d'électrification (NHTSA) ---
+  var fuel = ((r.FuelTypePrimary || '') + ' ' + (r.FuelTypeSecondary || '') + ' ' + (r.ElectrificationLevel || '')).toLowerCase();
+  var motorVal = null;
+  if(fuel.indexOf('electric') !== -1 && fuel.indexOf('hybrid') === -1 && fuel.indexOf('phev') === -1 && fuel.indexOf('mild') === -1){
+    motorVal = 'electrique';
+  } else if(fuel.indexOf('hybrid') !== -1 || fuel.indexOf('phev') !== -1){
+    motorVal = 'hybride';
+  } else if(fuel.indexOf('diesel') !== -1){
+    motorVal = 'diesel';
+  } else if(fuel.indexOf('gasoline') !== -1 || fuel.indexOf('flex') !== -1 || fuel.indexOf('e85') !== -1){
+    motorVal = 'essence';
+  }
+  if(motorVal){
+    var motorSel = document.getElementById('motor');
+    motorSel.value = motorVal;
+    document.getElementById('motor-ic').textContent = MOTOR_ICONS[motorVal];
+    _motorManual = true; // empêche autoDetectMotor() d'écraser ce que le NIV vient de trouver
+  }
+  return applied;
+}
 // Remplit le menu des modèles selon la marque choisie
 function fillModels(){
   _motorManual = false;
@@ -516,7 +623,6 @@ function fillModels(){
   list.forEach(function(m){ sel.innerHTML += '<option value="'+m+'">'+m+'</option>'; });
   sel.innerHTML += '<option value="__autre__">Autre / pas dans la liste</option>';
 }
-
 // Détecte la motorisation d'après le modèle choisi (suffixe ⚡/🔋 ou mots-clés)
 function autoDetectMotor(){
   if(_motorManual) return;
@@ -536,13 +642,11 @@ function autoDetectMotor(){
     document.getElementById('motor-ic').textContent = MOTOR_ICONS[found];
   }
 }
-
 // ═══════════ DISTRIBUTION : courroie vs chaîne ═══════════
 // Ce qui varie vraiment par modèle. Une chaîne se remplace pas, une courroie oui.
 // Basé sur des faits généraux : à confirmer avec le manuel / le mécano.
 var CHAIN_BRANDS = ['Toyota','Lexus','Mazda','BMW','Mercedes-Benz','Nissan','Infiniti','Chevrolet','GMC','Buick','Cadillac','Subaru'];
 var BELT_MODELS = ['odyssey','pilot','ridgeline','mdx','passport']; // Honda/Acura V6 = courroie
-
 function getDistributionType(make, model, year, motorCode){
   if(motorCode === 'e') return 'aucune';          // électrique : pas de distribution
   var m = (model||'').toLowerCase();
@@ -556,7 +660,6 @@ var DISTRIB_ITEMS = {
   chaine:    { nom:'Chaîne de distribution (inspection)', ic:'🔗', km:150000, min:0, max:120, imp:'recommande', why:'Bonne nouvelle : une chaîne se remplace pas comme une courroie. Juste une inspection.' },
   incertain: { nom:'Distribution — courroie ou chaîne ?', ic:'🔗', km:130000, min:0, max:1300, imp:'recommande', why:'Vérifie ton manuel : une chaîne se remplace pas, une courroie oui (~100-160k km, 600-1300$).' },
 };
-
 function generate(){
   var make = document.getElementById('make').value;
   var modelRaw = document.getElementById('model').value.trim();
@@ -565,18 +668,15 @@ function generate(){
   if(model === 'Autre / pas dans la liste' || modelRaw === '__autre__') model = '';
   var year = parseInt(document.getElementById('year').value);
   var km = parseInt(document.getElementById('km').value);
-
   if(!make){ alert('Choisis une marque 🏷️'); return; }
   if(!year){ alert('Choisis une année 📅'); return; }
   if(isNaN(km) || km < 0){ alert('Entre un kilométrage valide 📊'); return; }
-
   var isLuxe = LUXE.indexOf(make) !== -1;
   var motor = document.getElementById('motor').value;
   var motorCode = { essence:'g', diesel:'d', hybride:'h', electrique:'e' }[motor];
   var usage = document.getElementById('usage').value;
   // Ville = trajets courts = usure plus rapide → intervalles raccourcis de 25%
   var usageFactor = usage==='ville' ? 0.75 : (usage==='autoroute' ? 1.1 : 1.0);
-
   // Entretiens applicables à cette motorisation (on gère la distribution à part)
   var applicable = MAINTENANCE.filter(function(m){
     return m.t.indexOf(motorCode) !== -1 && m.nom.indexOf('Courroie de distribution') === -1;
@@ -587,15 +687,12 @@ function generate(){
     var di = DISTRIB_ITEMS[distribType];
     applicable.push({ nom:di.nom, ic:di.ic, km:di.km, min:di.min, max:di.max, imp:di.imp, t:[motorCode], why:di.why });
   }
-
   var now = new Date().getFullYear();
   var age = Math.max(1, now - year);
   var kmPerYear = Math.min(35000, Math.max(8000, Math.round(km / age)));
   var costMult = isLuxe ? 1.4 : 1.0;
-
   var dueNow = [], soon = [], upcoming = [];
   var annualCost = 0;
-
   applicable.forEach(function(m){
     var avg = (m.min + m.max) / 2 * costMult;
     // L'intervalle effectif tient compte du type de conduite
@@ -609,15 +706,12 @@ function generate(){
     else if(kmUntil <= kmPerYear * 0.6){ soon.push(entry); }
     else { upcoming.push(entry); }
   });
-
   dueNow.sort(function(a,b){ return a.kmUntil - b.kmUntil; });
   soon.sort(function(a,b){ return a.kmUntil - b.kmUntil; });
   upcoming.sort(function(a,b){ return a.kmUntil - b.kmUntil; });
-
   var cost5y = annualCost * 5;
   var savings = annualCost * 0.32;
   var lifePct = Math.min(100, Math.round(km / 250000 * 100));
-
   // ═══════════ PLAN DE POSSESSION (si prix d'achat fourni) ═══════════
   var buyPrice = parseFloat(document.getElementById('buy-price').value);
   var ownership = null;
@@ -641,11 +735,9 @@ function generate(){
       maintTotal: maintTotal, grandTotal: grandTotal, greazSaves: greazSaves,
     };
   }
-
   // Petit feedback sur le bouton pour un rendu premium
   var gBtn = document.querySelector('.btn');
   if(gBtn){ gBtn.innerHTML = '<span class="btn-spin"></span> On calcule...'; gBtn.style.pointerEvents='none'; }
-
   setTimeout(function(){
     renderResults({
       make:make, model:model, year:year, km:km, isLuxe:isLuxe, motor:motor,
@@ -656,7 +748,6 @@ function generate(){
     if(gBtn){ gBtn.innerHTML = 'Voir mon plan <span class="btn-arrow">→</span>'; gBtn.style.pointerEvents=''; }
   }, 280);
 }
-
 function itemHtml(e, state, idx){
   var m = e.m;
   var whenTxt, whenCls;
@@ -674,7 +765,6 @@ function itemHtml(e, state, idx){
     + '<div class="item-cost"><div class="item-cost-val">'+money(e.avg)+'</div><div class="item-cost-lbl">estimé</div></div>'
     + '</div>';
 }
-
 function renderResults(d){
   var vehName = [d.year, d.make, d.model].filter(Boolean).join(' ');
   var MOTOR_LABEL = {
@@ -682,7 +772,6 @@ function renderResults(d){
   };
   var motorBadge = MOTOR_LABEL[d.motor] || '⛽ Essence';
   var profile = (d.isLuxe ? '💎 Premium' : '✨ Standard');
-
   var html =
     '<div class="veh-hero reveal-stagger"><div class="veh-hero-in">'
     + '<div class="veh-hero-label">Ton plan d\'entretien</div>'
@@ -698,7 +787,6 @@ function renderResults(d){
     +   '<div class="km-gauge-lbl"><span>0 km</span><span>aujourd\'hui</span><span>250k</span></div>'
     + '</div>'
     + '</div></div>';
-
   // Bannière contextuelle selon la motorisation
   if(d.motor === 'electrique'){
     html += '<div class="motor-banner motor-elec">⚡ <b>Ton électrique, c\'est différent :</b> pas de vidange, pas de bougies, pas de courroie. On surveille surtout ta <b>batterie</b>, tes <b>freins</b> (qui durent plus longtemps grâce au freinage régénératif) pis tes <b>pneus</b> (qui s\'usent plus vite). Voici ton vrai plan.</div>';
@@ -707,12 +795,10 @@ function renderResults(d){
   } else if(d.motor === 'diesel'){
     html += '<div class="motor-banner motor-dies">🛢️ <b>Ton diesel :</b> vidanges plus espacées mais huile plus exigeante. Surveille aussi le système d\'échappement. Voici ton plan.</div>';
   }
-
   html += '<div class="fin-toggle'+(_isFinanced?' on':'')+' reveal-stagger" id="fin-toggle" onclick="toggleFin()" style="animation-delay:.06s">'
     + '<div class="fin-check">'+(_isFinanced?'✓':'')+'</div>'
     + '<div class="fin-txt"><b>Ta voiture est en financement ? 💳</b><br>Coche pour voir pourquoi l\'entretien est encore plus important.</div>'
     + '</div>';
-
   if(d.dueNow.length){
     html += '<div class="sec"><div class="sec-head"><span class="sec-title">🔴 À faire maintenant</span><span class="sec-pill red">'+d.dueNow.length+' item(s)</span></div>';
     html += d.dueNow.map(function(e,i){ return itemHtml(e,'due',i); }).join('');
@@ -728,14 +814,12 @@ function renderResults(d){
     html += d.upcoming.map(function(e,i){ return itemHtml(e,'ok',i); }).join('');
     html += '</div>';
   }
-
   html += '<div class="sec"><div class="sec-head"><span class="sec-title">💰 Ce que ça représente</span></div>'
     + '<div class="cost-block">'
     +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>Entretien bien fait</div><div class="cost-row-sub" style="margin-left:31px">par année, en moyenne</div></div><div class="cost-row-v" data-count="'+Math.round(d.annualCost)+'">0 $</div></div>'
     +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">📆</span>Sur 5 ans</div><div class="cost-row-sub" style="margin-left:31px">durée typique d\'un financement</div></div><div class="cost-row-v" data-count="'+Math.round(d.cost5y)+'">0 $</div></div>'
     +   '<div class="cost-row hero"><div><div class="cost-row-l"><span class="cost-ic">🎉</span>Greaz te fait économiser</div><div class="cost-row-sub" style="margin-left:31px">par année, en magasinant pour toi</div></div><div class="cost-row-v" data-count="'+Math.round(d.savings)+'">0 $</div></div>'
     + '</div></div>';
-
   // ═══════════ PLAN DE POSSESSION (si prix d'achat fourni) ═══════════
   if(d.ownership){
     var o = d.ownership;
@@ -754,12 +838,10 @@ function renderResults(d){
       + '<div class="own-note">💡 Le paiement de la voiture pis les intérêts sont des <b>calculs exacts</b>. L\'entretien est estimé selon les intervalles constructeurs. L\'économie Greaz est une estimation prudente (magasinage des prix + éviter les réparations d\'urgence).</div>'
       + '</div>';
   }
-
   html += '<div class="fin-note'+(_isFinanced?' show':'')+'" id="fin-note">'
     + '<h4>💳 Ta voiture est en financement</h4>'
     + '<p>Tu la payes chaque mois, qu\'elle roule bien ou pas. Si tu négliges l\'entretien, elle brise avant la fin de tes paiements — pis tu te retrouves à payer un char qui vaut plus rien. <b>L\'entretien, c\'est protéger l\'argent que t\'as déjà investi.</b> Une transmission grillée ou un moteur surchauffé, c\'est 3000 à 5000 $ — assez pour couvrir des années d\'entretien préventif. 🛡️</p>'
     + '</div>';
-
   html += '<div class="pitch reveal-stagger"><div class="pitch-in">'
     + '<div class="pitch-badge">🛡️ Pourquoi Greaz</div>'
     + '<h3>Dépenser moins,<br>sans y penser. 💙</h3>'
@@ -772,9 +854,7 @@ function renderResults(d){
     +   '<div class="pitch-price-note">Soit <b>168 $ par année</b>. Une seule réparation évitée au bon prix, pis c\'est déjà payé. Le reste, c\'est de l\'argent dans tes poches. 🎉</div>'
     + '</div>'
     + '</div></div>';
-
   html += '<button class="restart" onclick="restart()">↻ Faire un autre véhicule</button>';
-
   // ═══════════ RECOMMANDATION PAR MARQUE ═══════════
   var bn = BRAND_NOTES[d.make];
   if(bn){
@@ -783,7 +863,6 @@ function renderResults(d){
       + '<div class="brand-note-txt">'+bn.note+'</div>'
       + '</div>';
   }
-
   // ═══════════ CAPTURE DE LEAD + ABONNEMENT ═══════════
   var isBuyer = (_profile === 'acheteur');
   html += '<div class="lead-capture" id="lead-capture">'
@@ -805,11 +884,8 @@ function renderResults(d){
     + '<button class="lead-btn" id="lead-btn" onclick="saveLead()">Recevoir mon accompagnement →</button>'
     + '<div class="lead-note">Gratuit, sans engagement. On te répond vite.</div>'
     + '</div>';
-
   html += '<div class="disclaimer"><b>D\'où viennent ces chiffres ?</b> Les intervalles sont basés sur les recommandations moyennes des constructeurs et de l\'industrie'+(d.usage==='ville'?', ajustés pour la conduite en ville (trajets courts = usure plus rapide)':(d.usage==='autoroute'?', ajustés pour la conduite sur autoroute':''))+'. Les prix sont des moyennes observées au Québec. <b>La référence exacte reste le manuel de ton véhicule</b> — les intervalles varient selon le moteur, l\'année et les conditions. Confirme toujours avec ton mécano.</div>';
-
   window._lastPlan = d;   // pour la sauvegarde du prospect
-
   document.getElementById('results').innerHTML = html;
   document.getElementById('form-card').style.display = 'none';
   document.getElementById('results').style.display = 'block';
@@ -818,7 +894,6 @@ function renderResults(d){
   // Anime les montants qui montent (effet premium)
   setTimeout(runCountUps, 450);
 }
-
 /* Enregistre le prospect dans Firebase pis propose l'abonnement Greaz.
    Ces infos arrivent dans le dashboard admin (onglet Clients / leads). */
 async function saveLead(){
@@ -836,14 +911,12 @@ async function saveLead(){
   if(!isEmail){ err.textContent='Mets un courriel valide.'; err.style.display='block'; return; }
   err.style.display='none';
   btn.disabled=true; btn.textContent='Envoi...';
-
   var p = window._lastPlan || {};
   var isBuyer = (_profile === 'acheteur');
   var veh = [p.year,p.make,p.model].filter(Boolean).join(' ');
   var payTxt = (p.ownership ? (_payMode==='comptant'?'comptant':'à crédit') : 'non précisé');
   var priceTxt = (p.ownership ? Math.round(p.ownership.price)+'$' : 'non précisé');
   var totalTxt = (p.ownership ? Math.round(p.ownership.grandTotal)+'$' : 'non calculé');
-
   var desc = (isBuyer ? '🛒 VEUT ACHETER' : '🚗 PROPRIÉTAIRE ACTUEL') + '\n'
     + 'Véhicule : '+(veh||'non précisé')+'\n'
     + 'Kilométrage : '+(p.km?Number(p.km).toLocaleString('fr-CA')+' km':'non précisé')+'\n'
@@ -851,7 +924,6 @@ async function saveLead(){
     + 'Entretien estimé : '+(p.annualCost?Math.round(p.annualCost)+'$/an':'—')+'\n'
     + 'Coût total prévisionnel : '+totalTxt
     + (isBuyer ? '\nAchat prévu : '+(timeline||'non précisé')+'\nBudget : '+(budget||'non précisé') : '');
-
   var lead = {
     type:'client', source:'simulateur',
     profile: _profile,                       // 'acheteur' ou 'proprietaire'
@@ -870,7 +942,6 @@ async function saveLead(){
   try {
     if(_db) await _db.collection('leads').add(lead);
   } catch(e){ console.log('Sauvegarde prospect:', e && e.message); }
-
   var cap = document.getElementById('lead-capture');
   if(cap){
     cap.innerHTML =
@@ -886,7 +957,6 @@ async function saveLead(){
       + '</div>';
   }
 }
-
 // Anime chaque nombre [data-count] de 0 jusqu'à sa valeur
 function runCountUps(){
   var els = document.querySelectorAll('[data-count]');
@@ -905,7 +975,6 @@ function runCountUps(){
     requestAnimationFrame(step);
   });
 }
-
 function toggleFin(){
   _isFinanced = !_isFinanced;
   var t = document.getElementById('fin-toggle');
@@ -916,7 +985,6 @@ function toggleFin(){
   note.classList.toggle('show', _isFinanced);
   if(_isFinanced){ setTimeout(function(){ note.scrollIntoView({behavior:'smooth',block:'center'}); }, 100); }
 }
-
 function restart(){
   _motorManual = false;
   document.getElementById('results').style.display = 'none';
