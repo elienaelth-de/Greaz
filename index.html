@@ -238,6 +238,34 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 
 /* Modal conditions d'abonnement */
 .terms-overlay{position:fixed;inset:0;background:rgba(23,26,32,.55);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+
+/* Pop-up capture "Parle-nous de ton auto" */
+.lp-overlay{position:fixed;inset:0;background:rgba(23,26,32,.6);backdrop-filter:blur(5px);z-index:1200;display:none;align-items:center;justify-content:center;padding:20px}
+.lp-overlay.open{display:flex;animation:termsFade .3s ease both}
+.lp-card{background:#fff;border-radius:24px;padding:30px 26px;max-width:420px;width:100%;position:relative;max-height:92vh;overflow-y:auto;box-shadow:0 25px 70px rgba(23,26,32,.4);animation:termsPop .4s var(--spring) both;text-align:center}
+.lp-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;border:none;background:var(--ink);color:#96989C;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.lp-close:hover{background:#EAE7E1;color:var(--white)}
+.lp-ic{font-size:2.6rem;margin-bottom:8px}
+.lp-title{font-family:var(--display);font-size:1.4rem;font-weight:700;letter-spacing:-.02em;color:var(--white);line-height:1.15;margin-bottom:8px}
+.lp-sub{font-size:13.5px;color:var(--muted);line-height:1.55;margin-bottom:1.4rem}
+.lp-sub b{color:var(--blue2)}
+.lp-fields{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;text-align:left}
+.lp-row{display:flex;gap:10px}
+.lp-row .lp-inp{flex:1;min-width:0}
+.lp-inp{width:100%;padding:14px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;font-family:inherit;outline:none;transition:border-color .2s;background:var(--ink);color:var(--white)}
+.lp-inp:focus{border-color:var(--blue);background:#fff}
+.lp-err{display:none;color:#B3261E;font-size:12.5px;margin-bottom:10px;text-align:left}
+.lp-btn{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:16px;border-radius:13px;font-family:var(--display);font-weight:600;font-size:15.5px;cursor:pointer;box-shadow:0 8px 24px rgba(62,106,225,.3);transition:transform .2s var(--ease)}
+.lp-btn:hover{transform:translateY(-2px)}
+.lp-btn:disabled{opacity:.6}
+.lp-btn2{width:100%;background:var(--bluelt);color:var(--blue2);border:none;padding:14px;border-radius:12px;font-family:var(--display);font-weight:600;font-size:14px;cursor:pointer;margin-top:10px;transition:background .2s}
+.lp-btn2:hover{background:#E3ECFE}
+.lp-note{font-size:11px;color:var(--faint);margin-top:12px;line-height:1.5}
+.lp-est{display:flex;flex-direction:column;gap:8px;margin:1rem 0;text-align:left}
+.lp-est-item{display:flex;justify-content:space-between;align-items:center;background:var(--ink);border-radius:11px;padding:13px 15px;font-size:13.5px;color:var(--white)}
+.lp-est-item b{color:var(--blue2);font-family:var(--data);font-weight:700}
+.lp-est-total{background:linear-gradient(135deg,var(--ink),#EDF2FE);border:1px solid var(--bluebdr,rgba(62,106,225,.2));border-radius:14px;padding:16px;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:1.2rem;display:flex;flex-direction:column;gap:4px}
+.lp-est-total span{font-family:var(--display);font-size:1.8rem;font-weight:700;color:var(--blue2)}
 .terms-overlay.open{display:flex;animation:termsFade .25s ease both}
 @keyframes termsFade{from{opacity:0}to{opacity:1}}
 .terms-card{background:#fff;border-radius:24px;padding:30px;max-width:440px;width:100%;position:relative;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(23,26,32,.3);animation:termsPop .35s var(--spring) both}
@@ -3935,6 +3963,121 @@ function captureReferral(){
     }catch(e){}
   }
 }
+
+/* ══════════ POP-UP CAPTURE — « Parle-nous de ton auto » ══════════
+   Apparaît après un délai ou quand la personne s'apprête à partir.
+   En échange de ses infos, on lui montre une estimation d'entretien.
+   Objectif : garder le contact même si elle prend pas l'abonnement. */
+function lpSeen(){ try{ return !!localStorage.getItem('greaz_lp_seen'); }catch(e){ return false; } }
+function lpMarkSeen(){ try{ localStorage.setItem('greaz_lp_seen','1'); }catch(e){} }
+
+function initLeadPopup(){
+  if(lpSeen()) return;
+  setTimeout(function(){ lpTryShow(); }, 15000);   // après 15 s
+  document.addEventListener('mouseout', function(e){
+    if(e.clientY <= 0 && !e.relatedTarget){ lpTryShow(); }   // intention de quitter (desktop)
+  });
+}
+function lpTryShow(){
+  if(lpSeen()) return;
+  if((typeof clientUser!=='undefined' && clientUser) || window.clientUser) return;  // déjà connecté
+  var ov = document.getElementById('lp-overlay');
+  if(!ov || ov.classList.contains('open')) return;
+  if(document.querySelector('.terms-overlay.open, .policy-overlay.open, .overlay.open')) return;
+  lpMarkSeen();
+  lpRenderForm();
+  ov.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function lpClose(){
+  var ov = document.getElementById('lp-overlay');
+  if(ov){ ov.classList.remove('open'); }
+  var terms = document.getElementById('terms-overlay');
+  if(!(terms && terms.classList.contains('open'))){ document.body.style.overflow=''; }
+}
+function lpRenderForm(){
+  var card = document.getElementById('lp-card');
+  if(!card) return;
+  var yearsOpts=''; for(var y=2026;y>=2000;y--){ yearsOpts+='<option>'+y+'</option>'; }
+  card.innerHTML =
+    '<button class="lp-close" onclick="lpClose()">✕</button>'
+    + '<div class="lp-ic">🚗</div>'
+    + '<div class="lp-title">Parle-nous de ton auto</div>'
+    + '<div class="lp-sub">On te montre <b>gratuitement</b> une estimation de ce qui s\'en vient sur ton char — pis combien ça coûte.</div>'
+    + '<div class="lp-fields">'
+    +   '<input class="lp-inp" id="lp-vehicle" placeholder="Marque et modèle (ex. Toyota Corolla)">'
+    +   '<div class="lp-row">'
+    +     '<select class="lp-inp" id="lp-year"><option value="">Année</option>'+yearsOpts+'</select>'
+    +     '<input class="lp-inp" id="lp-km" placeholder="Kilométrage" inputmode="numeric">'
+    +   '</div>'
+    +   '<input class="lp-inp" id="lp-name" placeholder="Ton nom">'
+    +   '<input class="lp-inp" id="lp-email" placeholder="Ton courriel" inputmode="email">'
+    + '</div>'
+    + '<div class="lp-err" id="lp-err"></div>'
+    + '<button class="lp-btn" id="lp-btn" onclick="lpSubmit()">Voir mon estimation gratuite →</button>'
+    + '<div class="lp-note">Sans engagement. On te contacte seulement si tu veux.</div>';
+}
+function lpEstimate(km, vehicle){
+  km = parseInt(km||0,10) || 0;
+  var luxe = /bmw|mercedes|audi|lexus|acura|infiniti|volvo|cadillac|porsche|tesla/i.test(vehicle||'');
+  var mult = luxe ? 1.4 : 1.0;
+  var items = [];
+  var addIfDue = function(interval, name, price){
+    var next = Math.ceil((km+1)/interval)*interval;
+    if((next - km) <= interval*0.5){ items.push({ name:name, price:Math.round(price*mult) }); }
+  };
+  addIfDue(10000, 'Vidange d\'huile + filtre', 85);
+  addIfDue(45000, 'Liquide de frein', 130);
+  addIfDue(50000, 'Plaquettes de frein', 310);
+  addIfDue(60000, 'Pneus (jeu de 4)', 950);
+  addIfDue(100000, 'Bougies d\'allumage', 265);
+  addIfDue(90000, 'Liquide de transmission', 265);
+  var annual = Math.round((650 + Math.min(km,200000)/1000*2.5) * mult);
+  return { items: items.slice(0,3), annual: annual };
+}
+async function lpSubmit(){
+  var vehicle = (document.getElementById('lp-vehicle').value||'').trim();
+  var year = document.getElementById('lp-year').value||'';
+  var km = (document.getElementById('lp-km').value||'').trim();
+  var name = (document.getElementById('lp-name').value||'').trim();
+  var email = (document.getElementById('lp-email').value||'').trim();
+  var err = document.getElementById('lp-err');
+  var btn = document.getElementById('lp-btn');
+  var isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  if(!vehicle){ err.textContent='Dis-nous quelle auto tu as.'; err.style.display='block'; return; }
+  if(!name){ err.textContent='Mets ton nom.'; err.style.display='block'; return; }
+  if(!isEmail){ err.textContent='Mets un courriel valide.'; err.style.display='block'; return; }
+  err.style.display='none';
+  btn.disabled=true; btn.textContent='Un instant...';
+  try {
+    await db.collection('leads').add({
+      type:'client', source:'popup-auto',
+      client_name:name, client_email:email, client_phone:'',
+      problem:'Estimation d\'entretien (pop-up)',
+      description:'Via pop-up d\'accueil. Véhicule : '+vehicle+(year?' '+year:'')+'. Km : '+(km||'non précisé')+'.',
+      vehicle_make:vehicle, vehicle_year:year, vehicle_km:km,
+      referral_code: getReferralCode(),
+      status:'nouveau',
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  } catch(e){ console.log('Pop-up lead:', e && e.message); }
+  var est = lpEstimate(km, vehicle);
+  var fmt = function(n){ return n.toLocaleString('fr-CA'); };
+  var card = document.getElementById('lp-card');
+  var itemsHtml = est.items.length
+    ? est.items.map(function(it){ return '<div class="lp-est-item"><span>'+it.name+'</span><b>~'+fmt(it.price)+' $</b></div>'; }).join('')
+    : '<div class="lp-est-item"><span>Ton auto est à jour pour l\'instant 👍</span></div>';
+  card.innerHTML =
+    '<button class="lp-close" onclick="lpClose()">✕</button>'
+    + '<div class="lp-ic">📋</div>'
+    + '<div class="lp-title">Salut '+name.split(' ')[0]+' ! Voici ton estimation</div>'
+    + '<div class="lp-sub">Pour ta <b>'+vehicle+'</b>'+(km?' à '+fmt(parseInt(km))+' km':'')+', voici ce qui s\'en vient bientôt :</div>'
+    + '<div class="lp-est">'+itemsHtml+'</div>'
+    + '<div class="lp-est-total">Budget entretien estimé cette année<span>~'+fmt(est.annual)+' $</span></div>'
+    + '<a class="lp-btn" href="greaz-entretien.html" style="display:block;text-decoration:none;text-align:center">Voir mon plan complet gratuit →</a>'
+    + '<button class="lp-btn2" onclick="lpClose();goToSubscribe()">💜 On s\'occupe de tout pour 14,99$/mois</button>'
+    + '<div class="lp-note">Estimation indicative. Ton plan complet est plus précis.</div>';
+}
 function getReferralCode(){
   // 1. Un code tapé à la main dans le formulaire a la priorité
   var manual = document.getElementById('cc-referral');
@@ -4646,6 +4789,7 @@ window.addEventListener('DOMContentLoaded', function(){
   initScrollFx();
   initDrawerSwipe();
   initBookingProgress();
+  initLeadPopup();
 });
 </script>
 <!-- Modal conditions d'abonnement -->
@@ -4710,6 +4854,11 @@ window.addEventListener('DOMContentLoaded', function(){
       <button class="policy-ok" onclick="closePolicy()">J'ai compris</button>
     </div>
   </div>
+</div>
+
+<!-- Pop-up capture : Parle-nous de ton auto -->
+<div class="lp-overlay" id="lp-overlay" onclick="if(event.target===this)lpClose()">
+  <div class="lp-card" id="lp-card"></div>
 </div>
 
 </body>
