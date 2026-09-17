@@ -526,6 +526,9 @@ h1 .hl{color:var(--blue);-webkit-text-fill-color:currentColor;background:none}
 .fab:active{transform:translateX(-50%) scale(.97)}
 .fab.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
 
+/* ═══ NAVIGATION MOBILE (bas d'écran) — remplace les liens du nav caché en mobile ═══ */
+.mobile-tabbar{display:none}
+
 /* ═══ Barre de progression du RDV ═══ */
 .bk-progress{position:sticky;top:0;height:4px;background:rgba(23,26,32,.07);border-radius:3px;margin-bottom:1.15rem;overflow:hidden;z-index:6}
 .bk-progress span{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .5s var(--ease)}
@@ -1112,6 +1115,28 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
   .logo{font-size:1.25rem}
   .nav-badge{display:none}
   .nav-links{display:none}
+
+  /* Le nav du haut perd ses liens en mobile → on les remplace par une barre
+     d'onglets fixée en bas (pattern app mobile, comme Airbnb/Uber), sinon
+     "Carte" et "Programme" deviennent introuvables sur téléphone. */
+  .mobile-tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:95;
+    background:rgba(255,255,255,.94);backdrop-filter:blur(20px) saturate(1.6);
+    border-top:1px solid rgba(23,26,32,.08);
+    padding:5px max(6px,env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));
+    box-shadow:0 -6px 24px rgba(23,26,32,.07)}
+  .mtab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    padding:6px 2px 5px;border:none;background:none;cursor:pointer;color:var(--muted);
+    font-family:var(--body);font-size:10px;font-weight:600;letter-spacing:-.01em;border-radius:11px;
+    transition:color .2s,background .15s;-webkit-tap-highlight-color:transparent}
+  .mtab-btn svg{width:21px;height:21px}
+  .mtab-btn:active{background:rgba(23,26,32,.05);transform:scale(.96)}
+  .mtab-btn.active{color:var(--blue)}
+  /* on laisse de la place en bas pour que le contenu (footer, FAB, toasts)
+     ne se retrouve jamais caché sous la barre fixe */
+  body{padding-bottom:calc(58px + env(safe-area-inset-bottom))}
+  .fab{bottom:calc(74px + env(safe-area-inset-bottom))}
+  .toast-wrap{bottom:calc(138px + env(safe-area-inset-bottom))}
+  #cc-toast{bottom:calc(74px + env(safe-area-inset-bottom))!important}
   .nav-account{padding:8px 14px;font-size:12.5px;min-height:36px}
 
   .hero{padding:6rem 1.25rem 3.5rem;min-height:auto}
@@ -1235,6 +1260,25 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
       <span id="nav-account-label">Mon espace</span>
     </button>
   </div>
+</nav>
+
+<nav class="mobile-tabbar" id="mobile-tabbar">
+  <button class="mtab-btn active" id="mtab-home" onclick="mtabGo('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    Accueil
+  </button>
+  <button class="mtab-btn" id="mtab-map" onclick="mtabGo('map')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+    Carte
+  </button>
+  <button class="mtab-btn" id="mtab-perks" onclick="mtabGo('perks')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3.17A3 3 0 1 0 12 4a3 3 0 1 0-4.83 3H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z"/><path d="M4 11v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8"/><path d="M12 7v13"/></svg>
+    Programme
+  </button>
+  <button class="mtab-btn" id="mtab-account" onclick="mtabGo('account')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+    Mon espace
+  </button>
 </nav>
 
 <section class="hero">
@@ -2275,6 +2319,30 @@ function ccRevealMap(address){
   }, 250);
 }
 
+/* Barre d'onglets mobile (remplace le nav du haut, caché sous 640px) */
+function mtabSetActive(id){
+  ['mtab-home','mtab-map','mtab-perks','mtab-account'].forEach(function(bid){
+    var el = document.getElementById(bid);
+    if(el) el.classList.toggle('active', bid === id);
+  });
+}
+function mtabGo(target){
+  if(target === 'home'){
+    mtabSetActive('mtab-home');
+    window.scrollTo({ top:0, behavior:'smooth' });
+  } else if(target === 'map'){
+    mtabSetActive('mtab-map');
+    ccRevealMap('');
+  } else if(target === 'perks'){
+    mtabSetActive('mtab-perks');
+    var m = document.getElementById('membership');
+    if(m) m.scrollIntoView({ behavior:'smooth' });
+  } else if(target === 'account'){
+    mtabSetActive('mtab-account');
+    openAccount();
+  }
+}
+
 /* Petit toast pour les validations du formulaire */
 function ccToast(msg){
   var existing = document.getElementById('cc-toast');
@@ -3020,11 +3088,23 @@ function initMap(){
     worldCopyJump: false,
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  // CARTO exige désormais une clé API sur son domaine gratuit (tuiles floutées
+  // "API KEY REQUIRED") — on utilise Esri (gratuit, sans clé) à la place :
+  // une couche de fond gris clair + une couche de référence pour les noms de lieux.
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    attribution:'&copy; <a href="https://www.esri.com/">Esri</a>, HERE, Garmin, FAO, NOAA, USGS',
     maxZoom:19,
+    maxNativeZoom:16,             // Esri ne fournit pas de tuiles natives au-delà — on agrandit
     noWrap:true,                  // pas de répétition du globe
     bounds: QC_BOUNDS,
+  }).addTo(leafletMap);
+
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom:19,
+    maxNativeZoom:16,
+    noWrap:true,
+    bounds: QC_BOUNDS,
+    pane:'overlayPane',
   }).addTo(leafletMap);
 
   // ══════════ REGROUPEMENT DES MARQUEURS (clustering pro) ══════════
