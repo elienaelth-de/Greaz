@@ -798,6 +798,43 @@ body.map-is-active .map-lock-btn{display:flex}
 .slot-pick-btn.sel{background:var(--bluelt);border-color:var(--blue)}
 .slot-pick-btn:disabled{opacity:.32;cursor:not-allowed}
 .slot-empty-msg{font-size:12px;color:#B3261E;margin-top:8px}
+/* ── Wizard d'inscription / assistance profil ── */
+.wiz-progress{position:sticky;top:0;height:4px;background:rgba(23,26,32,.07);border-radius:3px;margin-bottom:.85rem;overflow:hidden;z-index:6}
+.wiz-progress span{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .45s var(--ease)}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin-bottom:1rem}
+.wiz-dot{width:7px;height:7px;border-radius:50%;background:rgba(23,26,32,.14);transition:all .3s var(--ease)}
+.wiz-dot.on{background:var(--blue);width:20px;border-radius:4px}
+.wiz-dot.done{background:var(--green)}
+.wiz-step-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:.35rem}
+.wiz-title{font-family:var(--display);font-size:1.3rem;font-weight:800;margin-bottom:.2rem;line-height:1.2}
+.wiz-sub{font-size:12.5px;color:var(--muted);margin-bottom:1.35rem;line-height:1.5}
+.wiz-nav{display:flex;gap:10px;margin-top:1.5rem}
+.wiz-nav .btn-submit{margin-top:0;flex:1}
+.wiz-back{flex:0 0 auto;padding:0 18px;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62;border-radius:var(--r);font-family:var(--body);font-size:13.5px;font-weight:700;cursor:pointer;transition:background .2s}
+.wiz-back:hover{background:#EAEBEC}
+.wiz-bonus{display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,rgba(255,215,0,.14),rgba(255,201,74,.06));border:1px solid rgba(255,215,0,.3);border-radius:var(--r2);padding:10px 13px;margin-bottom:1.25rem;font-size:12px;color:#8A6A00}
+.chip-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem}
+.chip-btn{padding:9px 15px;border-radius:99px;background:#F4F4F4;border:1.5px solid transparent;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--white);transition:all .2s;white-space:nowrap}
+.chip-btn:active{transform:scale(.95)}
+.chip-btn.sel{background:var(--bluelt);border-color:var(--blue)}
+.chip-btn .chip-ic{margin-right:5px}
+.assist-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F4F4F4;border-radius:var(--r2);padding:12px 14px;margin-bottom:1rem;cursor:pointer}
+.assist-toggle-t{font-size:12.5px;font-weight:700;color:var(--white)}
+.assist-toggle-d{font-size:11px;color:var(--faint);margin-top:2px}
+.assist-toggle-ic{font-size:14px;color:var(--blue);transition:transform .25s var(--ease);flex-shrink:0}
+.assist-toggle-ic.open{transform:rotate(180deg)}
+.assist-body{max-height:0;overflow:hidden;transition:max-height .35s var(--ease)}
+.assist-body.open{max-height:600px}
+.assist-body-in{padding-top:1rem}
+.profile-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(23,26,32,.06)}
+.profile-row:last-child{border-bottom:none}
+.profile-row-l{font-size:11.5px;color:var(--faint);font-weight:600}
+.profile-row-v{font-size:12.5px;color:var(--white);font-weight:600;text-align:right}
+.profile-nudge{background:linear-gradient(135deg,rgba(26,60,255,.1),rgba(0,194,111,.06));border:1px solid rgba(26,60,255,.22);border-radius:var(--r2);padding:12px 14px;margin-bottom:1rem;cursor:pointer}
+.profile-nudge-t{font-size:12.5px;font-weight:700;color:var(--white);margin-bottom:5px}
+.profile-nudge-bar{height:5px;background:rgba(23,26,32,.08);border-radius:3px;overflow:hidden;margin-bottom:5px}
+.profile-nudge-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:3px;transition:width .5s var(--ease)}
+.profile-nudge-d{font-size:11px;color:var(--muted)}
 .star-picker{display:flex;gap:8px;justify-content:center;margin:1.25rem 0}
 .star-btn{font-size:2.2rem;background:none;border:none;cursor:pointer;color:rgba(23,26,32,.14);transition:color .15s,transform .18s var(--spring);line-height:1}
 .star-btn:hover{transform:scale(1.18)}
@@ -3461,6 +3498,7 @@ function openBooking(id){
     +'<div class="ff" style="margin-top:1.25rem"><label>Problème</label></div>'
     +'<div class="problem-grid">'+probCards+'</div>'
     +'<div class="ff"><label>Détails (optionnel)</label><textarea id="b_desc" rows="2" placeholder="Ex : bruit au freinage..."></textarea></div>'
+    + (needsAssistInfo() ? renderAssistSection('bk') : '')
     +'<div class="ff2"><div class="ff"><label>Prénom *</label><input type="text" id="b_prenom" placeholder="Jean"></div>'
     +'<div class="ff"><label>Nom *</label><input type="text" id="b_nom" placeholder="Tremblay"></div></div>'
     +'<div class="ff2">'
@@ -3615,15 +3653,20 @@ async function submitBooking(){
   if(!eOk){ errEl.textContent="Courriel invalide."; errEl.style.display='block'; return; }
   if(!pOk){ errEl.textContent="Numéro canadien invalide."; errEl.style.display='block'; return; }
   var code="GZ-"+Math.floor(Math.random()*90000+10000);
+  var assistVals = readAssistValues('bk');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi...';
   try {
     await db.collection('appointments').add({
       mechanic_id:currentProfile.id, mechanic_name:currentProfile.name, mechanic_type:currentProfile.type,
       client_prenom:prenom, client_nom:nom, client_phone:phone, client_email:email, client_address:addr,
+      client_birthdate: assistVals.birthdate || (clientData?clientData.birthdate:'') || '',
+      client_insurer: assistVals.insurer || (clientData?clientData.insurer:'') || '',
+      client_insurer_since: assistVals.insurer_since || (clientData?clientData.insurer_since:'') || '',
       vehicle_type:document.getElementById('b_vtype').value||'',
       vehicle_make:document.getElementById('b_make').value||'',
       vehicle_model:document.getElementById('b_model').value||'',
       vehicle_year:document.getElementById('b_year').value||'',
+      vehicle_financed: assistVals.financed || '',
       date:date, time_slot:selSlot, problem:_bookingProblem||'Non précisé',
       description:document.getElementById('b_desc').value.trim(),
       referral_code:(document.getElementById('b_referral').value||'').trim().toUpperCase(),
@@ -3632,6 +3675,7 @@ async function submitBooking(){
       created_at:firebase.firestore.FieldValue.serverTimestamp(),
     });
     if(clientUser) await awardPoints();
+    await mergeAssistIntoProfile(assistVals);
 
     document.getElementById('booking-drawer-body').innerHTML=
       '<div class="success-screen"><span class="success-icon">✅</span>'
@@ -3727,6 +3771,7 @@ function renderClientForm(){
     +'<div class="ff"><label>Courriel *</label><input type="email" id="c_email" placeholder="jean@email.com" oninput="validateEmail(this)"><div id="email-err" style="font-size:11px;color:#D93025;margin-top:3px;display:none">Courriel invalide</div></div>'
     +'</div><div class="ff"><label>Adresse *</label><input type="text" id="c_addr" placeholder="1234 Rue Principale, Montréal, QC H2X 1Y4"></div>'
     +'<div class="ff"><label>Code de référence <span style="font-weight:400;color:#8E9094;font-size:11px">(optionnel)</span></label><input type="text" id="c_referral" placeholder="Ex: MARIE10" style="text-transform:uppercase"></div></div>'
+    + (needsAssistInfo() ? '<div class="form-section">'+renderAssistSection('cl')+'</div>' : '')
     +'<div class="form-section"><div class="form-section-title">Comment vous répondre ?</div>'
     +'<div class="contact-row">'
     +'<div class="contact-pill sel" id="cont-both" onclick="selContact(\'both\')">📱 SMS + courriel</div>'
@@ -3840,14 +3885,19 @@ async function submitClient(){
   var time=document.getElementById("c_time").value||"";
   var urgLabel=_urgency==="asap"?"Dès que possible":_urgency==="24h"?"Sous 24h":_urgency==="date"?(date+" à "+time):"Non précisé";
   var code="GZ-"+Math.floor(Math.random()*90000+10000);
+  var assistVals = readAssistValues('cl');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Envoi en cours...';
   try {
     var leadData={
       type:"client", client_name:prenom+" "+nom, client_phone:phone, client_email:email, address:addr,
+      client_birthdate: assistVals.birthdate || (clientData?clientData.birthdate:'') || '',
+      client_insurer: assistVals.insurer || (clientData?clientData.insurer:'') || '',
+      client_insurer_since: assistVals.insurer_since || (clientData?clientData.insurer_since:'') || '',
       vehicle_type:document.getElementById("c_vtype").value||"",
       vehicle_make:document.getElementById("c_make").value||"",
       vehicle_model:document.getElementById("c_model").value||"",
       vehicle_year:document.getElementById("c_year").value||"",
+      vehicle_financed: assistVals.financed || '',
       problem:_selProblem||"Non précisé",
       description:document.getElementById("c_desc").value||"",
       urgency:urgLabel, contact_pref:_contact_pref||"both",
@@ -3867,6 +3917,7 @@ async function submitClient(){
           clientData.address = addr;
         }
         await awardPoints();
+        await mergeAssistIntoProfile(assistVals);
       } catch(e){ console.log('Profil:', e); }
     }
     var cLabel=_contact_pref==="sms"?"SMS":_contact_pref==="email"?"courriel":"SMS et courriel";
@@ -4309,28 +4360,15 @@ function openAccount(){
 /* ── Écran connexion / inscription ── */
 function renderAuth(mode){
   _authMode = mode;
-  var isSignup = mode === 'signup';
-  document.getElementById('account-title').textContent = isSignup ? 'Créer mon compte' : 'Me connecter';
+  if(mode === 'signup'){ startSignupWizard(); return; }
+  document.getElementById('account-title').textContent = 'Me connecter';
   document.getElementById('account-body').innerHTML =
     '<div class="alert-err" id="auth-err"></div>'
-    + (isSignup
-      ? '<div style="background:linear-gradient(135deg,rgba(26,60,255,.14),rgba(0,194,111,.08));border:1px solid rgba(26,60,255,.25);border-radius:var(--r2);padding:1.1rem;margin-bottom:1.5rem">'
-        +'<div style="font-size:14px;font-weight:700;margin-bottom:.7rem">✨ Pourquoi créer un compte ?</div>'
-        +'<div class="perk"><span class="perk-ic">🚗</span><div><div class="perk-t">Tes véhicules enregistrés</div><div class="perk-d">Plus besoin de tout retaper à chaque fois</div></div></div>'
-        +'<div class="perk"><span class="perk-ic">📋</span><div><div class="perk-t">Historique de tes rendez-vous</div><div class="perk-d">Tout ton suivi d\'entretien au même endroit</div></div></div>'
-        +'<div class="perk"><span class="perk-ic">🎁</span><div><div class="perk-t">Points et rabais</div><div class="perk-d">'+PTS_PER_BOOKING+' points par rendez-vous — échangeables contre des rabais</div></div></div>'
-        +'</div>'
-      : '')
-    + (isSignup ? '<div class="ff2"><div class="ff"><label>Prénom *</label><input type="text" id="au-prenom" placeholder="Jean"></div>'
-      +'<div class="ff"><label>Nom</label><input type="text" id="au-nom" placeholder="Tremblay"></div></div>'
-      +'<div class="ff"><label>Téléphone</label><input type="tel" id="au-phone" placeholder="514-555-0100"></div>' : '')
     +'<div class="ff"><label>Courriel *</label><input type="email" id="au-email" placeholder="jean@email.com" autocomplete="username"></div>'
-    +'<div class="ff"><label>Mot de passe *</label><input type="password" id="au-pass" placeholder="Min. 6 caractères" autocomplete="'+(isSignup?'new-password':'current-password')+'" onkeydown="if(event.key===\'Enter\')doAuth()"></div>'
-    +'<button class="btn-submit blue" id="auth-btn" onclick="doAuth()">'+(isSignup?'Créer mon compte →':'Me connecter →')+'</button>'
-    +'<div class="auth-switch">'+(isSignup
-      ? 'Déjà un compte ? <b onclick="renderAuth(\'login\')">Me connecter</b>'
-      : 'Pas encore de compte ? <b onclick="renderAuth(\'signup\')">En créer un</b>')+'</div>'
-    + (isSignup ? '' : '<div class="auth-switch" style="margin-top:.75rem"><b onclick="resetPass()" style="color:#7A7C80;font-weight:500;font-size:12px">Mot de passe oublié ?</b></div>');
+    +'<div class="ff"><label>Mot de passe *</label><input type="password" id="au-pass" placeholder="Min. 6 caractères" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')doAuth()"></div>'
+    +'<button class="btn-submit blue" id="auth-btn" onclick="doAuth()">Me connecter →</button>'
+    +'<div class="auth-switch">Pas encore de compte ? <b onclick="renderAuth(\'signup\')">En créer un</b></div>'
+    +'<div class="auth-switch" style="margin-top:.75rem"><b onclick="resetPass()" style="color:#7A7C80;font-weight:500;font-size:12px">Mot de passe oublié ?</b></div>';
 }
 
 async function doAuth(){
@@ -4341,31 +4379,11 @@ async function doAuth(){
   errEl.style.display = 'none';
 
   if(!email || !pass){ errEl.textContent='Remplis ton courriel et ton mot de passe.'; errEl.style.display='block'; return; }
-  if(_authMode==='signup'){
-    var prenom = (document.getElementById('au-prenom').value||'').trim();
-    if(!prenom){ errEl.textContent='Ton prénom est obligatoire.'; errEl.style.display='block'; return; }
-    if(pass.length < 6){ errEl.textContent='Mot de passe trop court (min. 6 caractères).'; errEl.style.display='block'; return; }
-  }
 
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Un instant...';
   try {
-    if(_authMode === 'signup'){
-      var cred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
-      await db.collection('clients').doc(cred.user.uid).set({
-        prenom: (document.getElementById('au-prenom').value||'').trim(),
-        nom: (document.getElementById('au-nom').value||'').trim(),
-        email: email,
-        phone: (document.getElementById('au-phone').value||'').trim(),
-        vehicles: [], points: 0,
-        referral_code: getReferralCode(),
-        created_at: firebase.firestore.FieldValue.serverTimestamp(),
-      });
-      await loadClientProfile(cred.user);
-      toast('🎉 Bienvenue dans la famille Greaz, '+(document.getElementById('au-prenom')?document.getElementById('au-prenom').value:'')+' !', 'ok');
-    } else {
-      var c2 = await firebase.auth().signInWithEmailAndPassword(email, pass);
-      await loadClientProfile(c2.user);
-    }
+    var c2 = await firebase.auth().signInWithEmailAndPassword(email, pass);
+    await loadClientProfile(c2.user);
     renderAccount();
   } catch(e){
     var msg = 'Une erreur est survenue.';
@@ -4376,7 +4394,222 @@ async function doAuth(){
     if(e.code==='auth/weak-password') msg='Mot de passe trop faible (min. 6 caractères).';
     if(e.code==='auth/too-many-requests') msg='Trop de tentatives. Réessaie dans quelques minutes.';
     errEl.textContent = msg; errEl.style.display='block';
-    btn.disabled=false; btn.textContent = _authMode==='signup'?'Créer mon compte →':'Me connecter →';
+    btn.disabled=false; btn.textContent = 'Me connecter →';
+  }
+}
+
+/* ── Wizard d'inscription (fun, en étapes courtes) ── */
+var _signupStep = 1;
+var _signupData = {};
+var SIGNUP_TOTAL_STEPS = 4;
+var SIGNUP_BONUS_PTS = 20;
+var CAR_BRANDS = ['Toyota','Honda','Ford','Chevrolet','Hyundai','Kia','Mazda','Nissan','BMW','Mercedes','Volkswagen','Subaru','Autre'];
+var INSURERS = ['Intact','Desjardins','Belairdirect','TD Assurance','CAA','Promutuel','Beneva','Economical','Autre'];
+var INSURER_DURATIONS = ["Moins d'1 an","1 à 3 ans","3 à 5 ans","5 ans et plus"];
+
+function startSignupWizard(){
+  _signupStep = 1; _signupData = {};
+  renderSignupStep(1);
+}
+
+function wizDots(step){
+  var d=''; for(var i=1;i<=SIGNUP_TOTAL_STEPS;i++){ d+='<span class="wiz-dot '+(i===step?'on':(i<step?'done':''))+'"></span>'; }
+  return '<div class="wiz-dots">'+d+'</div>';
+}
+function wizChips(groupId, options, selected, iconMap){
+  return '<div class="chip-grid" id="'+groupId+'" data-value="'+(selected?selected.replace(/"/g,'&quot;'):'')+'">'+options.map(function(o,i){
+    var ic = iconMap && iconMap[o] ? '<span class="chip-ic">'+iconMap[o]+'</span>' : '';
+    return '<button type="button" class="chip-btn'+(selected===o?' sel':'')+'" data-val="'+o.replace(/"/g,'&quot;')+'" onclick="wizPickChip(\''+groupId+'\','+i+')">'+ic+o+'</button>';
+  }).join('')+'</div>';
+}
+function wizPickChip(groupId, idx){
+  var wrap = document.getElementById(groupId); if(!wrap) return;
+  var btns = wrap.querySelectorAll('.chip-btn');
+  btns.forEach(function(b){ b.classList.remove('sel'); });
+  var picked = btns[idx];
+  if(picked){ picked.classList.add('sel'); wrap.dataset.value = picked.getAttribute('data-val'); }
+}
+
+function renderSignupStep(step){
+  document.getElementById('account-title').textContent = 'Créer mon compte';
+  var body = document.getElementById('account-body');
+  var html = '<div class="wiz-progress"><span style="width:'+Math.round(step/SIGNUP_TOTAL_STEPS*100)+'%"></span></div>'
+    + wizDots(step)
+    + '<div class="alert-err" id="auth-err"></div>';
+
+  if(step===1){
+    html += '<div class="wiz-step-lbl">Étape 1 sur '+SIGNUP_TOTAL_STEPS+'</div>'
+      +'<div class="wiz-title">Salut ! On se présente ? 👋</div>'
+      +'<div class="wiz-sub">15 secondes chrono — après ça tu ne retapes plus jamais tes infos.</div>'
+      +'<div class="ff2"><div class="ff"><label>Prénom *</label><input type="text" id="s-prenom" placeholder="Jean" value="'+(_signupData.prenom||'')+'"></div>'
+      +'<div class="ff"><label>Nom</label><input type="text" id="s-nom" placeholder="Tremblay" value="'+(_signupData.nom||'')+'"></div></div>'
+      +'<div class="ff"><label>Courriel *</label><input type="email" id="s-email" placeholder="jean@email.com" autocomplete="username" value="'+(_signupData.email||'')+'"></div>'
+      +'<div class="ff"><label>Mot de passe *</label><input type="password" id="s-pass" placeholder="Min. 6 caractères" autocomplete="new-password" value="'+(_signupData.pass||'')+'" onkeydown="if(event.key===\'Enter\')signupNext()"></div>'
+      +'<div class="wiz-nav"><button class="btn-submit blue" id="wiz-btn" onclick="signupNext()">Continuer →</button></div>'
+      +'<div class="auth-switch">Déjà un compte ? <b onclick="renderAuth(\'login\')">Me connecter</b></div>';
+  } else if(step===2){
+    html += '<div class="wiz-step-lbl">Étape 2 sur '+SIGNUP_TOTAL_STEPS+'</div>'
+      +'<div class="wiz-title">On te trouve où ? 📍</div>'
+      +'<div class="wiz-sub">Pour envoyer un mécano proche de toi et te souhaiter ta fête avec un p\'tit rabais 🎂</div>'
+      +'<div class="ff"><label>Téléphone *</label><input type="tel" id="s-phone" placeholder="514-555-0100" value="'+(_signupData.phone||'')+'"></div>'
+      +'<div class="ff"><label>Adresse *</label><input type="text" id="s-addr" placeholder="1234 Rue Principale, Montréal" value="'+(_signupData.address||'')+'"></div>'
+      +'<div class="ff"><label>Date de naissance</label><input type="date" id="s-birth" value="'+(_signupData.birthdate||'')+'"></div>'
+      +'<div class="wiz-nav"><button type="button" class="wiz-back" onclick="signupBack()">← Retour</button><button class="btn-submit blue" id="wiz-btn" onclick="signupNext()">Continuer →</button></div>';
+  } else if(step===3){
+    html += '<div class="wiz-step-lbl">Étape 3 sur '+SIGNUP_TOTAL_STEPS+'</div>'
+      +'<div class="wiz-title">Parle-nous de ton char 🚗</div>'
+      +'<div class="wiz-sub">Comme ça on prépare déjà tes prochaines demandes.</div>'
+      +'<div class="ff"><label>Marque</label>'+wizChips('wiz-brand', CAR_BRANDS, _signupData.veh_make)+'</div>'
+      +'<div class="ff2"><div class="ff"><label>Modèle</label><input type="text" id="s-vmodel" placeholder="Corolla" value="'+(_signupData.veh_model||'')+'"></div>'
+      +'<div class="ff"><label>Année</label><select id="s-vyear">'+yearOptions(_signupData.veh_year)+'</select></div></div>'
+      +'<div class="ff"><label>Comptant ou financé ?</label>'+wizChips('wiz-financed', ['Comptant','Financé / Crédit'], _signupData.veh_financed, {'Comptant':'💵','Financé / Crédit':'🏦'})+'</div>'
+      +'<div class="wiz-nav"><button type="button" class="wiz-back" onclick="signupBack()">← Retour</button><button class="btn-submit blue" id="wiz-btn" onclick="signupNext()">Continuer →</button></div>';
+  } else if(step===4){
+    html += '<div class="wiz-step-lbl">Étape 4 sur '+SIGNUP_TOTAL_STEPS+' · Dernière !</div>'
+      +'<div class="wiz-title">Ton assurance 🛡️</div>'
+      +'<div class="wiz-sub">Ça nous aide à négocier de meilleurs prix pour toi sur les réparations.</div>'
+      +'<div class="wiz-bonus">🎁 <span>Complète ton profil au complet et reçois <b>+'+SIGNUP_BONUS_PTS+' points</b> Greaz tout de suite !</span></div>'
+      +'<div class="ff"><label>Ton assureur</label>'+wizChips('wiz-insurer', INSURERS, _signupData.insurer)+'</div>'
+      +'<div class="ff"><label>Depuis combien de temps ?</label>'+wizChips('wiz-duration', INSURER_DURATIONS, _signupData.insurer_since)+'</div>'
+      +'<div class="wiz-nav"><button type="button" class="wiz-back" onclick="signupBack()">← Retour</button><button class="btn-submit blue" id="wiz-btn" onclick="signupNext()">🎉 Créer mon compte</button></div>';
+  }
+  body.innerHTML = html;
+}
+
+function yearOptions(sel){
+  var o = '<option value="">Année</option>';
+  for(var y=2026;y>=1990;y--){ o+='<option'+(String(sel)===String(y)?' selected':'')+'>'+y+'</option>'; }
+  return o;
+}
+
+/* ── Section d'assistance optionnelle (booking + demande rapide) ──
+   S'affiche quand des infos utiles au garage (assurance, financement, naissance)
+   manquent encore au profil — repliée par défaut pour ne pas alourdir le formulaire. */
+function needsAssistInfo(){
+  if(!clientData) return true;
+  var v0 = (clientData.vehicles||[])[0]||{};
+  return !(clientData.insurer && clientData.birthdate && v0.financed);
+}
+function renderAssistSection(prefix){
+  var showBirth = !clientData || !clientData.birthdate;
+  return '<div class="assist-toggle" onclick="toggleAssist(\''+prefix+'\')">'
+    +'<div><div class="assist-toggle-t">🛡️ Aide-nous à mieux te servir</div><div class="assist-toggle-d">Assurance et financement (optionnel, 20 sec)</div></div>'
+    +'<span class="assist-toggle-ic" id="'+prefix+'-ic">▾</span>'
+    +'</div>'
+    +'<div class="assist-body" id="'+prefix+'-body"><div class="assist-body-in">'
+    + (showBirth ? '<div class="ff"><label>Date de naissance</label><input type="date" id="'+prefix+'_birth"></div>' : '')
+    +'<div class="ff"><label>Ton assureur</label>'+wizChips(prefix+'-insurer', INSURERS, '')+'</div>'
+    +'<div class="ff"><label>Depuis combien de temps ?</label>'+wizChips(prefix+'-duration', INSURER_DURATIONS, '')+'</div>'
+    +'<div class="ff"><label>Ton auto : comptant ou financée ?</label>'+wizChips(prefix+'-financed', ['Comptant','Financé / Crédit'], '', {'Comptant':'💵','Financé / Crédit':'🏦'})+'</div>'
+    +'</div></div>';
+}
+function toggleAssist(prefix){
+  var body = document.getElementById(prefix+'-body');
+  var ic = document.getElementById(prefix+'-ic');
+  if(!body) return;
+  var open = body.classList.toggle('open');
+  if(ic) ic.classList.toggle('open', open);
+}
+function readAssistValues(prefix){
+  var chipVal = function(groupId){ var e=document.getElementById(groupId); return e ? (e.dataset.value||'') : ''; };
+  var birthEl = document.getElementById(prefix+'_birth');
+  return {
+    birthdate: birthEl ? (birthEl.value||'') : '',
+    insurer: chipVal(prefix+'-insurer'),
+    insurer_since: chipVal(prefix+'-duration'),
+    financed: chipVal(prefix+'-financed'),
+  };
+}
+/* Fusionne les infos d'assistance récoltées dans le profil client connecté,
+   sans jamais écraser une valeur déjà présente. */
+async function mergeAssistIntoProfile(vals){
+  if(!clientUser || !clientData) return;
+  var updates = {};
+  if(vals.birthdate && !clientData.birthdate) updates.birthdate = vals.birthdate;
+  if(vals.insurer && !clientData.insurer) updates.insurer = vals.insurer;
+  if(vals.insurer_since && !clientData.insurer_since) updates.insurer_since = vals.insurer_since;
+  if(vals.financed){
+    var vehicles = (clientData.vehicles||[]).slice();
+    if(vehicles.length && !vehicles[0].financed){ vehicles[0] = Object.assign({}, vehicles[0], { financed: vals.financed }); updates.vehicles = vehicles; }
+  }
+  if(Object.keys(updates).length){
+    try { await db.collection('clients').doc(clientUser.uid).update(updates); Object.assign(clientData, updates); } catch(e){ console.log('Fusion profil:', e); }
+  }
+}
+
+function signupBack(){
+  if(_signupStep<=1) return;
+  _signupStep--; renderSignupStep(_signupStep);
+}
+
+async function signupNext(){
+  var errEl = document.getElementById('auth-err');
+  errEl.style.display='none';
+  var val = function(id){ var e=document.getElementById(id); return e ? (e.value||'').trim() : ''; };
+  var chipVal = function(groupId){ var e=document.getElementById(groupId); return e ? (e.dataset.value||'') : ''; };
+
+  if(_signupStep===1){
+    var prenom=val('s-prenom'), email=val('s-email'), pass=val('s-pass');
+    if(!prenom){ errEl.textContent='Ton prénom est obligatoire.'; errEl.style.display='block'; return; }
+    if(!email){ errEl.textContent='Ton courriel est obligatoire.'; errEl.style.display='block'; return; }
+    if(pass.length<6){ errEl.textContent='Mot de passe trop court (min. 6 caractères).'; errEl.style.display='block'; return; }
+    _signupData.prenom=prenom; _signupData.nom=val('s-nom'); _signupData.email=email; _signupData.pass=pass;
+    _signupStep=2; renderSignupStep(2); return;
+  }
+  if(_signupStep===2){
+    var phone=val('s-phone'), addr=val('s-addr');
+    if(!phone){ errEl.textContent='Ton téléphone est obligatoire — c\'est comme ça qu\'on te rejoint !'; errEl.style.display='block'; return; }
+    if(!addr){ errEl.textContent='Ton adresse est obligatoire pour trouver un pro proche de toi.'; errEl.style.display='block'; return; }
+    _signupData.phone=phone; _signupData.address=addr; _signupData.birthdate=val('s-birth');
+    _signupStep=3; renderSignupStep(3); return;
+  }
+  if(_signupStep===3){
+    var brand=chipVal('wiz-brand'), financed=chipVal('wiz-financed');
+    if(!brand){ errEl.textContent='Choisis la marque de ton véhicule (ou "Autre").'; errEl.style.display='block'; return; }
+    if(!financed){ errEl.textContent='Dis-nous si ton auto est comptant ou financée.'; errEl.style.display='block'; return; }
+    _signupData.veh_make=brand; _signupData.veh_model=val('s-vmodel'); _signupData.veh_year=val('s-vyear'); _signupData.veh_financed=financed;
+    _signupStep=4; renderSignupStep(4); return;
+  }
+  if(_signupStep===4){
+    var insurer=chipVal('wiz-insurer'), duration=chipVal('wiz-duration');
+    if(!insurer){ errEl.textContent='Choisis ton assureur (ou "Autre").'; errEl.style.display='block'; return; }
+    if(!duration){ errEl.textContent='Depuis combien de temps es-tu avec cet assureur ?'; errEl.style.display='block'; return; }
+    _signupData.insurer=insurer; _signupData.insurer_since=duration;
+    await finalizeSignup();
+  }
+}
+
+async function finalizeSignup(){
+  var errEl = document.getElementById('auth-err');
+  var btn = document.getElementById('wiz-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Un instant...';
+  try {
+    var d = _signupData;
+    var cred = await firebase.auth().createUserWithEmailAndPassword(d.email, d.pass);
+    var vehicles = [];
+    if(d.veh_make){
+      vehicles.push({ make:d.veh_make, model:d.veh_model||'', year:d.veh_year||'', financed:d.veh_financed||'', plate:'', km:'', color:'', fuel:'', vin:'' });
+    }
+    await db.collection('clients').doc(cred.user.uid).set({
+      prenom: d.prenom, nom: d.nom||'', email: d.email, phone: d.phone,
+      address: d.address, birthdate: d.birthdate||'',
+      insurer: d.insurer||'', insurer_since: d.insurer_since||'',
+      vehicles: vehicles, points: SIGNUP_BONUS_PTS,
+      referral_code: getReferralCode(),
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    await loadClientProfile(cred.user);
+    renderAccount();
+    setTimeout(function(){ spawnConfetti(document.querySelector('#overlay-account .drawer')); }, 150);
+    toast('🎉 Bienvenue dans la famille Greaz, '+d.prenom+' ! +'+SIGNUP_BONUS_PTS+' points pour ton profil complet.', 'ok', 4500);
+  } catch(e){
+    var msg = 'Une erreur est survenue.';
+    if(e.code==='auth/email-already-in-use') msg='Ce courriel a déjà un compte. Connecte-toi.';
+    if(e.code==='auth/invalid-email') msg='Courriel invalide.';
+    if(e.code==='auth/weak-password') msg='Mot de passe trop faible (min. 6 caractères).';
+    if(e.code==='auth/too-many-requests') msg='Trop de tentatives. Réessaie dans quelques minutes.';
+    errEl.textContent = msg; errEl.style.display='block';
+    btn.disabled=false; btn.innerHTML='🎉 Créer mon compte';
   }
 }
 
@@ -4444,6 +4677,9 @@ function renderAccount(){
       ? 'Encore <b style="color:var(--gold)">'+(nxt.min-pts)+' points</b> pour atteindre '+nxt.icon+' '+nxt.label
       : '🎉 Tu es au niveau maximum !')+'</div>'
     +'</div></div>'
+
+    +'<div class="acc-section">👤 Mon profil</div>'
+    + renderProfileSection()
 
     +'<div class="acc-section">🔧 Mes demandes en cours</div>'
     + (isMember() ? '' : '<div class="acc-join" onclick="goToSubscribe()">'
@@ -4599,6 +4835,7 @@ function openVehicleForm(idx){
     +'<div class="ff"><label>Kilométrage</label><input type="number" id="v-km" inputmode="numeric" placeholder="85000" value="'+(v.km||'')+'"></div></div>'
     +'<div class="ff2"><div class="ff"><label>Couleur</label><input type="text" id="v-color" placeholder="Noir" value="'+(v.color||'')+'"></div>'
     +'<div class="ff"><label>Carburant</label><select id="v-fuel">'+fuelOpts+'</select></div></div>'
+    +'<div class="ff"><label>Comptant ou financé ?</label>'+wizChips('veh-financed', ['Comptant','Financé / Crédit'], v.financed, {'Comptant':'💵','Financé / Crédit':'🏦'})+'</div>'
     +'<div class="ff"><label>NIV / VIN <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="text" id="v-vin" placeholder="Numéro d\'identification" style="text-transform:uppercase" value="'+(v.vin||'')+'"></div>'
     +'<button class="btn-submit blue" id="veh-btn" onclick="saveVehicle('+(editing?idx:'')+')">✓ Enregistrer</button>'
     +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Annuler</button>';
@@ -4612,6 +4849,7 @@ async function saveVehicle(idx){
   var btn = document.getElementById('veh-btn');
   if(!make || !model){ errEl.textContent='La marque et le modèle sont obligatoires.'; errEl.style.display='block'; return; }
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Enregistrement...';
+  var financedEl = document.getElementById('veh-financed');
   var entry = {
     make: make, model: model,
     year: document.getElementById('v-year').value||'',
@@ -4619,6 +4857,7 @@ async function saveVehicle(idx){
     km: (document.getElementById('v-km').value||'').trim(),
     color: (document.getElementById('v-color').value||'').trim(),
     fuel: document.getElementById('v-fuel').value||'',
+    financed: financedEl ? (financedEl.dataset.value||'') : '',
     vin: (document.getElementById('v-vin').value||'').trim().toUpperCase(),
   };
   var vehicles = (clientData.vehicles||[]).slice();
@@ -4628,6 +4867,89 @@ async function saveVehicle(idx){
     clientData.vehicles = vehicles;
     renderAccount();
     toast('🚗 Véhicule enregistré ✓', 'ok', 2800);
+  } catch(e){
+    errEl.textContent='Erreur : '+e.message; errEl.style.display='block';
+    btn.disabled=false; btn.textContent='✓ Enregistrer';
+  }
+}
+
+/* ── Mon profil (adresse, naissance, assurance) ── */
+function profileCompletionPct(d){
+  if(!d) return 0;
+  var fields = [d.address, d.birthdate, d.insurer, d.insurer_since, (d.vehicles&&d.vehicles.length&&d.vehicles[0].financed)];
+  var done = fields.filter(Boolean).length;
+  return Math.round(done/fields.length*100);
+}
+
+function renderProfileSection(){
+  var d = clientData||{};
+  var pct = profileCompletionPct(d);
+  if(pct < 100){
+    var missing = [];
+    if(!d.address) missing.push('adresse');
+    if(!d.birthdate) missing.push('date de naissance');
+    if(!d.insurer) missing.push('assureur');
+    if(!(d.vehicles&&d.vehicles.length&&d.vehicles[0].financed)) missing.push('financement de ton auto');
+    return '<div class="profile-nudge" onclick="openProfileEdit()">'
+      +'<div class="profile-nudge-t">👤 Complète ton profil ('+pct+'%)</div>'
+      +'<div class="profile-nudge-bar"><div class="profile-nudge-fill" style="width:'+pct+'%"></div></div>'
+      +'<div class="profile-nudge-d">Il manque : '+missing.join(', ')+' — <b style="color:var(--blue)">Compléter →</b></div>'
+      +'</div>';
+  }
+  var v0 = (d.vehicles||[])[0]||{};
+  return '<div class="profile-row"><span class="profile-row-l">📍 Adresse</span><span class="profile-row-v">'+(d.address||'—')+'</span></div>'
+    +'<div class="profile-row"><span class="profile-row-l">🎂 Naissance</span><span class="profile-row-v">'+(d.birthdate||'—')+'</span></div>'
+    +'<div class="profile-row"><span class="profile-row-l">🛡️ Assureur</span><span class="profile-row-v">'+(d.insurer||'—')+(d.insurer_since?' · '+d.insurer_since:'')+'</span></div>'
+    +'<div class="profile-row"><span class="profile-row-l">💳 Véhicule</span><span class="profile-row-v">'+(v0.financed||'—')+'</span></div>'
+    +'<button class="acc-add" style="margin-top:.75rem" onclick="openProfileEdit()">✏️ Modifier mon profil</button>';
+}
+
+function openProfileEdit(){
+  var d = clientData||{};
+  var v0 = (d.vehicles||[])[0]||{};
+  document.getElementById('account-title').textContent = 'Mon profil';
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="prof-err"></div>'
+    +'<div class="form-section"><div class="form-section-title">Coordonnées</div>'
+    +'<div class="ff"><label>Adresse</label><input type="text" id="p-addr" placeholder="1234 Rue Principale, Montréal" value="'+(d.address||'')+'"></div>'
+    +'<div class="ff"><label>Date de naissance</label><input type="date" id="p-birth" value="'+(d.birthdate||'')+'"></div></div>'
+    +'<div class="form-section"><div class="form-section-title">Assurance</div>'
+    +'<div class="ff"><label>Assureur</label>'+wizChips('p-insurer', INSURERS, d.insurer)+'</div>'
+    +'<div class="ff"><label>Depuis combien de temps ?</label>'+wizChips('p-duration', INSURER_DURATIONS, d.insurer_since)+'</div></div>'
+    + (v0.make ? '<div class="form-section"><div class="form-section-title">Ton véhicule principal</div>'
+      +'<div class="ff"><label>Comptant ou financé ?</label>'+wizChips('p-financed', ['Comptant','Financé / Crédit'], v0.financed, {'Comptant':'💵','Financé / Crédit':'🏦'})+'</div></div>' : '')
+    +'<button class="btn-submit blue" id="prof-btn" onclick="saveProfileEdit()">✓ Enregistrer</button>'
+    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Annuler</button>';
+}
+
+async function saveProfileEdit(){
+  var errEl = document.getElementById('prof-err');
+  var btn = document.getElementById('prof-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Enregistrement...';
+  var val = function(id){ var e=document.getElementById(id); return e ? (e.value||'').trim() : ''; };
+  var chipVal = function(groupId){ var e=document.getElementById(groupId); return e ? (e.dataset.value||'') : ''; };
+  var wasComplete = profileCompletionPct(clientData) >= 100;
+  var updates = {
+    address: val('p-addr'),
+    birthdate: val('p-birth'),
+    insurer: chipVal('p-insurer'),
+    insurer_since: chipVal('p-duration'),
+  };
+  var vehicles = (clientData.vehicles||[]).slice();
+  var financedEl = document.getElementById('p-financed');
+  if(financedEl && vehicles.length){ vehicles[0] = Object.assign({}, vehicles[0], { financed: financedEl.dataset.value||'' }); updates.vehicles = vehicles; }
+  try {
+    await db.collection('clients').doc(clientUser.uid).update(updates);
+    Object.assign(clientData, updates);
+    var nowComplete = profileCompletionPct(clientData) >= 100;
+    if(!wasComplete && nowComplete){
+      await awardPoints();
+      toast('🎉 Profil complété ! +'+PTS_PER_BOOKING+' points bonus', 'ok', 4000);
+      setTimeout(function(){ spawnConfetti(document.querySelector('#overlay-account .drawer')); }, 150);
+    } else {
+      toast('✓ Profil mis à jour', 'ok', 2500);
+    }
+    renderAccount();
   } catch(e){
     errEl.textContent='Erreur : '+e.message; errEl.style.display='block';
     btn.disabled=false; btn.textContent='✓ Enregistrer';
