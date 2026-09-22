@@ -1180,6 +1180,9 @@ body.logged-in .hero-scroll{display:none}
 .history-note{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5}
 .history-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:7px;font-size:11.5px;color:var(--muted)}
 .history-saved{color:var(--green);font-weight:600}
+.history-subhead{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:14px 0 8px}
+.history-subhead:first-child{margin-top:0}
+.history-upcoming-badge{font-size:10px;font-weight:700;color:var(--blue);background:var(--bluelt);padding:2px 8px;border-radius:10px;white-space:nowrap;margin-right:8px;flex-shrink:0}
 .auth-switch{text-align:center;font-size:13px;color:var(--muted);margin-top:1.25rem}
 .auth-switch b{color:var(--blue);cursor:pointer;font-weight:700}
 .perk{display:flex;gap:11px;align-items:flex-start;background:#F4F4F4;border-radius:10px;padding:11px 13px;margin-bottom:7px}
@@ -5362,11 +5365,33 @@ function loadClientServiceHistory(targetId){
       return;
     }
     var list = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-    list.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
-    var totalSaved = list.reduce(function(s,r){ return s + (Number(r.saved)||0); }, 0);
     var today = new Date().toISOString().slice(0,10);
+    // Un entretien daté dans le futur (ou aujourd'hui) est un RV à venir ;
+    // une fois la date passée, il bascule automatiquement dans l'historique.
+    var upcoming = list.filter(function(r){ return r.date && r.date >= today; })
+      .sort(function(a,b){ return (a.date||'').localeCompare(b.date||''); });
+    var past = list.filter(function(r){ return !r.date || r.date < today; })
+      .sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+
+    var totalSaved = list.reduce(function(s,r){ return s + (Number(r.saved)||0); }, 0);
     var nextRecord = list.filter(function(r){ return r.next_due_date && r.next_due_date >= today; })
       .sort(function(a,b){ return (a.next_due_date||'').localeCompare(b.next_due_date||''); })[0];
+
+    function itemHtml(r, isUpcoming){
+      var dateStr = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      return '<div class="history-item"'+(isUpcoming?' style="border-color:rgba(62,106,225,.3);background:var(--bluelt)"':'')+'>'
+        +'<div class="history-top"><b>'+(r.title||'Entretien')+'</b>'
+        +'<span style="display:flex;align-items:center">'
+        + (isUpcoming ? '<span class="history-upcoming-badge">À venir</span>' : '')
+        + '<span class="history-date">'+dateStr+(r.time?' · '+r.time:'')+'</span></span></div>'
+        + ((r.mechanic_name||r.location) ? '<div class="history-note" style="color:var(--faint)">'+(r.mechanic_name?'🔧 '+r.mechanic_name:'')+(r.mechanic_name&&r.location?' · ':'')+(r.location?'📍 '+r.location:'')+'</div>' : '')
+        + (r.note ? '<div class="history-note">'+r.note+'</div>' : '')
+        +'<div class="history-meta">'
+        + (r.vehicle_label ? '<span>🚗 '+r.vehicle_label+'</span>' : '')
+        + (r.cost ? '<span>💳 '+Number(r.cost).toLocaleString('fr-CA',{style:'currency',currency:'CAD'})+'</span>' : '')
+        + (r.saved ? '<span class="history-saved">💰 '+Number(r.saved).toLocaleString('fr-CA',{style:'currency',currency:'CAD'})+' économisés</span>' : '')
+        +'</div></div>';
+    }
 
     var html = '';
     if(totalSaved > 0){
@@ -5376,18 +5401,14 @@ function loadClientServiceHistory(targetId){
       var d = new Date(nextRecord.next_due_date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'long',year:'numeric'});
       html += '<div class="history-next-banner">🗓️ Ton garage a prévu ton prochain entretien pour le <b>'+d+'</b></div>';
     }
-    html += list.map(function(r){
-      var dateStr = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short',year:'numeric'}) : '—';
-      return '<div class="history-item">'
-        +'<div class="history-top"><b>'+(r.title||'Entretien')+'</b><span class="history-date">'+dateStr+(r.time?' · '+r.time:'')+'</span></div>'
-        + ((r.mechanic_name||r.location) ? '<div class="history-note" style="color:var(--faint)">'+(r.mechanic_name?'🔧 '+r.mechanic_name:'')+(r.mechanic_name&&r.location?' · ':'')+(r.location?'📍 '+r.location:'')+'</div>' : '')
-        + (r.note ? '<div class="history-note">'+r.note+'</div>' : '')
-        +'<div class="history-meta">'
-        + (r.vehicle_label ? '<span>🚗 '+r.vehicle_label+'</span>' : '')
-        + (r.cost ? '<span>💳 '+Number(r.cost).toLocaleString('fr-CA',{style:'currency',currency:'CAD'})+'</span>' : '')
-        + (r.saved ? '<span class="history-saved">💰 '+Number(r.saved).toLocaleString('fr-CA',{style:'currency',currency:'CAD'})+' économisés</span>' : '')
-        +'</div></div>';
-    }).join('');
+    if(upcoming.length){
+      html += '<div class="history-subhead">📅 '+(upcoming.length>1?'Prochains rendez-vous':'Prochain rendez-vous')+'</div>';
+      html += upcoming.map(function(r){ return itemHtml(r, true); }).join('');
+    }
+    if(past.length){
+      html += '<div class="history-subhead">🛠️ Historique</div>';
+      html += past.map(function(r){ return itemHtml(r, false); }).join('');
+    }
     el.innerHTML = html;
   }).catch(function(e){ console.log('Historique entretien:', e); });
 }
