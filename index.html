@@ -5027,7 +5027,8 @@ function loadClientServiceHistory(){
     html += list.map(function(r){
       var dateStr = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short',year:'numeric'}) : '—';
       return '<div class="history-item">'
-        +'<div class="history-top"><b>'+(r.title||'Entretien')+'</b><span class="history-date">'+dateStr+'</span></div>'
+        +'<div class="history-top"><b>'+(r.title||'Entretien')+'</b><span class="history-date">'+dateStr+(r.time?' · '+r.time:'')+'</span></div>'
+        + ((r.mechanic_name||r.location) ? '<div class="history-note" style="color:var(--faint)">'+(r.mechanic_name?'🔧 '+r.mechanic_name:'')+(r.mechanic_name&&r.location?' · ':'')+(r.location?'📍 '+r.location:'')+'</div>' : '')
         + (r.note ? '<div class="history-note">'+r.note+'</div>' : '')
         +'<div class="history-meta">'
         + (r.vehicle_label ? '<span>🚗 '+r.vehicle_label+'</span>' : '')
