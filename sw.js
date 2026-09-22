@@ -6,7 +6,7 @@
    jamais les appels Firebase/EmailJS, pour ne jamais servir de données
    clients périmées. */
 
-var CACHE_NAME = 'greaz-shell-v1';
+var CACHE_NAME = 'greaz-shell-v2';
 var CORE_ASSETS = [
   './',
   './index.html',
@@ -41,6 +41,25 @@ self.addEventListener('fetch', function(event){
   // EmailJS, polices, cartes, Stripe...) — ils passent directement au réseau.
   if(!req.url.startsWith(self.location.origin)) return;
 
+  // La PAGE elle-même (navigation) : toujours essayer le réseau EN PREMIER,
+  // pour que tes mises à jour soient visibles tout de suite dans l'app
+  // installée sur le téléphone. Le cache ne sert que de filet si jamais
+  // le téléphone est hors-ligne au moment d'ouvrir l'app.
+  if(req.mode === 'navigate'){
+    event.respondWith(
+      fetch(req).then(function(res){
+        var clone = res.clone();
+        caches.open(CACHE_NAME).then(function(cache){ cache.put(req, clone); });
+        return res;
+      }).catch(function(){
+        return caches.match(req).then(function(cached){ return cached || caches.match('./index.html'); });
+      })
+    );
+    return;
+  }
+
+  // Le reste (icônes, manifest...) : cache d'abord pour la vitesse, avec
+  // mise à jour silencieuse en arrière-plan.
   event.respondWith(
     caches.match(req).then(function(cached){
       var network = fetch(req).then(function(res){
@@ -50,7 +69,6 @@ self.addEventListener('fetch', function(event){
         }
         return res;
       }).catch(function(){ return cached; });
-      // Cache d'abord pour la vitesse, réseau en secours (et mise à jour silencieuse du cache)
       return cached || network;
     })
   );
