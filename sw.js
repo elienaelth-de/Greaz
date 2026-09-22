@@ -6,7 +6,7 @@
    jamais les appels Firebase/EmailJS, pour ne jamais servir de données
    clients périmées. */
 
-var CACHE_NAME = 'greaz-shell-v2';
+var CACHE_NAME = 'greaz-shell-v3';
 var CORE_ASSETS = [
   './',
   './index.html',
