@@ -2522,9 +2522,28 @@ window.addEventListener('appinstalled', function(){
   _deferredInstallPrompt = null;
   try{ ccToast('Greaz est installé sur ton appareil 🎉'); }catch(e){}
 });
+/* Mise à jour automatique de l'app installée — sans que le client ait besoin
+   de vider son cache lui-même. Dès qu'une nouvelle version de sw.js est
+   publiée, on force le navigateur à vérifier (updateViaCache:'none'), et
+   dès qu'elle prend le contrôle, on recharge la page une seule fois pour
+   que le client voie tout de suite la nouvelle version. */
 if('serviceWorker' in navigator){
+  var _swRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if(_swRefreshing) return;
+    _swRefreshing = true;
+    window.location.reload();
+  });
+
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js').catch(function(e){ console.log('SW:', e); });
+    navigator.serviceWorker.register('sw.js', { updateViaCache:'none' }).then(function(reg){
+      // Vérifie s'il y a une mise à jour tout de suite, puis à chaque
+      // retour sur l'onglet (utile pour une app gardée ouverte longtemps).
+      reg.update().catch(function(){});
+      document.addEventListener('visibilitychange', function(){
+        if(document.visibilityState === 'visible') reg.update().catch(function(){});
+      });
+    }).catch(function(e){ console.log('SW:', e); });
   });
 }
 
