@@ -1,0 +1,21 @@
+{
+  "name": "Greaz — La mécanique, réinventée",
+  "short_name": "Greaz",
+  "description": "Trouve un mécanicien ou un garage certifié près de chez toi au Québec. Prix transparents, avis vérifiés, réservation en ligne en 3 minutes.",
+  "start_url": "./index.html?pwa=1",
+  "id": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#ffffff",
+  "theme_color": "#4568D6",
+  "orientation": "portrait-primary",
+  "lang": "fr-CA",
+  "dir": "ltr",
+  "categories": ["automobile", "business", "lifestyle"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
