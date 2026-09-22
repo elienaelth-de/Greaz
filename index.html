@@ -1098,6 +1098,41 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 .acc-section{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:1.5rem 0 .85rem;display:flex;justify-content:space-between;align-items:center}
 .acc-add{font-size:11px;font-weight:700;color:var(--blue);background:var(--bluelt);border:none;padding:5px 13px;border-radius:16px;cursor:pointer;letter-spacing:0;text-transform:none;transition:background .2s}
 .acc-add:hover{background:#DFE8FC}
+
+/* ═══ CALENDRIER D'ENTRETIEN ═══ */
+.maint-note{font-size:11.5px;color:var(--faint);line-height:1.5;margin-bottom:10px;padding:8px 11px;background:#FAFAFB;border-radius:9px}
+.maint-card{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin-bottom:9px}
+.maint-veh-title{font-size:13.5px;font-weight:700;color:var(--white);display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.maint-km{font-size:11px;font-weight:600;color:var(--muted)}
+.maint-empty{font-size:12.5px;color:var(--muted);line-height:1.5}
+.maint-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.maint-item:first-of-type{border-top:none;padding-top:0}
+.maint-ic{font-size:1.15rem;flex-shrink:0}
+.maint-info{flex:1;min-width:0}
+.maint-name{font-size:12.5px;font-weight:600;color:var(--white)}
+.maint-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.maint-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.maint-ok .maint-badge{background:rgba(0,168,98,.12);color:var(--green)}
+.maint-soon .maint-badge{background:rgba(184,134,11,.12);color:var(--gold)}
+.maint-due .maint-badge{background:rgba(228,87,46,.12);color:var(--orange)}
+
+/* Badge d'alerte sur le bouton compte (nav + barre mobile) */
+.nav-account{position:relative}
+.nav-alert-badge{display:none;position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;background:var(--orange);color:#fff;font-size:10px;font-weight:800;align-items:center;justify-content:center;border:2px solid #fff;line-height:1}
+.nav-alert-badge.show{display:flex}
+.mtab-btn{position:relative}
+.mtab-alert-badge{display:none;position:absolute;top:2px;right:calc(50% - 20px);min-width:14px;height:14px;padding:0 3px;border-radius:8px;background:var(--orange);color:#fff;font-size:9px;font-weight:800;align-items:center;justify-content:center;border:1.5px solid #fff;line-height:1}
+.mtab-alert-badge.show{display:flex}
+
+/* ═══ HISTORIQUE D'ENTRETIEN & ÉCONOMIES (rempli par le garage/admin) ═══ */
+.history-saved-banner{background:linear-gradient(135deg,var(--green),#00875A);color:#fff;border-radius:12px;padding:13px 16px;font-size:14px;font-weight:600;margin-bottom:9px;box-shadow:0 6px 18px rgba(0,168,98,.25)}
+.history-next-banner{background:var(--bluelt);border:1px solid rgba(62,106,225,.25);color:var(--blue2);border-radius:12px;padding:12px 15px;font-size:13px;font-weight:600;margin-bottom:9px;line-height:1.5}
+.history-item{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;margin-bottom:8px}
+.history-top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13.5px;color:var(--white)}
+.history-date{font-size:11px;color:var(--faint);font-weight:600;white-space:nowrap}
+.history-note{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5}
+.history-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:7px;font-size:11.5px;color:var(--muted)}
+.history-saved{color:var(--green);font-weight:600}
 .auth-switch{text-align:center;font-size:13px;color:var(--muted);margin-top:1.25rem}
 .auth-switch b{color:var(--blue);cursor:pointer;font-weight:700}
 .perk{display:flex;gap:11px;align-items:flex-start;background:#F4F4F4;border-radius:10px;padding:11px 13px;margin-bottom:7px}
@@ -1281,6 +1316,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
       </span>
       <span id="nav-account-label">Mon espace</span>
+      <span class="nav-alert-badge" id="nav-alert-badge"></span>
     </button>
   </div>
 </nav>
@@ -1299,6 +1335,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
     Programme
   </button>
   <button class="mtab-btn" id="mtab-account" onclick="mtabGo('account')">
+    <span class="mtab-alert-badge" id="mtab-alert-badge"></span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
     Mon espace
   </button>
@@ -1626,6 +1663,14 @@ firebase.initializeApp({
   appId:"1:165170790975:web:38fe20428046e6328b6e8a"
 });
 var db = firebase.firestore();
+
+// Session la plus durable possible : reste connecté même après avoir
+// fermé le navigateur/l'app. Sans ce réglage explicite, certains
+// contextes (surtout l'app installée sur iPhone) peuvent retomber sur
+// une persistance plus courte et déconnecter l'utilisateur tout seul.
+try{
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+}catch(e){ console.log('Auth persistence:', e); }
 
 var DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 var DOW_MAP = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
@@ -4453,6 +4498,7 @@ function updateNavAccount(){
     if(avatar) avatar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>';
     lbl.textContent = 'Mon espace';
   }
+  if(typeof updateMaintenanceAlertBadge === 'function') updateMaintenanceAlertBadge();
 }
 
 async function loadClientProfile(user){
@@ -4540,6 +4586,110 @@ var SIGNUP_BONUS_PTS = 20;
 var CAR_BRANDS = ['Toyota','Honda','Ford','Chevrolet','Hyundai','Kia','Mazda','Nissan','BMW','Mercedes','Volkswagen','Subaru','Autre'];
 var INSURERS = ['Intact','Desjardins','Belairdirect','TD Assurance','CAA','Promutuel','Beneva','Economical','Autre'];
 var INSURER_DURATIONS = ["Moins d'1 an","1 à 3 ans","3 à 5 ans","5 ans et plus"];
+
+/* ═══ CALENDRIER D'ENTRETIEN — même table que le simulateur greaz-entretien.html,
+   pour rester cohérent d'un outil à l'autre. t = types de moteur applicables
+   (g=essence, d=diesel, h=hybride, e=électrique). ═══ */
+var MAINTENANCE = [
+  { nom:'Vidange d\'huile + filtre', ic:'🛢️', km:10000, imp:'critique', t:['g','d','h'] },
+  { nom:'Rotation des pneus', ic:'🔄', km:10000, imp:'recommande', t:['g','d','h','e'] },
+  { nom:'Inspection des freins', ic:'🔍', km:20000, imp:'recommande', t:['g','d','h','e'] },
+  { nom:'Filtre à air habitacle', ic:'🌬️', km:25000, imp:'preventif', t:['g','d','h','e'] },
+  { nom:'Filtre à air moteur', ic:'💨', km:30000, imp:'recommande', t:['g','d','h'] },
+  { nom:'Alignement des roues', ic:'📐', km:40000, imp:'recommande', t:['g','d','h','e'] },
+  { nom:'Liquide de frein', ic:'🧪', km:45000, imp:'recommande', t:['g','d','h','e'] },
+  { nom:'Plaquettes de frein (avant)', ic:'🛑', km:50000, imp:'critique', t:['g','d','h'] },
+  { nom:'Plaquettes de frein (avant)', ic:'🛑', km:90000, imp:'recommande', t:['e'] },
+  { nom:'Batterie de démarrage (12V)', ic:'🔋', km:70000, imp:'preventif', t:['g','d','h','e'] },
+  { nom:'Bougies d\'allumage', ic:'⚡', km:100000, imp:'recommande', t:['g','h'] },
+  { nom:'Liquide de refroidissement (moteur)', ic:'❄️', km:100000, imp:'critique', t:['g','d','h'] },
+  { nom:'Liquide de transmission', ic:'⚙️', km:90000, imp:'critique', t:['g','d','h'] },
+  { nom:'Disques de frein', ic:'💿', km:95000, imp:'recommande', t:['g','d','h','e'] },
+  { nom:'Pneus (jeu de 4)', ic:'🛞', km:60000, imp:'critique', t:['e'] },
+  { nom:'Courroie de distribution', ic:'🔗', km:130000, imp:'critique', t:['g','d'] },
+  { nom:'Vérification système haute tension', ic:'⚡', km:30000, imp:'recommande', t:['e'] },
+  { nom:'Liquide de refroidissement (batterie)', ic:'🔋', km:100000, imp:'critique', t:['e'] },
+];
+var MAINT_EV_KEYWORDS = ['mach-e','mach e','tesla','model 3','model y','model s','model x','bolt','leaf','ioniq 5','ioniq5','ioniq 6','ev6','id.4','id4','ariya','e-tron','etron','i4','ix','eqs','eqb','eqe','taycan','polestar','lyriq','blazer ev','equinox ev','lightning','solterra','bz4x','kona electric','niro ev','soul ev'];
+var MAINT_HYBRID_KEYWORDS = ['prius','hybrid','hybride','rav4 prime','phev'];
+
+function vehicleFuelCode(v){
+  var f = (v.fuel||'').toLowerCase();
+  if(f.indexOf('lectr')>-1) return 'e';
+  if(f.indexOf('hybrid')>-1) return 'h';
+  if(f.indexOf('diesel')>-1) return 'd';
+  if(f.indexOf('essence')>-1) return 'g';
+  // Type non précisé → on devine d'après la marque/modèle, sinon on assume essence (le plus fréquent)
+  var mk = ((v.make||'')+' '+(v.model||'')).toLowerCase();
+  if(MAINT_EV_KEYWORDS.some(function(k){ return mk.indexOf(k)>-1; })) return 'e';
+  if(MAINT_HYBRID_KEYWORDS.some(function(k){ return mk.indexOf(k)>-1; })) return 'h';
+  return 'g';
+}
+
+/* Renvoie les entretiens applicables à un véhicule, triés par proximité
+   (le plus proche du kilométrage actuel en premier). Estimation basée sur
+   des intervalles standards des fabricants — pas sur l'historique réel
+   d'entretien du véhicule (qu'on ne connaît pas). */
+function computeMaintenancePlan(v){
+  var km = parseInt(v.km, 10);
+  if(!km || km <= 0) return [];
+  var code = vehicleFuelCode(v);
+  return MAINTENANCE
+    .filter(function(m){ return m.t.indexOf(code) > -1; })
+    .map(function(m){
+      var nextDue = Math.ceil((km + 1) / m.km) * m.km;
+      var remaining = nextDue - km;
+      var status = remaining <= 500 ? 'due' : (remaining <= 2500 ? 'soon' : 'ok');
+      return { nom:m.nom, ic:m.ic, nextDue:nextDue, remaining:remaining, status:status, imp:m.imp };
+    })
+    .sort(function(a,b){ return a.remaining - b.remaining; });
+}
+
+function renderMaintenanceSection(){
+  var vehicles = (clientData && clientData.vehicles) || [];
+  if(!vehicles.length) return '';
+  return '<div class="maint-note">📍 Estimation basée sur les intervalles standards des fabricants selon ton kilométrage — pas sur ton historique réel d\'entretien. À valider avec ton garage.</div>'
+    + vehicles.map(function(v, i){
+        var title = [v.year, v.make, v.model].filter(Boolean).join(' ') || ('Véhicule '+(i+1));
+        if(!v.km){
+          return '<div class="maint-card"><div class="maint-veh-title">🚗 '+title+'</div>'
+            +'<div class="maint-empty">Ajoute ton kilométrage pour voir ton calendrier d\'entretien personnalisé.</div>'
+            +'<button class="acc-empty-btn" style="margin-top:9px;padding:8px 16px;font-size:12px" onclick="openVehicleForm('+i+')">+ Ajouter le kilométrage</button>'
+            +'</div>';
+        }
+        var plan = computeMaintenancePlan(v).slice(0, 4);
+        var itemsHtml = plan.map(function(it){
+          var cls = it.status === 'due' ? 'maint-due' : (it.status === 'soon' ? 'maint-soon' : 'maint-ok');
+          var lbl = it.status === 'due' ? 'Bientôt' : (it.status === 'soon' ? 'Approche' : 'OK');
+          return '<div class="maint-item '+cls+'">'
+            +'<span class="maint-ic">'+it.ic+'</span>'
+            +'<div class="maint-info"><div class="maint-name">'+it.nom+'</div>'
+            +'<div class="maint-sub">dans ~'+it.remaining.toLocaleString('fr-CA')+' km · vers '+it.nextDue.toLocaleString('fr-CA')+' km</div></div>'
+            +'<span class="maint-badge">'+lbl+'</span>'
+            +'</div>';
+        }).join('');
+        return '<div class="maint-card"><div class="maint-veh-title">🚗 '+title+' <span class="maint-km">'+Number(v.km).toLocaleString('fr-CA')+' km</span></div>'
+          + (itemsHtml || '<div class="maint-empty">Aucun entretien standard trouvé pour ce véhicule.</div>')
+          + '</div>';
+      }).join('');
+}
+
+/* Petit badge rouge sur "Mon espace" (nav + barre mobile) quand un ou
+   plusieurs entretiens approchent — sert d'alerte discrète. */
+function updateMaintenanceAlertBadge(){
+  var n = 0;
+  if(clientData && clientData.vehicles && clientData.vehicles.length){
+    clientData.vehicles.forEach(function(v){
+      computeMaintenancePlan(v).forEach(function(it){ if(it.status !== 'ok') n++; });
+    });
+  }
+  ['nav-alert-badge','mtab-alert-badge'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    if(n > 0){ el.textContent = n > 9 ? '9+' : String(n); el.classList.add('show'); }
+    else { el.classList.remove('show'); }
+  });
+}
 
 function startSignupWizard(){
   _signupStep = 1; _signupData = {};
@@ -4829,6 +4979,11 @@ function renderAccount(){
     +'<div class="acc-section">🚗 Mes véhicules <button class="acc-add" onclick="openVehicleForm()">+ Ajouter</button></div>'
     + vehHtml
 
+    + (vehicles.length ? '<div class="acc-section">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection() : '')
+
+    +'<div class="acc-section">🛠️ Historique & économies</div>'
+    +'<div id="acc-history"><div class="acc-loading">Chargement...</div></div>'
+
     +'<div class="acc-section">🎁 Mes récompenses</div>'
     + renderRewards(pts)
 
@@ -4836,6 +4991,52 @@ function renderAccount(){
 
   loadClientDemandes();
   loadClientRdvs();
+  loadClientServiceHistory();
+}
+
+/* Historique d'entretien réel + économies — alimenté par le garage/admin
+   depuis le dashboard (Dossier client), pas calculé automatiquement. */
+function loadClientServiceHistory(){
+  var el = document.getElementById('acc-history');
+  if(!el || !clientUser) return;
+  db.collection('service_history').where('client_uid','==',clientUser.uid).get().then(function(snap){
+    if(!el) return;
+    if(snap.empty){
+      el.innerHTML = '<div class="acc-empty">'
+        +'<div class="acc-empty-ic">🛠️</div>'
+        +'<div class="acc-empty-t">Aucun entretien enregistré</div>'
+        +'<div class="acc-empty-d">Ton historique et tes économies grâce à Greaz apparaîtront ici après ton premier rendez-vous.</div>'
+        +'</div>';
+      return;
+    }
+    var list = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    list.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+    var totalSaved = list.reduce(function(s,r){ return s + (Number(r.saved)||0); }, 0);
+    var today = new Date().toISOString().slice(0,10);
+    var nextRecord = list.filter(function(r){ return r.next_due_date && r.next_due_date >= today; })
+      .sort(function(a,b){ return (a.next_due_date||'').localeCompare(b.next_due_date||''); })[0];
+
+    var html = '';
+    if(totalSaved > 0){
+      html += '<div class="history-saved-banner">💰 '+totalSaved.toLocaleString('fr-CA',{style:'currency',currency:'CAD'})+' économisés grâce à Greaz</div>';
+    }
+    if(nextRecord){
+      var d = new Date(nextRecord.next_due_date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'long',year:'numeric'});
+      html += '<div class="history-next-banner">🗓️ Ton garage a prévu ton prochain entretien pour le <b>'+d+'</b></div>';
+    }
+    html += list.map(function(r){
+      var dateStr = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      return '<div class="history-item">'
+        +'<div class="history-top"><b>'+(r.title||'Entretien')+'</b><span class="history-date">'+dateStr+'</span></div>'
+        + (r.note ? '<div class="history-note">'+r.note+'</div>' : '')
+        +'<div class="history-meta">'
+        + (r.vehicle_label ? '<span>🚗 '+r.vehicle_label+'</span>' : '')
+        + (r.cost ? '<span>💳 '+Number(r.cost).toLocaleString('fr-CA',{style:'currency',currency:'CAD'})+'</span>' : '')
+        + (r.saved ? '<span class="history-saved">💰 '+Number(r.saved).toLocaleString('fr-CA',{style:'currency',currency:'CAD'})+' économisés</span>' : '')
+        +'</div></div>';
+    }).join('');
+    el.innerHTML = html;
+  }).catch(function(e){ console.log('Historique entretien:', e); });
 }
 
 /* Les demandes conciergerie envoyées par le client (collection leads) */
@@ -5000,6 +5201,7 @@ async function saveVehicle(idx){
     await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
     clientData.vehicles = vehicles;
     renderAccount();
+    updateMaintenanceAlertBadge();
     toast('🚗 Véhicule enregistré ✓', 'ok', 2800);
   } catch(e){
     errEl.textContent='Erreur : '+e.message; errEl.style.display='block';
@@ -5098,6 +5300,7 @@ async function removeVehicle(idx){
     await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
     clientData.vehicles = vehicles;
     renderAccount();
+    updateMaintenanceAlertBadge();
   } catch(e){ toast('Erreur : '+e.message, 'err'); }
 }
 
