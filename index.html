@@ -1099,6 +1099,25 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 .acc-add{font-size:11px;font-weight:700;color:var(--blue);background:var(--bluelt);border:none;padding:5px 13px;border-radius:16px;cursor:pointer;letter-spacing:0;text-transform:none;transition:background .2s}
 .acc-add:hover{background:#DFE8FC}
 
+/* ═══ TABLEAU DE BORD PERMANENT (utilisateur connecté) ═══
+   Contrairement au tiroir "Mon espace" (overlay), cette section vit
+   directement dans la page d'accueil et reste toujours visible une
+   fois connecté — voir renderHomeDashboard(). */
+body.logged-in #hero-marketing{display:none}
+body.logged-in .hero{min-height:auto;padding:6.5rem 2rem 2.75rem}
+body.logged-in .hero-scroll{display:none}
+.home-dash{display:none;padding:0 1.5rem 3rem;max-width:1000px;margin:0 auto}
+.home-dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 2.5rem;align-items:start}
+.home-dash-col .acc-section:first-child{margin-top:0}
+@media(max-width:860px){
+  .home-dash-grid{grid-template-columns:1fr;gap:0}
+  .home-dash-col:first-child .acc-section:first-child{margin-top:1.5rem}
+}
+@media(max-width:640px){
+  .home-dash{padding:0 1.1rem 1.5rem}
+  body.logged-in .hero{padding:6rem 1.25rem 2rem}
+}
+
 /* ═══ CALENDRIER D'ENTRETIEN ═══ */
 .maint-note{font-size:11.5px;color:var(--faint);line-height:1.5;margin-bottom:10px;padding:8px 11px;background:#FAFAFB;border-radius:9px}
 .maint-card{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin-bottom:9px}
@@ -1346,6 +1365,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
   <div class="hero-overlay"></div>
   <div class="hero-content">
 
+    <div id="hero-marketing">
     <div class="hero-eyebrow">
       <span class="hero-dot"></span>
       <span>Québec</span>
@@ -1360,6 +1380,7 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
     </h1>
 
     <p class="hero-sub">Décris-nous ce qui se passe. On trouve le bon garage proche de chez toi, on compare, pis on organise ton rendez-vous.</p>
+    </div>
 
     <!-- Bouton d'ouverture du formulaire -->
     <div class="cc-open-wrap" id="cc-open-wrap">
@@ -1412,6 +1433,12 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 
   </div>
   <div class="hero-scroll" aria-hidden="true"><span></span></div>
+</section>
+
+<!-- Tableau de bord permanent, visible seulement pour un usager connecté —
+     remplace la place que prenait la page marketing (voir renderHomeDashboard()). -->
+<section class="home-dash" id="home-dash">
+  <div id="home-dash-body"></div>
 </section>
 
 <section class="annuaire-section cc-map-hidden" id="annuaire">
@@ -1973,6 +2000,14 @@ function ccOpenForm(){
     ccUpdateReferralField();
     setTimeout(function(){ form.scrollIntoView({behavior:'smooth',block:'center'}); }, 120);
   }
+}
+
+/* Depuis le tableau de bord permanent (usager connecté) : remonte vers le
+   formulaire conciergerie en haut de page, puis l'ouvre. */
+function ccScrollToForm(){
+  var hero = document.querySelector('.hero');
+  if(hero) hero.scrollIntoView({behavior:'smooth'});
+  setTimeout(ccOpenForm, 350);
 }
 
 /* Le champ code sert SEULEMENT aux gens sans abonnement.
@@ -4480,7 +4515,7 @@ function nextTier(pts){
 /* ── Auth ── */
 firebase.auth().onAuthStateChanged(function(user){
   if(user){ loadClientProfile(user); }
-  else { clientUser = null; clientData = null; updateNavAccount(); }
+  else { clientUser = null; clientData = null; updateNavAccount(); renderHomeDashboard(); }
 });
 
 function updateNavAccount(){
@@ -4515,6 +4550,7 @@ async function loadClientProfile(user){
     }
     window.clientData = clientData;
     updateNavAccount();
+    renderHomeDashboard();
     if(document.getElementById('overlay-account').classList.contains('open')) renderAccount();
     // Si le formulaire conciergerie est déjà ouvert (profil chargé après l'ouverture),
     // on pré-remplit maintenant que les infos sont prêtes.
@@ -4532,7 +4568,7 @@ function openAccount(){
   if(clientUser && clientData){
     renderAccount();
     // Rafraîchit le statut membre puis re-render si ça a changé
-    refreshMemberStatus().then(function(){ if(clientUser && clientData) renderAccount(); });
+    refreshMemberStatus().then(function(){ if(clientUser && clientData){ renderAccount(); renderHomeDashboard(); } });
   }
   else renderAuth('login');
 }
@@ -4645,16 +4681,17 @@ function computeMaintenancePlan(v){
     .sort(function(a,b){ return a.remaining - b.remaining; });
 }
 
-function renderMaintenanceSection(){
+function renderMaintenanceSection(home){
   var vehicles = (clientData && clientData.vehicles) || [];
   if(!vehicles.length) return '';
+  var addFn = home ? 'homeOpenVehicleForm' : 'openVehicleForm';
   return '<div class="maint-note">📍 Estimation basée sur les intervalles standards des fabricants selon ton kilométrage — pas sur ton historique réel d\'entretien. À valider avec ton garage.</div>'
     + vehicles.map(function(v, i){
         var title = [v.year, v.make, v.model].filter(Boolean).join(' ') || ('Véhicule '+(i+1));
         if(!v.km){
           return '<div class="maint-card"><div class="maint-veh-title">🚗 '+title+'</div>'
             +'<div class="maint-empty">Ajoute ton kilométrage pour voir ton calendrier d\'entretien personnalisé.</div>'
-            +'<button class="acc-empty-btn" style="margin-top:9px;padding:8px 16px;font-size:12px" onclick="openVehicleForm('+i+')">+ Ajouter le kilométrage</button>'
+            +'<button class="acc-empty-btn" style="margin-top:9px;padding:8px 16px;font-size:12px" onclick="'+addFn+'('+i+')">+ Ajouter le kilométrage</button>'
             +'</div>';
         }
         var plan = computeMaintenancePlan(v).slice(0, 4);
@@ -4908,6 +4945,7 @@ function resetPass(){
 function clientLogout(){
   firebase.auth().signOut().then(function(){
     clientUser=null; clientData=null; updateNavAccount();
+    renderHomeDashboard();
     closeDrawer('account');
     toast('À bientôt ! 👋', 'ok', 2500);
   });
@@ -4994,10 +5032,112 @@ function renderAccount(){
   loadClientServiceHistory();
 }
 
+/* ── Tableau de bord permanent (page d'accueil, usager connecté) ──
+   Même contenu que "Mon espace" (renderAccount ci-dessus), mais affiché
+   directement sur la page au lieu d'être caché dans le tiroir. Les actions
+   d'édition (véhicule, profil) ouvrent le tiroir existant pour réutiliser
+   ses formulaires tels quels. */
+function homeOpenDrawerThen(fn){
+  document.getElementById('overlay-account').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  fn();
+}
+function homeOpenVehicleForm(idx){ homeOpenDrawerThen(function(){ openVehicleForm(idx); }); }
+function homeOpenProfileEdit(){ homeOpenDrawerThen(function(){ openProfileEdit(); }); }
+
+function renderHomeDashboard(){
+  var section = document.getElementById('home-dash');
+  if(!clientData){
+    if(section) section.style.display = 'none';
+    document.body.classList.remove('logged-in');
+    return;
+  }
+  document.body.classList.add('logged-in');
+  if(section) section.style.display = '';
+  var body = document.getElementById('home-dash-body');
+  if(!body) return;
+
+  var pts = clientData.points||0;
+  var tier = getTier(pts);
+  var nxt = nextTier(pts);
+  var pct = nxt ? Math.min(100, Math.round(pts/nxt.min*100)) : 100;
+  var vehicles = clientData.vehicles||[];
+
+  var vehHtml = vehicles.length
+    ? vehicles.map(function(v,i){
+        var title = [v.year,v.make,v.model].filter(Boolean).join(' ');
+        var details = [];
+        if(v.plate) details.push('🔖 '+v.plate);
+        if(v.km) details.push('📊 '+Number(v.km).toLocaleString('fr-CA')+' km');
+        if(v.color) details.push('🎨 '+v.color);
+        if(v.fuel) details.push('⛽ '+v.fuel);
+        var detailsHtml = details.length
+          ? '<div class="veh-details">'+details.join('<span class="veh-dsep">·</span>')+'</div>'
+          : '<div class="veh-details veh-details-empty">Clique pour ajouter le kilométrage, la plaque... →</div>';
+        return '<div class="veh-card" onclick="homeOpenVehicleForm('+i+')" style="cursor:pointer">'
+          +'<div class="veh-ic">🚗</div>'
+          +'<div style="flex:1;min-width:0"><div class="veh-name">'+(title||'Véhicule')+'</div>'
+          + detailsHtml + '</div>'
+          +'<button class="close-btn" style="width:28px;height:28px;font-size:13px;flex-shrink:0" onclick="event.stopPropagation();removeVehicle('+i+')">✕</button>'
+          +'</div>';
+      }).join('')
+    : '<div class="acc-empty">'
+        +'<div class="acc-empty-ic">🚗</div>'
+        +'<div class="acc-empty-t">Aucun véhicule enregistré</div>'
+        +'<div class="acc-empty-d">Ajoute ton char pour remplir tes demandes en 2 clics la prochaine fois.</div>'
+        +'<button class="acc-empty-btn" onclick="homeOpenVehicleForm()">+ Ajouter mon véhicule</button>'
+        +'</div>';
+
+  var leftCol =
+      '<div class="acc-section">👤 Mon profil</div>'
+      + renderProfileSection(true)
+      +'<div class="acc-section">🚗 Mes véhicules <button class="acc-add" onclick="homeOpenVehicleForm()">+ Ajouter</button></div>'
+      + vehHtml
+      + (vehicles.length ? '<div class="acc-section">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection(true) : '');
+
+  var rightCol =
+      (isMember() ? '' : '<div class="acc-join" onclick="goToSubscribe()">'
+        + '<div class="acc-join-l"><div class="acc-join-t">🛡️ Deviens membre Greaz</div>'
+        + '<div class="acc-join-d">Pour qu\'on s\'occupe de ton auto au complet — '+GREAZ_PRICE+'/mois</div></div>'
+        + '<div class="acc-join-btn">S\'abonner →</div>'
+        + '</div>')
+      +'<div class="acc-section">🔧 Mes demandes en cours</div>'
+      +'<div id="home-acc-demandes"><div class="acc-loading">Chargement...</div></div>'
+      +'<div class="acc-section">📅 Mes rendez-vous</div>'
+      +'<div id="home-acc-rdvs"><div class="acc-loading">Chargement...</div></div>'
+      +'<div class="acc-section">🛠️ Historique & économies</div>'
+      +'<div id="home-acc-history"><div class="acc-loading">Chargement...</div></div>'
+      +'<div class="acc-section">🎁 Mes récompenses</div>'
+      + renderRewards(pts);
+
+  body.innerHTML =
+    '<div class="acc-hero" style="margin-bottom:1.75rem">'
+    +'<div class="acc-name">Salut '+(clientData.prenom||'')+' 👋</div>'
+    +'<div class="acc-mail">'+(clientData.email||'')+'</div>'
+    +'<div class="loyalty">'
+    +'<div class="loy-top"><div><div class="loy-pts">'+pts+'</div><div class="loy-lbl">Points Greaz</div></div>'
+    +'<span class="loy-tier '+tier.cls+'">'+tier.icon+' '+tier.label+'</span></div>'
+    +'<div class="loy-bar"><div class="loy-fill" style="width:'+pct+'%"></div></div>'
+    +'<div class="loy-next">'+(nxt
+      ? 'Encore <b style="color:var(--gold)">'+(nxt.min-pts)+' points</b> pour atteindre '+nxt.icon+' '+nxt.label
+      : '🎉 Tu es au niveau maximum !')+'</div>'
+    +'</div></div>'
+    +'<div class="home-dash-grid">'
+    +'<div class="home-dash-col">'+leftCol+'</div>'
+    +'<div class="home-dash-col">'+rightCol+'</div>'
+    +'</div>'
+    +'<button class="btn-book" style="margin-top:1.5rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="clientLogout()">Me déconnecter</button>';
+
+  loadClientDemandes('home-acc-demandes');
+  loadClientRdvs('home-acc-rdvs');
+  loadClientServiceHistory('home-acc-history');
+  updateMaintenanceAlertBadge();
+}
+
 /* Historique d'entretien réel + économies — alimenté par le garage/admin
    depuis le dashboard (Dossier client), pas calculé automatiquement. */
-function loadClientServiceHistory(){
-  var el = document.getElementById('acc-history');
+function loadClientServiceHistory(targetId){
+  var el = document.getElementById(targetId || 'acc-history');
   if(!el || !clientUser) return;
   db.collection('service_history').where('client_uid','==',clientUser.uid).get().then(function(snap){
     if(!el) return;
@@ -5041,8 +5181,9 @@ function loadClientServiceHistory(){
 }
 
 /* Les demandes conciergerie envoyées par le client (collection leads) */
-function loadClientDemandes(){
-  var el = document.getElementById('acc-demandes');
+function loadClientDemandes(targetId){
+  var isHome = targetId === 'home-acc-demandes';
+  var el = document.getElementById(targetId || 'acc-demandes');
   if(!el || !clientUser) return;
   db.collection('leads').where('client_uid','==',clientUser.uid).get().then(function(snap){
     if(!el) return;
@@ -5051,7 +5192,7 @@ function loadClientDemandes(){
         +'<div class="acc-empty-ic">📭</div>'
         +'<div class="acc-empty-t">Aucune demande en cours</div>'
         +'<div class="acc-empty-d">Ton auto fait des siennes ? Décris ton problème, on s\'occupe du reste.</div>'
-        +'<button class="acc-empty-btn" onclick="closeDrawer(\'account\');setTimeout(ccOpenForm,300)">Décris ton problème →</button>'
+        +'<button class="acc-empty-btn" onclick="'+(isHome ? 'ccScrollToForm()' : 'closeDrawer(\'account\');setTimeout(ccOpenForm,300)')+'">Décris ton problème →</button>'
         +'</div>';
       return;
     }
@@ -5102,9 +5243,9 @@ function renderRewards(pts){
   }).join('');
 }
 
-function loadClientRdvs(){
+function loadClientRdvs(targetId){
   if(!clientData || !clientData.email) return;
-  var el = document.getElementById('acc-rdvs');
+  var el = document.getElementById(targetId || 'acc-rdvs');
   db.collection('appointments').where('client_email','==',clientData.email).get().then(function(snap){
     if(!el) return;
     if(snap.empty){
@@ -5202,6 +5343,7 @@ async function saveVehicle(idx){
     await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
     clientData.vehicles = vehicles;
     renderAccount();
+    renderHomeDashboard();
     updateMaintenanceAlertBadge();
     toast('🚗 Véhicule enregistré ✓', 'ok', 2800);
   } catch(e){
@@ -5218,7 +5360,8 @@ function profileCompletionPct(d){
   return Math.round(done/fields.length*100);
 }
 
-function renderProfileSection(){
+function renderProfileSection(home){
+  var editFn = home ? 'homeOpenProfileEdit()' : 'openProfileEdit()';
   var d = clientData||{};
   var pct = profileCompletionPct(d);
   if(pct < 100){
@@ -5227,7 +5370,7 @@ function renderProfileSection(){
     if(!d.birthdate) missing.push('date de naissance');
     if(!d.insurer) missing.push('assureur');
     if(!(d.vehicles&&d.vehicles.length&&d.vehicles[0].financed)) missing.push('financement de ton auto');
-    return '<div class="profile-nudge" onclick="openProfileEdit()">'
+    return '<div class="profile-nudge" onclick="'+editFn+'">'
       +'<div class="profile-nudge-t">👤 Complète ton profil ('+pct+'%)</div>'
       +'<div class="profile-nudge-bar"><div class="profile-nudge-fill" style="width:'+pct+'%"></div></div>'
       +'<div class="profile-nudge-d">Il manque : '+missing.join(', ')+' — <b style="color:var(--blue)">Compléter →</b></div>'
@@ -5238,7 +5381,7 @@ function renderProfileSection(){
     +'<div class="profile-row"><span class="profile-row-l">🎂 Naissance</span><span class="profile-row-v">'+(d.birthdate||'—')+'</span></div>'
     +'<div class="profile-row"><span class="profile-row-l">🛡️ Assureur</span><span class="profile-row-v">'+(d.insurer||'—')+(d.insurer_since?' · '+d.insurer_since:'')+'</span></div>'
     +'<div class="profile-row"><span class="profile-row-l">💳 Véhicule</span><span class="profile-row-v">'+(v0.financed||'—')+'</span></div>'
-    +'<button class="acc-add" style="margin-top:.75rem" onclick="openProfileEdit()">✏️ Modifier mon profil</button>';
+    +'<button class="acc-add" style="margin-top:.75rem" onclick="'+editFn+'">✏️ Modifier mon profil</button>';
 }
 
 function openProfileEdit(){
@@ -5287,6 +5430,7 @@ async function saveProfileEdit(){
       toast('✓ Profil mis à jour', 'ok', 2500);
     }
     renderAccount();
+    renderHomeDashboard();
   } catch(e){
     errEl.textContent='Erreur : '+e.message; errEl.style.display='block';
     btn.disabled=false; btn.textContent='✓ Enregistrer';
@@ -5301,6 +5445,7 @@ async function removeVehicle(idx){
     await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
     clientData.vehicles = vehicles;
     renderAccount();
+    renderHomeDashboard();
     updateMaintenanceAlertBadge();
   } catch(e){ toast('Erreur : '+e.message, 'err'); }
 }
