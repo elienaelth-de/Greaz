@@ -1118,6 +1118,34 @@ body.logged-in .hero-scroll{display:none}
   body.logged-in .hero{padding:6rem 1.25rem 2rem}
 }
 
+/* ═══ TICKER "BOURSE" — prix carburant / électricité / entretien ═══ */
+.ticker-wrap{background:#0B0C10;border-radius:18px;padding:14px;margin-bottom:1.75rem}
+.ticker-head{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);padding:2px 6px 10px}
+.ticker-row{display:flex;align-items:center;gap:13px;background:#16171D;border-radius:13px;padding:12px 14px;margin-bottom:8px}
+.ticker-row:last-child{margin-bottom:0}
+.ticker-ic{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ticker-info{flex:1;min-width:0}
+.ticker-name{font-size:13px;font-weight:700;color:#fff}
+.ticker-sub{font-size:10.5px;color:rgba(255,255,255,.42);margin-top:1px}
+.ticker-right{text-align:right;flex-shrink:0}
+.ticker-price{font-size:16px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.ticker-unit{font-size:10px;font-weight:600;color:rgba(255,255,255,.4);margin-left:2px}
+.ticker-delta{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;display:inline-block;white-space:nowrap}
+.ticker-delta.up{background:rgba(0,194,111,.16);color:#22E68A}
+.ticker-delta.down{background:rgba(255,69,58,.16);color:#FF7A6E}
+.ticker-delta.flat{background:rgba(255,255,255,.08);color:rgba(255,255,255,.55)}
+.ticker-empty{font-size:12px;color:rgba(255,255,255,.4);padding:.5rem}
+
+/* ═══ CHAT CLIENT ═══ */
+.chat-bubble{max-width:78%;font-size:13.5px;line-height:1.45;padding:9px 13px;border-radius:15px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.chat-bubble.me{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
+.chat-bubble.them{align-self:flex-start;background:#F4F4F5;color:#111;border-bottom-left-radius:4px}
+.chat-time{font-size:10px;color:var(--faint);margin-top:2px}
+.chat-cta{display:flex;align-items:center;gap:12px;background:#F4F4F5;border-radius:15px;padding:14px 16px;cursor:pointer;transition:background .2s}
+.chat-cta:hover{background:#ECECEE}
+.chat-cta-ic{font-size:22px}
+.chat-unread-dot{width:9px;height:9px;border-radius:50%;background:#E11D48;display:inline-block;margin-left:6px;flex-shrink:0}
+
 /* ═══ CALENDRIER D'ENTRETIEN ═══ */
 .maint-note{font-size:11.5px;color:var(--faint);line-height:1.5;margin-bottom:10px;padding:8px 11px;background:#FAFAFB;border-radius:9px}
 .maint-card{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin-bottom:9px}
@@ -1657,6 +1685,17 @@ body.logged-in .hero-scroll{display:none}
   <div class="drawer"><div class="drawer-handle"></div>
     <div class="drawer-header"><span class="drawer-title">⭐ Laisser un avis</span><button class="close-btn" onclick="closeDrawer('review')">✕</button></div>
     <div class="drawer-body" id="review-drawer-body"></div>
+  </div>
+</div>
+<div class="overlay" id="overlay-chat" onclick="if(event.target===this)closeChatDrawer()">
+  <div class="drawer" style="max-height:88vh;display:flex;flex-direction:column">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header"><span class="drawer-title">💬 Discuter avec Greaz</span><button class="close-btn" onclick="closeChatDrawer()">✕</button></div>
+    <div id="chat-msgs" style="flex:1;overflow-y:auto;padding:0 1.5rem;display:flex;flex-direction:column;gap:9px;min-height:220px"></div>
+    <div style="padding:.9rem 1.25rem calc(1rem + env(safe-area-inset-bottom));display:flex;gap:8px;border-top:1px solid var(--line);margin-top:.75rem">
+      <input id="chat-input" type="text" placeholder="Écris ton message..." style="flex:1;padding:11px 14px;border:1.5px solid var(--line);border-radius:22px;font-size:14px;font-family:inherit" onkeydown="if(event.key==='Enter')sendClientChatMessage()">
+      <button onclick="sendClientChatMessage()" style="width:44px;height:44px;border-radius:50%;border:none;background:var(--blue);color:#fff;font-size:17px;cursor:pointer;flex-shrink:0">➤</button>
+    </div>
   </div>
 </div>
 
@@ -4515,7 +4554,7 @@ function nextTier(pts){
 /* ── Auth ── */
 firebase.auth().onAuthStateChanged(function(user){
   if(user){ loadClientProfile(user); }
-  else { clientUser = null; clientData = null; updateNavAccount(); renderHomeDashboard(); }
+  else { clientUser = null; clientData = null; updateNavAccount(); stopClientChatWatch(); renderHomeDashboard(); }
 });
 
 function updateNavAccount(){
@@ -4945,6 +4984,7 @@ function resetPass(){
 function clientLogout(){
   firebase.auth().signOut().then(function(){
     clientUser=null; clientData=null; updateNavAccount();
+    stopClientChatWatch();
     renderHomeDashboard();
     closeDrawer('account');
     toast('À bientôt ! 👋', 'ok', 2500);
@@ -5096,7 +5136,14 @@ function renderHomeDashboard(){
       + (vehicles.length ? '<div class="acc-section">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection(true) : '');
 
   var rightCol =
-      (isMember() ? '' : '<div class="acc-join" onclick="goToSubscribe()">'
+      '<div class="acc-section" style="margin-top:0">💬 Discuter avec Greaz</div>'
+      +'<div class="chat-cta" onclick="openChatDrawer()">'
+      +'<span class="chat-cta-ic">💬</span>'
+      +'<div style="flex:1"><div style="font-weight:700;font-size:13.5px">Une question ? Écris-nous</div>'
+      +'<div style="font-size:11.5px;color:var(--faint);margin-top:1px">On répond directement dans ton espace</div></div>'
+      +'<span id="home-chat-badge"></span>'
+      +'</div>'
+      + (isMember() ? '' : '<div class="acc-join" onclick="goToSubscribe()" style="margin-top:1.5rem">'
         + '<div class="acc-join-l"><div class="acc-join-t">🛡️ Deviens membre Greaz</div>'
         + '<div class="acc-join-d">Pour qu\'on s\'occupe de ton auto au complet — '+GREAZ_PRICE+'/mois</div></div>'
         + '<div class="acc-join-btn">S\'abonner →</div>'
@@ -5122,6 +5169,7 @@ function renderHomeDashboard(){
       ? 'Encore <b style="color:var(--gold)">'+(nxt.min-pts)+' points</b> pour atteindre '+nxt.icon+' '+nxt.label
       : '🎉 Tu es au niveau maximum !')+'</div>'
     +'</div></div>'
+    +'<div class="ticker-wrap" id="home-ticker-wrap"></div>'
     +'<div class="home-dash-grid">'
     +'<div class="home-dash-col">'+leftCol+'</div>'
     +'<div class="home-dash-col">'+rightCol+'</div>'
@@ -5131,7 +5179,152 @@ function renderHomeDashboard(){
   loadClientDemandes('home-acc-demandes');
   loadClientRdvs('home-acc-rdvs');
   loadClientServiceHistory('home-acc-history');
+  renderMarketTicker();
+  watchClientChatBadge();
   updateMaintenanceAlertBadge();
+}
+
+/* ── Prix du marché (style "bourse") — carburant, électricité, entretien
+   selon la ville. Alimenté chaque semaine par Greaz depuis le dashboard
+   admin (settings/market_prices), pas calculé automatiquement. ── */
+function extractCityFromAddress(addr){
+  if(!addr) return '';
+  var parts = addr.split(',');
+  return (parts[parts.length-1]||'').trim();
+}
+
+function tickerCardDelta(ic, name, val, prev, unit){
+  var hasPrev = typeof prev === 'number' && prev > 0 && prev !== val;
+  var delta = hasPrev ? (val - prev) : 0;
+  var pct = hasPrev ? (delta/prev*100) : 0;
+  var cls = !hasPrev ? 'flat' : (delta > 0 ? 'up' : 'down');
+  var arrow = !hasPrev ? '●' : (delta > 0 ? '▲' : '▼');
+  var deltaTxt = hasPrev
+    ? (arrow+' '+Math.abs(delta).toFixed(3)+' ('+(pct>=0?'+':'')+pct.toFixed(1)+'%)')
+    : 'Prix Greaz de la semaine';
+  return '<div class="ticker-row">'
+    +'<div class="ticker-ic">'+ic+'</div>'
+    +'<div class="ticker-info"><div class="ticker-name">'+name+'</div><div class="ticker-sub">Mis à jour par Greaz</div></div>'
+    +'<div class="ticker-right"><div class="ticker-price">'+val.toFixed(3)+'<span class="ticker-unit">'+unit+'</span></div>'
+    +'<span class="ticker-delta '+cls+'">'+deltaTxt+'</span></div>'
+    +'</div>';
+}
+function tickerCardFlat(ic, name, val, unit, sub){
+  return '<div class="ticker-row">'
+    +'<div class="ticker-ic">'+ic+'</div>'
+    +'<div class="ticker-info"><div class="ticker-name">'+name+'</div><div class="ticker-sub">'+sub+'</div></div>'
+    +'<div class="ticker-right"><div class="ticker-price">'+Math.round(val)+'<span class="ticker-unit">'+unit+'</span></div>'
+    +'<span class="ticker-delta flat">Prix Greaz</span></div>'
+    +'</div>';
+}
+
+function renderMarketTicker(){
+  var wrap = document.getElementById('home-ticker-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = '<div class="ticker-head">💹 Prix du marché — Québec</div><div id="home-ticker-list"><div class="acc-loading" style="color:rgba(255,255,255,.5)">Chargement...</div></div>';
+  db.collection('settings').doc('market_prices').get().then(function(doc){
+    var d = doc.exists ? doc.data() : {};
+    var vehicles = (clientData && clientData.vehicles) || [];
+    var hasElectric = vehicles.some(function(v){ return v.fuel === 'Électrique' || v.fuel === 'Hybride'; });
+    var hasGas = !vehicles.length || vehicles.some(function(v){ return v.fuel !== 'Électrique'; });
+    var cards = [];
+    if(hasGas && typeof d.fuel_regular === 'number') cards.push(tickerCardDelta('⛽','Essence ordinaire', d.fuel_regular, d.fuel_regular_prev, '$/L'));
+    if(hasElectric && typeof d.ev_kwh === 'number') cards.push(tickerCardDelta('🔌','Recharge électrique', d.ev_kwh, d.ev_kwh_prev, '$/kWh'));
+
+    var myCity = extractCityFromAddress(clientData && clientData.address);
+    var list = Array.isArray(d.city_prices) ? d.city_prices : [];
+    var cityEntry = null;
+    if(myCity){
+      cityEntry = list.find(function(c){
+        var cl = (c.city||'').toLowerCase(), ml = myCity.toLowerCase();
+        return cl && (cl.indexOf(ml) > -1 || ml.indexOf(cl) > -1);
+      });
+    }
+    if(!cityEntry) cityEntry = list.find(function(c){ return /qu[eé]bec|moyenne/i.test(c.city||''); });
+    if(cityEntry){
+      var isExact = myCity && cityEntry.city && cityEntry.city.toLowerCase().indexOf(myCity.toLowerCase()) > -1;
+      var locLabel = isExact ? ('📍 '+cityEntry.city) : ('📍 '+cityEntry.city+' (référence)');
+      if(cityEntry.vidange) cards.push(tickerCardFlat('🛢️',"Changement d'huile", cityEntry.vidange, '$', locLabel));
+      if(cityEntry.pneus) cards.push(tickerCardFlat('🛞','Pose de 4 pneus', cityEntry.pneus, '$', locLabel));
+    }
+
+    var listEl = document.getElementById('home-ticker-list');
+    if(listEl) listEl.innerHTML = cards.join('') || '<div class="ticker-empty">Greaz publie les prix de la semaine bientôt.</div>';
+  }).catch(function(e){ console.log('Prix marché:', e); });
+}
+
+/* ── Chat client ↔ Greaz (temps réel via Firestore) ── */
+var _clientChatUnsub = null;
+var _clientChatOpen = false;
+
+function watchClientChatBadge(){
+  if(!clientUser || _clientChatUnsub) return;
+  _clientChatUnsub = db.collection('chats').doc(clientUser.uid).onSnapshot(function(doc){
+    var d = doc.data() || {};
+    var badge = document.getElementById('home-chat-badge');
+    if(badge) badge.innerHTML = (d.unread_by_client && !_clientChatOpen) ? '<span class="chat-unread-dot"></span>' : '';
+    if(_clientChatOpen) renderChatMsgs(d.messages || []);
+  }, function(e){ console.log('Chat client:', e); });
+}
+function stopClientChatWatch(){
+  if(_clientChatUnsub){ _clientChatUnsub(); _clientChatUnsub = null; }
+}
+
+function openChatDrawer(){
+  if(!clientUser){ openAccount(); return; }
+  document.getElementById('overlay-chat').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  _clientChatOpen = true;
+  db.collection('chats').doc(clientUser.uid).set({ unread_by_client:false }, { merge:true }).catch(function(){});
+  db.collection('chats').doc(clientUser.uid).get().then(function(doc){
+    renderChatMsgs((doc.data()||{}).messages || []);
+  });
+  var badge = document.getElementById('home-chat-badge'); if(badge) badge.innerHTML = '';
+}
+function closeChatDrawer(){
+  document.getElementById('overlay-chat').classList.remove('open');
+  document.body.style.overflow = '';
+  _clientChatOpen = false;
+}
+
+function renderChatMsgs(messages){
+  var el = document.getElementById('chat-msgs');
+  if(!el) return;
+  if(!messages.length){
+    el.innerHTML = '<div class="acc-empty" style="padding:2rem 1rem">'
+      +'<div class="acc-empty-ic">💬</div>'
+      +'<div class="acc-empty-t">Aucun message encore</div>'
+      +'<div class="acc-empty-d">Écris-nous ta question, on te répond ici directement.</div>'
+      +'</div>';
+    return;
+  }
+  var list = messages.slice().sort(function(a,b){ return (a.at||0)-(b.at||0); });
+  el.innerHTML = list.map(function(m){
+    var mine = m.from === 'client';
+    var time = m.at ? new Date(m.at).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'}) : '';
+    return '<div style="display:flex;flex-direction:column;align-items:'+(mine?'flex-end':'flex-start')+'">'
+      +'<div class="chat-bubble '+(mine?'me':'them')+'">'+(m.text||'').replace(/</g,'&lt;')+'</div>'
+      +'<div class="chat-time">'+time+'</div>'
+      +'</div>';
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendClientChatMessage(){
+  var inp = document.getElementById('chat-input');
+  var text = (inp.value||'').trim();
+  if(!text || !clientUser) return;
+  inp.value = '';
+  try {
+    await db.collection('chats').doc(clientUser.uid).set({
+      client_uid: clientUser.uid,
+      client_name: (clientData && clientData.prenom) || '',
+      client_email: (clientData && clientData.email) || clientUser.email || '',
+      messages: firebase.firestore.FieldValue.arrayUnion({ from:'client', text:text, at:Date.now() }),
+      last_message: text, last_at: firebase.firestore.FieldValue.serverTimestamp(),
+      unread_by_admin: true, unread_by_client: false,
+    }, { merge:true });
+  } catch(e){ toast('Erreur d\'envoi : '+(e.message||e), 'err'); }
 }
 
 /* Historique d'entretien réel + économies — alimenté par le garage/admin
