@@ -2590,6 +2590,8 @@ window.addEventListener('appinstalled', function(){
   var btn = document.getElementById('pwa-install-btn');
   if(btn) btn.classList.remove('show');
   _deferredInstallPrompt = null;
+  try{ localStorage.setItem('greaz_pwa_installed', '1'); }catch(e){}
+  hideDlAppSection();
   try{ ccToast('Greaz est installé sur ton appareil 🎉'); }catch(e){}
 });
 
@@ -2617,7 +2619,7 @@ function showInstallSteps(title, bodyHtml){
   openInstallOverlay();
 }
 function dlAndroid(){
-  if(isStandaloneApp()){ toast('Greaz est déjà installé sur cet appareil ✓', 'ok', 2600); return; }
+  if(isAlreadyInstalledHere()){ toast('Greaz est déjà installé sur cet appareil ✓', 'ok', 2600); return; }
   if(_deferredInstallPrompt){ installPwa(); return; }
   showInstallSteps('🤖 Installer sur Android',
     '<div class="install-steps">'
@@ -2627,7 +2629,7 @@ function dlAndroid(){
     +'</div>');
 }
 function dlDesktop(){
-  if(isStandaloneApp()){ toast('Greaz est déjà installé sur cet ordinateur ✓', 'ok', 2600); return; }
+  if(isAlreadyInstalledHere()){ toast('Greaz est déjà installé sur cet ordinateur ✓', 'ok', 2600); return; }
   if(_deferredInstallPrompt){ installPwa(); return; }
   showInstallSteps('💻 Installer sur ordinateur',
     '<div class="install-steps">'
@@ -2640,7 +2642,7 @@ function dlIphone(){
   var ua = navigator.userAgent || '';
   var isIOS = /iphone|ipad|ipod/i.test(ua);
   var isSafari = isIOS && /safari/i.test(ua) && !/crios|fxios|edgios|opios/i.test(ua);
-  if(isStandaloneApp()){ toast('Greaz est déjà installé sur cet appareil ✓', 'ok', 2600); return; }
+  if(isAlreadyInstalledHere()){ toast('Greaz est déjà installé sur cet appareil ✓', 'ok', 2600); return; }
   if(isIOS && !isSafari){
     showInstallSteps('📱 Installer sur iPhone',
       '<div class="install-note">⚠️ Sur iPhone, Apple permet l\'installation seulement depuis <b>Safari</b> (pas Chrome ni un autre navigateur). Ouvre <b>greaz.ca</b> dans Safari, puis reviens ici.</div>');
@@ -2654,9 +2656,22 @@ function dlIphone(){
     +'<div class="install-step"><span class="install-num">4</span>Appuie sur <b>« Ajouter »</b> en haut à droite — l\'icône Greaz apparaît sur ton écran d\'accueil.</div>'
     +'</div>');
 }
+/* Si l'app est déjà installée sur cet appareil/navigateur, toute la section
+   "Installer" est inutile — on la cache complètement plutôt que de laisser
+   des boutons qui ne servent plus à rien. */
+function isAlreadyInstalledHere(){
+  if(isStandaloneApp()) return true;
+  try{ return localStorage.getItem('greaz_pwa_installed') === '1'; }catch(e){ return false; }
+}
+function hideDlAppSection(){
+  var s = document.getElementById('dl-app');
+  if(s) s.style.display = 'none';
+}
 /* Met en évidence le bouton correspondant à l'appareil du visiteur,
-   pour l'aider à trouver le bon en un coup d'œil. */
+   pour l'aider à trouver le bon en un coup d'œil — ou cache toute la
+   section si l'app tourne déjà ici. */
 function markRecommendedDlCard(){
+  if(isAlreadyInstalledHere()){ hideDlAppSection(); return; }
   var ua = navigator.userAgent || '';
   var isIOS = /iphone|ipad|ipod/i.test(ua);
   var isAndroid = /android/i.test(ua);
