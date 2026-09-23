@@ -1800,6 +1800,38 @@ firebase.initializeApp({
 });
 var db = firebase.firestore();
 
+/* ═══ TRAFIC — visites / visiteurs uniques / ouvertures de l'app par jour ═══
+   Un petit compteur maison dans Firestore (settings/{date} n'existe pas
+   déjà pour ça, donc collection dédiée "traffic"), visible dans le
+   Dashboard admin. Pas de service tiers — juste un doc par jour avec des
+   compteurs incrémentés. Aucune donnée personnelle : pas d'IP, pas d'id
+   client, juste des nombres. */
+(function trackGreazTraffic(){
+  try {
+    var today = new Date().toISOString().slice(0,10);
+    var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    var update = { visits: firebase.firestore.FieldValue.increment(1), updated_at: firebase.firestore.FieldValue.serverTimestamp() };
+    var seenKey = 'greaz_seen_'+today;
+    var alreadySeenToday = false;
+    try { alreadySeenToday = localStorage.getItem(seenKey) === '1'; } catch(e){}
+    if(!alreadySeenToday){
+      update.unique_visitors = firebase.firestore.FieldValue.increment(1);
+      try { localStorage.setItem(seenKey, '1'); } catch(e){}
+    }
+    if(isStandalone) update.app_opens = firebase.firestore.FieldValue.increment(1);
+    db.collection('traffic').doc(today).set(update, { merge:true }).catch(function(e){ console.log('Traffic:', e); });
+  } catch(e){ console.log('Traffic:', e); }
+})();
+window.addEventListener('appinstalled', function(){
+  try {
+    var today = new Date().toISOString().slice(0,10);
+    db.collection('traffic').doc(today).set({
+      installs: firebase.firestore.FieldValue.increment(1),
+      updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+    }, { merge:true }).catch(function(e){ console.log('Traffic install:', e); });
+  } catch(e){}
+});
+
 // Session la plus durable possible : reste connecté même après avoir
 // fermé le navigateur/l'app. Sans ce réglage explicite, certains
 // contextes (surtout l'app installée sur iPhone) peuvent retomber sur
