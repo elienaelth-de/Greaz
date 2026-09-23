@@ -1010,6 +1010,27 @@ body.map-is-active .map-lock-btn{display:flex}
 .feat-title{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:-.02em;margin-bottom:.5rem;color:var(--white)}
 .feat-desc{font-size:13.5px;color:var(--muted);line-height:1.7}
 
+/* ═══ TÉLÉCHARGER L'APP (Android / iPhone / Ordinateur) ═══ */
+.dl-app-section{padding:2rem 2rem 5rem;max-width:900px;margin:0 auto;text-align:center}
+.dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:2rem}
+.dl-card{position:relative;background:#F4F4F4;border:1.5px solid transparent;border-radius:16px;padding:1.6rem 1rem;cursor:pointer;transition:background .25s var(--ease),transform .2s var(--ease),border-color .2s;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:5px}
+.dl-card:hover{background:#EEEFF0;transform:translateY(-3px)}
+.dl-card:active{transform:translateY(0) scale(.98)}
+.dl-card.recommended{border-color:rgba(62,106,225,.4);background:var(--bluelt)}
+.dl-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.03em;padding:3px 9px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 8px rgba(62,106,225,.3)}
+.dl-ic{font-size:1.9rem;line-height:1}
+.dl-t{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--white);margin-top:.35rem}
+.dl-s{font-size:11.5px;color:var(--muted)}
+@media(max-width:620px){ .dl-grid{grid-template-columns:1fr;gap:10px} .dl-card{flex-direction:row;justify-content:flex-start;text-align:left;padding:1rem 1.1rem} .dl-badge{position:static;transform:none;margin-left:auto;order:3} .dl-t{margin-top:0} }
+
+/* Modal d'instructions d'installation (surtout iPhone, où on ne peut pas
+   déclencher l'installation par code — Apple l'interdit, contrairement à
+   Android/Chrome/Edge qui ont l'API beforeinstallprompt). */
+.install-steps{display:flex;flex-direction:column;gap:14px;margin-top:.25rem}
+.install-step{display:flex;align-items:flex-start;gap:12px;font-size:13.5px;color:var(--white);line-height:1.6}
+.install-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.install-note{background:#FDEEE9;border:1px solid rgba(228,87,46,.3);color:var(--orange);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.6}
+
 footer{padding:4rem 2rem calc(6rem + env(safe-area-inset-bottom));text-align:center;background:#fff;border-top:1px solid var(--line)}
 .footer-logo{font-family:var(--display);font-size:1.25rem;font-weight:800;margin-bottom:.5rem;color:var(--white)}
 .footer-logo span{color:var(--blue)}
@@ -1170,6 +1191,20 @@ body.logged-in .hero-scroll{display:none}
 .mtab-btn{position:relative}
 .mtab-alert-badge{display:none;position:absolute;top:2px;right:calc(50% - 20px);min-width:14px;height:14px;padding:0 3px;border-radius:8px;background:var(--orange);color:#fff;font-size:9px;font-weight:800;align-items:center;justify-content:center;border:1.5px solid #fff;line-height:1}
 .mtab-alert-badge.show{display:flex}
+
+/* ═══ ALERTE D'ENTRETIEN EN HAUT DE PAGE (visible sans défiler) ═══ */
+.top-maint-alert{display:flex;align-items:center;gap:12px;border-radius:14px;padding:13px 16px;margin-bottom:1.1rem;cursor:pointer;transition:transform .15s;box-shadow:0 6px 20px rgba(23,26,32,.08)}
+.top-maint-alert:active{transform:scale(.985)}
+.top-maint-alert.soon{background:var(--bluelt);border:1.5px solid rgba(62,106,225,.3)}
+.top-maint-alert.due{background:#FDEEE9;border:1.5px solid rgba(228,87,46,.35)}
+.top-maint-ic{font-size:22px;flex-shrink:0;line-height:1}
+.top-maint-t{font-weight:800;font-size:13.5px;color:var(--white)}
+.top-maint-alert.soon .top-maint-t{color:var(--blue2)}
+.top-maint-alert.due .top-maint-t{color:var(--orange)}
+.top-maint-s{font-size:11.5px;color:var(--faint);margin-top:1px}
+.top-maint-arrow{font-size:16px;font-weight:800;flex-shrink:0}
+.top-maint-alert.soon .top-maint-arrow{color:var(--blue)}
+.top-maint-alert.due .top-maint-arrow{color:var(--orange)}
 
 /* ═══ HISTORIQUE D'ENTRETIEN & ÉCONOMIES (rempli par le garage/admin) ═══ */
 .history-saved-banner{background:linear-gradient(135deg,var(--green),#00875A);color:#fff;border-radius:12px;padding:13px 16px;font-size:14px;font-weight:600;margin-bottom:9px;box-shadow:0 6px 18px rgba(0,168,98,.25)}
@@ -1651,6 +1686,32 @@ body.logged-in .hero-scroll{display:none}
   </div>
 </section>
 
+<section class="dl-app-section" id="dl-app">
+  <div class="section-label" style="justify-content:center"><span class="hero-dot"></span>Application</div>
+  <h2 class="section-title" style="font-size:clamp(1.4rem,4vw,2rem)">Installe Greaz sur ton appareil</h2>
+  <p class="section-sub">Accès plus rapide, en un tap depuis ton écran d'accueil — choisis ton appareil ci-dessous.</p>
+  <div class="dl-grid">
+    <button class="dl-card" id="dl-card-android" onclick="dlAndroid()">
+      <span class="dl-badge" id="dl-badge-android" style="display:none">Ton appareil</span>
+      <span class="dl-ic">🤖</span>
+      <span class="dl-t">Android</span>
+      <span class="dl-s">Installer l'app</span>
+    </button>
+    <button class="dl-card" id="dl-card-iphone" onclick="dlIphone()">
+      <span class="dl-badge" id="dl-badge-iphone" style="display:none">Ton appareil</span>
+      <span class="dl-ic">📱</span>
+      <span class="dl-t">iPhone</span>
+      <span class="dl-s">Ajouter à l'écran d'accueil</span>
+    </button>
+    <button class="dl-card" id="dl-card-desktop" onclick="dlDesktop()">
+      <span class="dl-badge" id="dl-badge-desktop" style="display:none">Ton appareil</span>
+      <span class="dl-ic">💻</span>
+      <span class="dl-t">Ordinateur</span>
+      <span class="dl-s">Installer l'app</span>
+    </button>
+  </div>
+</section>
+
 <footer>
   <div class="footer-logo">Gre<span>az</span></div>
   <p style="margin-bottom:.6rem">La plateforme automobile au Québec</p>
@@ -1660,6 +1721,12 @@ body.logged-in .hero-scroll{display:none}
 <!-- FAB : retour rapide à l'annuaire quand on a défilé loin -->
 
 
+<div class="overlay" id="overlay-install" onclick="if(event.target===this)closeInstallOverlay()">
+  <div class="drawer"><div class="drawer-handle"></div>
+    <div class="drawer-header"><span class="drawer-title" id="install-title">Installer Greaz</span><button class="close-btn" onclick="closeInstallOverlay()">✕</button></div>
+    <div class="drawer-body" id="install-body"></div>
+  </div>
+</div>
 <div class="overlay" id="overlay-client" onclick="if(event.target===this)closeDrawer('client')">
   <div class="drawer"><div class="drawer-handle"></div>
     <div class="drawer-header"><span class="drawer-title">🔧 Demande de service</span><button class="close-btn" onclick="closeDrawer('client')">✕</button></div>
@@ -2525,6 +2592,82 @@ window.addEventListener('appinstalled', function(){
   _deferredInstallPrompt = null;
   try{ ccToast('Greaz est installé sur ton appareil 🎉'); }catch(e){}
 });
+
+/* ═══ 3 BOUTONS "TÉLÉCHARGER" (Android / iPhone / Ordinateur) ═══
+   Pour les clients qui ne savent pas comment installer l'app eux-mêmes.
+   Android + Ordinateur utilisent la même API navigateur (beforeinstallprompt)
+   que le bouton "Installer" du haut — quand elle est dispo, ça installe
+   directement en un tap. iPhone est différent : Apple ne permet PAS de
+   déclencher l'installation par code sur Safari, donc on ne peut que
+   montrer les 3 étapes claires (Partager → Sur l'écran d'accueil). */
+function isStandaloneApp(){
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+}
+function openInstallOverlay(){
+  document.getElementById('overlay-install').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeInstallOverlay(){
+  document.getElementById('overlay-install').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function showInstallSteps(title, bodyHtml){
+  document.getElementById('install-title').textContent = title;
+  document.getElementById('install-body').innerHTML = bodyHtml;
+  openInstallOverlay();
+}
+function dlAndroid(){
+  if(isStandaloneApp()){ toast('Greaz est déjà installé sur cet appareil ✓', 'ok', 2600); return; }
+  if(_deferredInstallPrompt){ installPwa(); return; }
+  showInstallSteps('🤖 Installer sur Android',
+    '<div class="install-steps">'
+    +'<div class="install-step"><span class="install-num">1</span>Ouvre ce site dans <b>Chrome</b> sur ton téléphone Android.</div>'
+    +'<div class="install-step"><span class="install-num">2</span>Appuie sur les <b>3 points ⋮</b> en haut à droite.</div>'
+    +'<div class="install-step"><span class="install-num">3</span>Choisis <b>« Installer l\'application »</b> (ou « Ajouter à l\'écran d\'accueil »).</div>'
+    +'</div>');
+}
+function dlDesktop(){
+  if(isStandaloneApp()){ toast('Greaz est déjà installé sur cet ordinateur ✓', 'ok', 2600); return; }
+  if(_deferredInstallPrompt){ installPwa(); return; }
+  showInstallSteps('💻 Installer sur ordinateur',
+    '<div class="install-steps">'
+    +'<div class="install-step"><span class="install-num">1</span>Ouvre ce site dans <b>Chrome</b> ou <b>Edge</b>.</div>'
+    +'<div class="install-step"><span class="install-num">2</span>Clique sur l\'icône d\'installation ⊕ dans la barre d\'adresse (ou le menu <b>⋮</b> → « Installer Greaz »).</div>'
+    +'<div class="install-step"><span class="install-num">3</span>Clique sur <b>« Installer »</b> — Greaz s\'ouvre comme une vraie application, dans sa propre fenêtre.</div>'
+    +'</div>');
+}
+function dlIphone(){
+  var ua = navigator.userAgent || '';
+  var isIOS = /iphone|ipad|ipod/i.test(ua);
+  var isSafari = isIOS && /safari/i.test(ua) && !/crios|fxios|edgios|opios/i.test(ua);
+  if(isStandaloneApp()){ toast('Greaz est déjà installé sur cet appareil ✓', 'ok', 2600); return; }
+  if(isIOS && !isSafari){
+    showInstallSteps('📱 Installer sur iPhone',
+      '<div class="install-note">⚠️ Sur iPhone, Apple permet l\'installation seulement depuis <b>Safari</b> (pas Chrome ni un autre navigateur). Ouvre <b>greaz.ca</b> dans Safari, puis reviens ici.</div>');
+    return;
+  }
+  showInstallSteps('📱 Installer sur iPhone',
+    '<div class="install-steps">'
+    +'<div class="install-step"><span class="install-num">1</span>Assure-toi d\'être dans <b>Safari</b> (pas Chrome).</div>'
+    +'<div class="install-step"><span class="install-num">2</span>Appuie sur le bouton <b>Partager</b> <span style="font-size:15px">⬆️</span> (en bas ou en haut selon ton iPhone).</div>'
+    +'<div class="install-step"><span class="install-num">3</span>Fais défiler la liste et choisis <b>« Sur l\'écran d\'accueil »</b>.</div>'
+    +'<div class="install-step"><span class="install-num">4</span>Appuie sur <b>« Ajouter »</b> en haut à droite — l\'icône Greaz apparaît sur ton écran d\'accueil.</div>'
+    +'</div>');
+}
+/* Met en évidence le bouton correspondant à l'appareil du visiteur,
+   pour l'aider à trouver le bon en un coup d'œil. */
+function markRecommendedDlCard(){
+  var ua = navigator.userAgent || '';
+  var isIOS = /iphone|ipad|ipod/i.test(ua);
+  var isAndroid = /android/i.test(ua);
+  var id = isIOS ? 'dl-card-iphone' : (isAndroid ? 'dl-card-android' : 'dl-card-desktop');
+  var badgeId = isIOS ? 'dl-badge-iphone' : (isAndroid ? 'dl-badge-android' : 'dl-badge-desktop');
+  var card = document.getElementById(id);
+  var badge = document.getElementById(badgeId);
+  if(card) card.classList.add('recommended');
+  if(badge) badge.style.display = 'inline-block';
+}
+document.addEventListener('DOMContentLoaded', markRecommendedDlCard);
 /* Mise à jour automatique de l'app installée — sans que le client ait besoin
    de vider son cache lui-même. Dès qu'une nouvelle version de sw.js est
    publiée, on force le navigateur à vérifier (updateViaCache:'none'), et
@@ -5106,6 +5249,84 @@ function homeOpenDrawerThen(fn){
 }
 function homeOpenVehicleForm(idx){ homeOpenDrawerThen(function(){ openVehicleForm(idx); }); }
 function homeOpenProfileEdit(){ homeOpenDrawerThen(function(){ openProfileEdit(); }); }
+function homeOpenRentalForm(){ homeOpenDrawerThen(function(){ openRentalForm(); }); }
+
+/* ── Louer ton auto (lead-gen) : pré-rempli avec les infos client/véhicule
+   déjà connues quand elles existent, sinon le client complète. Le
+   financement n'est pas accepté pour ce programme — on prévient tout de
+   suite et on bloque l'envoi plutôt que de laisser une demande inéligible. ── */
+function openRentalForm(){
+  var v = (clientData.vehicles && clientData.vehicles[0]) || {};
+  var yearsOpts=''; for(var y=2026;y>=1990;y--){ yearsOpts+='<option'+(String(v.year)===String(y)?' selected':'')+'>'+y+'</option>'; }
+  document.getElementById('account-title').textContent = '💰 Louer mon auto';
+  document.getElementById('account-body').innerHTML =
+    '<div style="background:#ECFDF5;border:1px solid #6EE7B7;border-radius:12px;padding:13px 15px;font-size:12.5px;color:#065F46;line-height:1.6;margin-bottom:1.1rem">'
+    +'<b>Ton auto peut te rapporter jusqu\'à 50$/jour.</b> Pour être admissible : sois client Greaz et suis la fréquence d\'entretien recommandée pour ton véhicule. On te contacte pour les détails.</div>'
+    +'<div class="alert-err" id="rent-err"></div>'
+    +'<div class="ff2"><div class="ff"><label>Prénom *</label><input type="text" id="rent-prenom" placeholder="Jean" value="'+(clientData.prenom||'')+'"></div>'
+    +'<div class="ff"><label>Nom *</label><input type="text" id="rent-nom" placeholder="Tremblay" value="'+(clientData.nom||'')+'"></div></div>'
+    +'<div class="ff"><label>Téléphone *</label><input type="tel" id="rent-phone" placeholder="514-555-0100" value="'+(clientData.phone||'')+'"></div>'
+    +'<div class="ff"><label>Adresse *</label><input type="text" id="rent-addr" placeholder="1234 Rue Principale, Montréal" value="'+(clientData.address||'')+'"></div>'
+    +'<div class="ff2"><div class="ff"><label>Marque *</label><input type="text" id="rent-make" placeholder="Toyota" value="'+(v.make||'')+'"></div>'
+    +'<div class="ff"><label>Année *</label><select id="rent-year"><option value="">Année</option>'+yearsOpts+'</select></div></div>'
+    +'<div class="ff"><label>Modèle *</label><input type="text" id="rent-model" placeholder="Corolla" value="'+(v.model||'')+'"></div>'
+    +'<div class="ff"><label>Comptant ou financé ? *</label>'
+    +'<div class="chip-grid" id="rent-financed" data-value="'+(v.financed?v.financed.replace(/"/g,'&quot;'):'')+'">'
+    +'<button type="button" class="chip-btn'+(v.financed==='Comptant'?' sel':'')+'" data-val="Comptant" onclick="rentPickFinanced(0)"><span class="chip-ic">💵</span>Comptant</button>'
+    +'<button type="button" class="chip-btn'+(v.financed==='Financé / Crédit'?' sel':'')+'" data-val="Financé / Crédit" onclick="rentPickFinanced(1)"><span class="chip-ic">🏦</span>Financé / Crédit</button>'
+    +'</div></div>'
+    +'<div id="rent-financed-warn" style="display:'+(v.financed==='Financé / Crédit'?'block':'none')+';background:#FDEEE9;border:1px solid rgba(228,87,46,.35);color:var(--orange);border-radius:10px;padding:10px 12px;font-size:12px;font-weight:600;margin-bottom:1rem;line-height:1.5">⚠️ Désolé, ce programme accepte seulement les autos payées comptant (pas de financement) pour l\'instant.</div>'
+    +'<button class="btn-submit blue" id="rent-btn" onclick="saveRentalLead()">✓ Envoyer ma demande</button>'
+    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Annuler</button>';
+}
+function rentPickFinanced(idx){
+  wizPickChip('rent-financed', idx);
+  var warn = document.getElementById('rent-financed-warn');
+  var grp = document.getElementById('rent-financed');
+  if(warn && grp) warn.style.display = (grp.dataset.value === 'Financé / Crédit') ? 'block' : 'none';
+}
+async function saveRentalLead(){
+  var errEl = document.getElementById('rent-err');
+  errEl.style.display = 'none';
+  var prenom = (document.getElementById('rent-prenom').value||'').trim();
+  var nom = (document.getElementById('rent-nom').value||'').trim();
+  var phone = (document.getElementById('rent-phone').value||'').trim();
+  var addr = (document.getElementById('rent-addr').value||'').trim();
+  var make = (document.getElementById('rent-make').value||'').trim();
+  var model = (document.getElementById('rent-model').value||'').trim();
+  var year = document.getElementById('rent-year').value||'';
+  var financedEl = document.getElementById('rent-financed');
+  var financed = financedEl ? (financedEl.dataset.value||'') : '';
+  if(!prenom || !nom || !phone || !addr || !make || !model || !year || !financed){
+    errEl.textContent = 'Merci de remplir tous les champs obligatoires (*).'; errEl.style.display = 'block'; return;
+  }
+  if(financed === 'Financé / Crédit'){
+    errEl.textContent = 'Désolé, on accepte seulement les autos payées comptant pour ce programme.'; errEl.style.display = 'block'; return;
+  }
+  var btn = document.getElementById('rent-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi...';
+  try {
+    await db.collection('rental_leads').add({
+      client_uid: clientUser ? clientUser.uid : null,
+      prenom: prenom, nom: nom, phone: phone, address: addr,
+      email: (clientData && clientData.email) || (clientUser && clientUser.email) || '',
+      vehicle_make: make, vehicle_model: model, vehicle_year: year, financed: financed,
+      status: 'nouveau',
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    document.getElementById('account-body').innerHTML =
+      '<div class="acc-empty" style="padding:2.5rem 1rem">'
+      +'<div class="acc-empty-ic">✅</div>'
+      +'<div class="acc-empty-t">Demande envoyée !</div>'
+      +'<div class="acc-empty-d">On regarde ton dossier et on te contacte bientôt pour la suite.</div>'
+      +'<button class="btn-book" style="margin-top:1.25rem" onclick="renderAccount()">Retour</button>'
+      +'</div>';
+    toast('💰 Demande envoyée ✓', 'ok', 2800);
+  } catch(e){
+    errEl.textContent = 'Erreur : '+(e.message||e); errEl.style.display = 'block';
+    btn.disabled = false; btn.innerHTML = '✓ Envoyer ma demande';
+  }
+}
 
 function renderHomeDashboard(){
   var section = document.getElementById('home-dash');
@@ -5165,6 +5386,11 @@ function renderHomeDashboard(){
       +'<div style="font-size:11.5px;color:var(--faint);margin-top:1px">On répond directement dans ton espace</div></div>'
       +'<span id="home-chat-badge"></span>'
       +'</div>'
+      +'<div class="acc-join" onclick="homeOpenRentalForm()" style="margin-top:12px;background:linear-gradient(135deg,var(--green),#00875A);box-shadow:0 6px 20px rgba(0,168,98,.28)">'
+      +'<div class="acc-join-l"><div class="acc-join-t">💰 Loue ton auto — jusqu\'à 50$/jour</div>'
+      +'<div class="acc-join-d">Sois client Greaz, suis ta fréquence d\'entretien, fais de l\'argent avec ton char</div></div>'
+      +'<div class="acc-join-btn" style="color:#00875A">Ça m\'intéresse →</div>'
+      +'</div>'
       + (isMember() ? '' : '<div class="acc-join" onclick="goToSubscribe()" style="margin-top:1.5rem">'
         + '<div class="acc-join-l"><div class="acc-join-t">🛡️ Deviens membre Greaz</div>'
         + '<div class="acc-join-d">Pour qu\'on s\'occupe de ton auto au complet — '+GREAZ_PRICE+'/mois</div></div>'
@@ -5180,7 +5406,8 @@ function renderHomeDashboard(){
       + renderRewards(pts);
 
   body.innerHTML =
-    '<div class="acc-hero" style="margin-bottom:1.75rem">'
+    '<div id="home-top-alert"></div>'
+    +'<div class="acc-hero" style="margin-bottom:1.75rem">'
     +'<div class="acc-name">Salut '+(clientData.prenom||'')+' 👋</div>'
     +'<div class="acc-mail">'+(clientData.email||'')+'</div>'
     +'<div class="loyalty">'
@@ -5204,6 +5431,58 @@ function renderHomeDashboard(){
   renderMarketTicker();
   watchClientChatBadge();
   updateMaintenanceAlertBadge();
+  renderTopAlertFromKm();
+}
+
+/* ── Recommandation selon la période : dès qu'un entretien approche
+   (date confirmée par le garage, ou à défaut estimation par kilométrage),
+   on l'affiche tout en haut du tableau de bord — pas besoin de descendre
+   jusqu'à l'historique pour le voir. ── */
+function topAlertHtml(icon, cls, title, sub){
+  return '<div class="top-maint-alert '+cls+'" onclick="ccScrollToForm()">'
+    +'<span class="top-maint-ic">'+icon+'</span>'
+    +'<div style="flex:1;min-width:0"><div class="top-maint-t">'+title+'</div>'
+    +'<div class="top-maint-s">'+sub+'</div></div>'
+    +'<span class="top-maint-arrow">→</span>'
+    +'</div>';
+}
+function renderTopAlertFromKm(){
+  var el = document.getElementById('home-top-alert');
+  if(!el || el.dataset.locked === '1') return;
+  var vehicles = (clientData && clientData.vehicles) || [];
+  var worst = null;
+  vehicles.forEach(function(v){
+    computeMaintenancePlan(v).forEach(function(it){
+      if(it.status === 'ok') return;
+      if(!worst || (it.status === 'due' && worst.status !== 'due') || (it.status === worst.status && it.remaining < worst.remaining)){
+        worst = Object.assign({}, it, { vehLabel:[v.year,v.make,v.model].filter(Boolean).join(' ') });
+      }
+    });
+  });
+  if(!worst){ el.innerHTML=''; return; }
+  var isDue = worst.status === 'due';
+  el.innerHTML = topAlertHtml('🔧', isDue?'due':'soon',
+    (isDue ? 'Entretien à prévoir bientôt : ' : 'Un entretien approche : ')+worst.nom,
+    (worst.vehLabel?worst.vehLabel+' · ':'')+'dans ~'+worst.remaining.toLocaleString('fr-CA')+' km (estimation selon ton kilométrage)');
+}
+function renderTopAlertFromDate(nextRecord){
+  var el = document.getElementById('home-top-alert');
+  if(!el) return;
+  if(nextRecord){
+    var today = new Date().toISOString().slice(0,10);
+    var diffDays = Math.round((new Date(nextRecord.next_due_date+'T12:00:00') - new Date(today+'T12:00:00')) / 86400000);
+    if(diffDays <= 30){
+      var isOverdue = diffDays < 0;
+      var d = new Date(nextRecord.next_due_date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'long',year:'numeric'});
+      el.dataset.locked = '1';
+      el.innerHTML = topAlertHtml('🗓️', isOverdue?'due':'soon',
+        isOverdue ? 'Ton entretien était prévu le '+d : 'Ton prochain entretien approche',
+        isOverdue ? 'Prends rendez-vous dès que possible' : 'Prévu le '+d+(nextRecord.title?' · '+nextRecord.title:''));
+      return;
+    }
+  }
+  el.dataset.locked = '';
+  renderTopAlertFromKm();
 }
 
 /* ── Prix du marché (style "bourse") — carburant, électricité, entretien
@@ -5362,6 +5641,7 @@ function loadClientServiceHistory(targetId){
         +'<div class="acc-empty-t">Aucun entretien enregistré</div>'
         +'<div class="acc-empty-d">Ton historique et tes économies grâce à Greaz apparaîtront ici après ton premier rendez-vous.</div>'
         +'</div>';
+      renderTopAlertFromDate(null);
       return;
     }
     var list = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
@@ -5376,6 +5656,11 @@ function loadClientServiceHistory(targetId){
     var totalSaved = list.reduce(function(s,r){ return s + (Number(r.saved)||0); }, 0);
     var nextRecord = list.filter(function(r){ return r.next_due_date && r.next_due_date >= today; })
       .sort(function(a,b){ return (a.next_due_date||'').localeCompare(b.next_due_date||''); })[0];
+    // Pour l'alerte du haut de page, un entretien prévu dont la date est déjà
+    // passée sans que le client ait pris rendez-vous compte aussi (prioritaire).
+    var overdueRecord = list.filter(function(r){ return r.next_due_date && r.next_due_date < today; })
+      .sort(function(a,b){ return (b.next_due_date||'').localeCompare(a.next_due_date||''); })[0];
+    renderTopAlertFromDate(overdueRecord || nextRecord);
 
     function itemHtml(r, isUpcoming){
       var dateStr = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short',year:'numeric'}) : '—';
@@ -5734,13 +6019,12 @@ function initReveal(){
   els.forEach(function(e){ io.observe(e); });
 }
 
-/* ══════════ UX : NAV QUI S'EFFACE + FAB CONTEXTUEL ══════════
-   La barre du haut disparaît quand on descend (plus d'espace pour le contenu)
-   et revient dès qu'on remonte. Le FAB apparaît seulement quand l'annuaire
-   n'est plus visible — jamais par-dessus la carte. */
+/* ══════════ UX : NAV TOUJOURS VISIBLE + FAB CONTEXTUEL ══════════
+   La barre du haut (Mon espace, Carte...) reste affichée en permanence,
+   même en descendant dans la page — les clients doivent pouvoir y
+   accéder n'importe quand pendant le défilement. Le FAB apparaît
+   seulement quand l'annuaire n'est plus visible — jamais par-dessus la carte. */
 function initScrollFx(){
-  var lastY = window.scrollY;
-  var navEl = document.querySelector('nav');
   var fab = document.getElementById('fab-book');
   var annVisible = true;
 
@@ -5761,15 +6045,7 @@ function initScrollFx(){
     }
   }
 
-  window.addEventListener('scroll', function(){
-    var y = window.scrollY;
-    if(navEl && document.body.style.overflow !== 'hidden'){
-      if(y > 130 && y > lastY + 6) navEl.classList.add('nav-hide');
-      else if(y < lastY - 6 || y <= 130) navEl.classList.remove('nav-hide');
-    }
-    lastY = y;
-    syncFab();
-  }, { passive:true });
+  window.addEventListener('scroll', function(){ syncFab(); }, { passive:true });
 }
 
 /* ══════════ UX : FERMER LES TIROIRS AU GLISSEMENT ══════════
