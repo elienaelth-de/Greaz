@@ -1184,6 +1184,36 @@ body.logged-in .hero-scroll{display:none}
 .maint-soon .maint-badge{background:rgba(184,134,11,.12);color:var(--gold)}
 .maint-due .maint-badge{background:rgba(228,87,46,.12);color:var(--orange)}
 
+/* ═══ EXCLUSIF APP INSTALLÉE : grille santé, alerte problème, dépenses ═══
+   N'apparaît que quand le site tourne comme app installée (Android/iOS),
+   jamais sur le site web classique — voir isStandaloneApp(). */
+.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.1rem}
+@media(max-width:380px){ .health-grid{grid-template-columns:repeat(2,1fr)} }
+.health-tile{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;padding:12px 4px;text-align:center}
+.health-tile-ic{font-size:1.25rem;margin-bottom:4px}
+.health-tile-lbl{font-size:10.5px;font-weight:700;color:var(--white)}
+.health-tile-status{font-size:10px;font-weight:700;margin-top:2px}
+.health-tile-status.ok{color:var(--green)}
+.health-tile-status.soon{color:var(--gold)}
+.health-tile-status.due{color:var(--orange)}
+.health-tile-status.unknown{color:var(--faint)}
+
+.trouble-banner{display:flex;align-items:center;gap:12px;background:#FDEEE9;border:1.5px solid rgba(228,87,46,.3);border-radius:14px;padding:13px 15px;margin-bottom:1.1rem;cursor:pointer;transition:transform .15s}
+.trouble-banner:active{transform:scale(.985)}
+.trouble-ic{font-size:20px;flex-shrink:0}
+.trouble-t{font-weight:800;font-size:13.5px;color:var(--orange)}
+.trouble-s{font-size:11.5px;color:var(--faint);margin-top:1px}
+.trouble-arrow{font-size:16px;font-weight:800;color:var(--orange);flex-shrink:0}
+
+.spend-card{background:#F4F4F4;border-radius:14px;padding:14px 16px;margin-bottom:1rem;cursor:pointer}
+.spend-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.spend-card-lbl{font-size:12px;color:var(--faint);font-weight:600}
+.spend-card-val{font-size:22px;font-weight:800;color:var(--white);margin-top:2px;letter-spacing:-.02em}
+.spend-card-delta{font-size:11.5px;font-weight:700;margin-top:2px}
+.spend-card-delta.down{color:var(--green)}
+.spend-card-delta.up{color:var(--orange)}
+.spend-card-spark{height:32px;width:100%;display:block}
+
 /* Badge d'alerte sur le bouton compte (nav + barre mobile) */
 .nav-account{position:relative}
 .nav-alert-badge{display:none;position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;background:var(--orange);color:#fff;font-size:10px;font-weight:800;align-items:center;justify-content:center;border:2px solid #fff;line-height:1}
@@ -1256,7 +1286,7 @@ body.logged-in .hero-scroll{display:none}
   /* Le nav du haut perd ses liens en mobile → on les remplace par une barre
      d'onglets fixée en bas (pattern app mobile, comme Airbnb/Uber), sinon
      "Carte" et "Programme" deviennent introuvables sur téléphone. */
-  .mobile-tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:95;
+  .mobile-tabbar{display:flex;position:fixed;top:auto;left:0;right:0;bottom:0;z-index:95;height:auto;
     background:rgba(255,255,255,.94);backdrop-filter:blur(20px) saturate(1.6);
     border-top:1px solid rgba(23,26,32,.08);
     padding:5px max(6px,env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));
@@ -4932,6 +4962,85 @@ function computeMaintenancePlan(v){
     .sort(function(a,b){ return a.remaining - b.remaining; });
 }
 
+/* Grille "santé de l'auto" (Entretien/Pneus/Freins/Batterie) — exclusif à
+   l'app installée. Basée sur le même calcul par kilométrage que le
+   Calendrier d'entretien, juste regroupé en 4 tuiles rapides à lire. */
+var HEALTH_TILES = [
+  { key:'entretien', label:'Entretien', ic:'🔧', re:/vidange|huile/i },
+  { key:'pneus', label:'Pneus', ic:'🛞', re:/pneu/i },
+  { key:'freins', label:'Freins', ic:'🛑', re:/frein/i },
+  { key:'batterie', label:'Batterie', ic:'🔋', re:/batterie/i },
+];
+function computeHealthStatus(vehicles, re){
+  var any = false, worst = 'ok';
+  vehicles.forEach(function(v){
+    computeMaintenancePlan(v).forEach(function(it){
+      if(!re.test(it.nom)) return;
+      any = true;
+      if(it.status === 'due') worst = 'due';
+      else if(it.status === 'soon' && worst !== 'due') worst = 'soon';
+    });
+  });
+  return any ? worst : 'unknown';
+}
+function renderHealthGrid(vehicles){
+  if(!vehicles.length || !vehicles.some(function(v){ return v.km; })) return '';
+  var labels = { ok:'OK', soon:'Bientôt', due:'Approche', unknown:'—' };
+  var tiles = HEALTH_TILES.map(function(t){
+    var status = computeHealthStatus(vehicles, t.re);
+    return '<div class="health-tile"><div class="health-tile-ic">'+t.ic+'</div>'
+      +'<div class="health-tile-lbl">'+t.label+'</div>'
+      +'<div class="health-tile-status '+status+'">'+labels[status]+'</div></div>';
+  }).join('');
+  return '<div class="health-grid">'+tiles+'</div>';
+}
+
+/* Carte "Ton auto cette année" — total dépensé (via le Dossier client,
+   champ "cost") vs l'année dernière, + mini-tendance 6 mois. Exclusif app. */
+function renderYearlySpendCard(list){
+  var el = document.getElementById('home-spend-card');
+  if(!el) return;
+  var withCost = (list||[]).filter(function(r){ return r.date && Number(r.cost) > 0; });
+  if(!withCost.length){ el.innerHTML = ''; return; }
+  var now = new Date();
+  var thisYear = now.getFullYear();
+  var lastYear = thisYear - 1;
+  function totalForYear(y){
+    return withCost.filter(function(r){ return r.date.slice(0,4) === String(y); })
+      .reduce(function(s,r){ return s + Number(r.cost); }, 0);
+  }
+  var thisTotal = totalForYear(thisYear);
+  var lastTotal = totalForYear(lastYear);
+  var deltaHtml = '';
+  if(lastTotal > 0){
+    var pctChange = Math.round((thisTotal - lastTotal) / lastTotal * 100);
+    var down = pctChange <= 0;
+    deltaHtml = '<div class="spend-card-delta '+(down?'down':'up')+'">'+(down?'↓':'↑')+' '+Math.abs(pctChange)+'% vs '+lastYear+'</div>';
+  }
+  var months = [];
+  for(var i=5;i>=0;i--){
+    var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    months.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));
+  }
+  var monthTotals = months.map(function(key){
+    return withCost.filter(function(r){ return r.date.slice(0,7) === key; })
+      .reduce(function(s,r){ return s + Number(r.cost); }, 0);
+  });
+  var maxM = Math.max.apply(null, monthTotals.concat([1]));
+  var sparkPts = monthTotals.map(function(v,i){
+    var x = (i/(monthTotals.length-1||1))*100;
+    var y = 30 - (v/maxM*26);
+    return x+','+y;
+  }).join(' ');
+  var sparkHtml = '<svg class="spend-card-spark" viewBox="0 0 100 32" preserveAspectRatio="none"><polyline points="'+sparkPts+'" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  el.innerHTML = '<div class="spend-card" onclick="document.getElementById(\'home-acc-history\').scrollIntoView({behavior:\'smooth\'})">'
+    +'<div class="spend-card-top"><div><div class="spend-card-lbl">💳 Ton auto cette année</div>'
+    +'<div class="spend-card-val">'+thisTotal.toLocaleString('fr-CA',{style:'currency',currency:'CAD',maximumFractionDigits:0})+'</div>'
+    + deltaHtml + '</div>'
+    +'<div style="width:64px;flex-shrink:0">'+sparkHtml+'</div></div>'
+    +'</div>';
+}
+
 function renderMaintenanceSection(home){
   var vehicles = (clientData && clientData.vehicles) || [];
   if(!vehicles.length) return '';
@@ -5418,15 +5527,22 @@ function renderHomeDashboard(){
         +'<button class="acc-empty-btn" onclick="homeOpenVehicleForm()">+ Ajouter mon véhicule</button>'
         +'</div>';
 
+  // Ces ajouts (grille santé, alerte problème, dépenses annuelles) sont
+  // réservés à l'app installée (Android/iOS) — jamais sur le site web.
+  var isApp = isStandaloneApp();
+
   var leftCol =
       '<div class="acc-section">👤 Mon profil</div>'
       + renderProfileSection(true)
       +'<div class="acc-section">🚗 Mes véhicules <button class="acc-add" onclick="homeOpenVehicleForm()">+ Ajouter</button></div>'
       + vehHtml
+      + (isApp ? renderHealthGrid(vehicles) : '')
+      + (isApp ? '<div class="trouble-banner" onclick="ccScrollToForm()"><span class="trouble-ic">⚠️</span><div style="flex:1"><div class="trouble-t">Un problème avec ton auto ?</div><div class="trouble-s">Bruit, voyant, pneu, démarrage... on est là.</div></div><span class="trouble-arrow">→</span></div>' : '')
       + (vehicles.length ? '<div class="acc-section">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection(true) : '');
 
   var rightCol =
-      '<div class="acc-section" style="margin-top:0">💬 Discuter avec Greaz</div>'
+      (isApp ? '<div id="home-spend-card"></div>' : '')
+      +'<div class="acc-section" style="margin-top:0">💬 Discuter avec Greaz</div>'
       +'<div class="chat-cta" onclick="openChatDrawer()">'
       +'<span class="chat-cta-ic">💬</span>'
       +'<div style="flex:1"><div style="font-weight:700;font-size:13.5px">Une question ? Écris-nous</div>'
@@ -5708,6 +5824,7 @@ function loadClientServiceHistory(targetId){
     var overdueRecord = list.filter(function(r){ return r.next_due_date && r.next_due_date < today; })
       .sort(function(a,b){ return (b.next_due_date||'').localeCompare(a.next_due_date||''); })[0];
     renderTopAlertFromDate(overdueRecord || nextRecord);
+    renderYearlySpendCard(list);
 
     function itemHtml(r, isUpcoming){
       var dateStr = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short',year:'numeric'}) : '—';
