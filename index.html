@@ -5531,13 +5531,19 @@ function renderHomeDashboard(){
   // réservés à l'app installée (Android/iOS) — jamais sur le site web.
   var isApp = isStandaloneApp();
 
+  // Bloc véhicule (carte + grille santé + bouton "un problème ?") — affiché
+  // tout en haut, juste sous la carte de bienvenue/points, avant même le
+  // ticker de prix : c'est la première chose que le client voit en ouvrant
+  // l'app, pas besoin de descendre jusqu'à "Mon profil" pour ça.
+  var vehTopHtml =
+      '<div class="acc-section" style="margin-top:0">🚗 Mes véhicules <button class="acc-add" onclick="homeOpenVehicleForm()">+ Ajouter</button></div>'
+      + vehHtml
+      + (isApp ? renderHealthGrid(vehicles) : '')
+      + (isApp ? '<div class="trouble-banner" onclick="ccScrollToForm()"><span class="trouble-ic">⚠️</span><div style="flex:1"><div class="trouble-t">Un problème avec ton auto ?</div><div class="trouble-s">Bruit, voyant, pneu, démarrage... on est là.</div></div><span class="trouble-arrow">→</span></div>' : '');
+
   var leftCol =
       '<div class="acc-section">👤 Mon profil</div>'
       + renderProfileSection(true)
-      +'<div class="acc-section">🚗 Mes véhicules <button class="acc-add" onclick="homeOpenVehicleForm()">+ Ajouter</button></div>'
-      + vehHtml
-      + (isApp ? renderHealthGrid(vehicles) : '')
-      + (isApp ? '<div class="trouble-banner" onclick="ccScrollToForm()"><span class="trouble-ic">⚠️</span><div style="flex:1"><div class="trouble-t">Un problème avec ton auto ?</div><div class="trouble-s">Bruit, voyant, pneu, démarrage... on est là.</div></div><span class="trouble-arrow">→</span></div>' : '')
       + (vehicles.length ? '<div class="acc-section">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection(true) : '');
 
   var rightCol =
@@ -5581,6 +5587,7 @@ function renderHomeDashboard(){
       ? 'Encore <b style="color:var(--gold)">'+(nxt.min-pts)+' points</b> pour atteindre '+nxt.icon+' '+nxt.label
       : '🎉 Tu es au niveau maximum !')+'</div>'
     +'</div></div>'
+    + vehTopHtml
     +'<div class="ticker-wrap" id="home-ticker-wrap"></div>'
     +'<div class="home-dash-grid">'
     +'<div class="home-dash-col">'+leftCol+'</div>'
