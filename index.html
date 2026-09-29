@@ -5591,6 +5591,7 @@ function renderHomeDashboard(){
     +'</div></div>'
     + vehTopHtml
     +'<div class="ticker-wrap" id="home-ticker-wrap"></div>'
+    +'<div id="home-value-wrap"></div>'
     +'<div class="home-dash-grid">'
     +'<div class="home-dash-col">'+leftCol+'</div>'
     +'<div class="home-dash-col">'+rightCol+'</div>'
@@ -5601,6 +5602,7 @@ function renderHomeDashboard(){
   loadClientRdvs('home-acc-rdvs');
   loadClientServiceHistory('home-acc-history');
   renderMarketTicker();
+  renderVehicleValueCard();
   watchClientChatBadge();
   updateMaintenanceAlertBadge();
   renderTopAlertFromKm();
@@ -5724,6 +5726,85 @@ function renderMarketTicker(){
     var listEl = document.getElementById('home-ticker-list');
     if(listEl) listEl.innerHTML = cards.join('') || '<div class="ticker-empty">Greaz publie les prix de la semaine bientôt.</div>';
   }).catch(function(e){ console.log('Prix marché:', e); });
+}
+
+/* ── Valeur estimée du véhicule — courbe "bourse" alimentée par les
+   comparables (marque+modèle+année → points prix/kilométrage) que Greaz
+   entre côté admin. N'affiche rien si Greaz n'a pas encore de données pour
+   ce modèle précis — pas de faux zéro, juste rien tant qu'il n'y a rien. ── */
+function vehValueKey(make, model, year){
+  return [make, model, year].map(function(s){
+    return String(s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  }).join('_');
+}
+function vehValueInterpolate(points, km){
+  if(!points.length) return null;
+  if(points.length === 1) return points[0].price;
+  km = Number(km);
+  if(km <= points[0].km){
+    var p0=points[0], p1=points[1];
+    return Math.round(p0.price + (km-p0.km) * (p1.price-p0.price)/(p1.km-p0.km));
+  }
+  for(var i=0;i<points.length-1;i++){
+    var a=points[i], b=points[i+1];
+    if(km >= a.km && km <= b.km) return Math.round(a.price + (km-a.km) * (b.price-a.price)/(b.km-a.km));
+  }
+  var last1=points[points.length-2], last2=points[points.length-1];
+  return Math.round(last2.price + (km-last2.km) * (last2.price-last1.price)/(last2.km-last1.km));
+}
+function renderVehicleValueCard(){
+  var wrap = document.getElementById('home-value-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  var v0 = ((clientData && clientData.vehicles) || [])[0];
+  if(!v0 || !v0.make || !v0.model || !v0.year) return;
+  var key = vehValueKey(v0.make, v0.model, v0.year);
+  db.collection('vehicle_values').doc(key).get().then(function(doc){
+    if(!doc.exists) return;
+    var d = doc.data();
+    var points = (d.points||[]).slice().sort(function(a,b){ return a.km-b.km; });
+    if(points.length < 2) return;
+    var km = parseInt(v0.km, 10);
+    var estHtml = '';
+    if(km > 0){
+      var est = vehValueInterpolate(points, km);
+      estHtml = '<div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:2px">Estimé à ton kilométrage ('+Number(km).toLocaleString('fr-CA')+' km) : <b style="color:#fff">'+Number(est).toLocaleString('fr-CA')+' $</b></div>';
+    }
+    wrap.innerHTML = '<div class="ticker-wrap" style="margin-top:-.9rem">'
+      + '<div class="ticker-head">💰 Valeur estimée — '+v0.year+' '+v0.make+' '+v0.model+'</div>'
+      + vehValueCurveSvg(points)
+      + estHtml
+      + '<div style="font-size:10.5px;color:rgba(255,255,255,.35);margin-top:8px">Basé sur des comparables réels du marché, entrés par Greaz — pas une valeur officielle.</div>'
+      + '</div>';
+  }).catch(function(e){ console.log('Valeur véhicule:', e); });
+}
+function vehValueCurveSvg(pts){
+  var W = 600, H = 130, padL = 10, padR = 10, padT = 22, padB = 22;
+  var kms = pts.map(function(p){ return p.km; });
+  var prices = pts.map(function(p){ return p.price; });
+  var kmMin = Math.min.apply(null, kms), kmMax = Math.max.apply(null, kms);
+  var pMin = Math.min.apply(null, prices), pMax = Math.max.apply(null, prices);
+  if(kmMin===kmMax){ kmMin -= 1000; kmMax += 1000; }
+  if(pMin===pMax){ pMin -= 1000; pMax += 1000; }
+  var pPadding = (pMax-pMin) * 0.15;
+  pMin -= pPadding; pMax += pPadding;
+  function x(km){ return padL + (km-kmMin)/(kmMax-kmMin) * (W-padL-padR); }
+  function y(price){ return H-padB - (price-pMin)/(pMax-pMin) * (H-padT-padB); }
+  var linePts = pts.map(function(p){ return x(p.km)+','+y(p.price); }).join(' ');
+  var circles = pts.map(function(p){
+    return '<circle cx="'+x(p.km)+'" cy="'+y(p.price)+'" r="4" fill="#0B0C10" stroke="#7C9EFF" stroke-width="2"></circle>';
+  }).join('');
+  var lastP = pts[pts.length-1];
+  var lastLabel = '<text x="'+x(lastP.km)+'" y="'+(y(lastP.price)-10)+'" font-size="11" font-weight="700" fill="#7C9EFF" text-anchor="end">'+Number(lastP.price).toLocaleString('fr-CA')+' $</text>';
+  var firstP = pts[0];
+  var firstLabel = '<text x="'+x(firstP.km)+'" y="'+(y(firstP.price)-10)+'" font-size="11" font-weight="700" fill="#7C9EFF" text-anchor="start">'+Number(firstP.price).toLocaleString('fr-CA')+' $</text>';
+  var axisKmLabels = '<text x="'+padL+'" y="'+(H-6)+'" font-size="9.5" fill="rgba(255,255,255,.4)">'+Number(kmMin<0?0:Math.round(kmMin)).toLocaleString('fr-CA')+' km</text>'
+    + '<text x="'+(W-padR)+'" y="'+(H-6)+'" font-size="9.5" fill="rgba(255,255,255,.4)" text-anchor="end">'+Number(Math.round(kmMax)).toLocaleString('fr-CA')+' km</text>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block" preserveAspectRatio="none">'
+    + '<line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padR)+'" y2="'+(H-padB)+'" stroke="rgba(255,255,255,.12)" stroke-width="1"></line>'
+    + '<polyline points="'+linePts+'" fill="none" stroke="#7C9EFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>'
+    + circles + firstLabel + (pts.length>1?lastLabel:'') + axisKmLabels
+    + '</svg>';
 }
 
 /* ── Chat client ↔ Greaz (temps réel via Firestore) ── */
