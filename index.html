@@ -1869,6 +1869,24 @@ function uploadViaFunction(file, purpose, targetUid, extra){
   });
 }
 
+/* ══════════ ALERTE PUSH AU GARAGE — nouvelle demande/rdv/message ══════════
+   Dès qu'une personne (même pas connectée) envoie une demande, réserve un
+   rendez-vous ou écrit un message, on avise l'admin sur son cellulaire
+   (notification comme une vraie app), en plus du courriel et de l'alerte
+   déjà affichée dans le panneau. Appel "fire-and-forget" : si ça échoue
+   (pas de connexion, fonction pas encore déployée, etc.), ça ne bloque
+   jamais l'envoi de la demande du client — on avale l'erreur en silence. */
+var SUPABASE_SEND_PUSH_URL = 'https://cvgdrhxkevneswowtxrt.supabase.co/functions/v1/send-push';
+function notifyAdminsPush(purpose, name, extra){
+  try {
+    fetch(SUPABASE_SEND_PUSH_URL, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ purpose: purpose, name: (name||'').slice(0,80), extra: (extra||'').slice(0,140) })
+    }).catch(function(){});
+  } catch(e){}
+}
+
 /* ═══ TRAFIC — visites / visiteurs uniques / ouvertures de l'app par jour ═══
    Un petit compteur maison dans Firestore (settings/{date} n'existe pas
    déjà pour ça, donc collection dédiée "traffic"), visible dans le
@@ -2485,6 +2503,7 @@ async function ccSubmit(){
     if(typeof notifierNouvelleDemandeClient === 'function'){
       try{ notifierNouvelleDemandeClient(leadData); }catch(e){}
     }
+    notifyAdminsPush('new_lead', leadData.client_name, [leadData.vehicle_make,leadData.vehicle_year].filter(Boolean).join(' '));
     if(typeof clientUser!=='undefined' && clientUser && clientData){
       try{
         if(address && address !== clientData.address){
@@ -4208,6 +4227,7 @@ async function submitBooking(){
       client_uid: clientUser ? clientUser.uid : '',
       created_at:firebase.firestore.FieldValue.serverTimestamp(),
     });
+    notifyAdminsPush('new_appointment', prenom+' '+nom, currentProfile.name);
     if(clientUser) await awardPoints();
     await mergeAssistIntoProfile(assistVals);
 
@@ -4442,6 +4462,7 @@ async function submitClient(){
     };
     await db.collection("leads").add(leadData);
     notifierNouvelleDemandeClient(leadData);
+    notifyAdminsPush('new_lead', leadData.client_name, [leadData.vehicle_make,leadData.vehicle_year].filter(Boolean).join(' '));
 
     // On mémorise l'adresse pour les prochaines demandes, puis on crédite les points
     if(clientUser && clientData){
@@ -4645,6 +4666,7 @@ async function lpSubmit(){
       status:'nouveau',
       created_at: firebase.firestore.FieldValue.serverTimestamp(),
     });
+    notifyAdminsPush('new_lead', name, vehicle);
   } catch(e){ console.log('Pop-up lead:', e && e.message); }
   var est = lpEstimate(km, vehicle);
   var fmt = function(n){ return n.toLocaleString('fr-CA'); };
@@ -5926,6 +5948,7 @@ async function sendClientChatMessage(){
       last_message: text, last_at: firebase.firestore.FieldValue.serverTimestamp(),
       unread_by_admin: true, unread_by_client: false,
     }, { merge:true });
+    notifyAdminsPush('new_chat_message', (clientData && clientData.prenom) || 'Client', text);
   } catch(e){ toast('Erreur d\'envoi : '+(e.message||e), 'err'); }
 }
 
