@@ -1121,6 +1121,9 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 .acc-section{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:1.5rem 0 .85rem;display:flex;justify-content:space-between;align-items:center}
 .acc-add{font-size:11px;font-weight:700;color:var(--blue);background:var(--bluelt);border:none;padding:5px 13px;border-radius:16px;cursor:pointer;letter-spacing:0;text-transform:none;transition:background .2s}
 .acc-add:hover{background:#DFE8FC}
+.acc-claim-link{font-size:12px;font-weight:600;color:var(--blue);text-align:center;padding:.75rem 0 .25rem;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color .2s}
+.acc-claim-link:hover{text-decoration-color:var(--blue)}
+.transfer-code{font-family:var(--data,monospace);font-size:2rem;font-weight:800;letter-spacing:.18em;text-align:center;color:var(--blue2);background:var(--bluelt);border-radius:14px;padding:1.1rem;margin:1rem 0;user-select:all}
 
 /* ═══ TABLEAU DE BORD PERMANENT (utilisateur connecté) ═══
    Contrairement au tiroir "Mon espace" (overlay), cette section vit
@@ -5340,6 +5343,7 @@ function renderAccount(){
           +'<div class="veh-ic'+(v.photo_url?' veh-ic-photo':'')+'">'+(v.photo_url?'<img src="'+v.photo_url+'" alt="'+(title||'Véhicule')+'">':'🚗')+'</div>'
           +'<div style="flex:1;min-width:0"><div class="veh-name">'+(title||'Véhicule')+'</div>'
           + detailsHtml + '</div>'
+          +'<button class="close-btn" style="width:28px;height:28px;font-size:12px;flex-shrink:0" title="Transférer à un nouveau propriétaire" onclick="event.stopPropagation();openTransferForm('+i+')">🔄</button>'
           +'<button class="close-btn" style="width:28px;height:28px;font-size:13px;flex-shrink:0" onclick="event.stopPropagation();removeVehicle('+i+')">✕</button>'
           +'</div>';
       }).join('')
@@ -5349,6 +5353,7 @@ function renderAccount(){
         +'<div class="acc-empty-d">Ajoute ton char pour remplir tes demandes en 2 clics la prochaine fois.</div>'
         +'<button class="acc-empty-btn" onclick="openVehicleForm()">+ Ajouter mon véhicule</button>'
         +'</div>';
+  var vehClaimLinkHtml = '<div class="acc-claim-link" onclick="openClaimTransferForm()">🔑 T\'as reçu un véhicule ? Entrer un code de transfert →</div>';
 
   document.getElementById('account-body').innerHTML =
     '<div class="acc-hero">'
@@ -5379,10 +5384,11 @@ function renderAccount(){
 
     +'<div class="acc-section">🚗 Mes véhicules <button class="acc-add" onclick="openVehicleForm()">+ Ajouter</button></div>'
     + vehHtml
+    + vehClaimLinkHtml
 
     + (vehicles.length ? '<div class="acc-section">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection() : '')
 
-    +'<div class="acc-section">🛠️ Historique & économies</div>'
+    +'<div class="acc-section">🛠️ Historique & économies <button class="acc-add" onclick="openInvoiceForm()">📸 Ajouter une facture</button></div>'
     +'<div id="acc-history"><div class="acc-loading">Chargement...</div></div>'
 
     +'<div class="acc-section">🎁 Mes récompenses</div>'
@@ -5519,6 +5525,7 @@ function renderHomeDashboard(){
           +'<div class="veh-ic'+(v.photo_url?' veh-ic-photo':'')+'">'+(v.photo_url?'<img src="'+v.photo_url+'" alt="'+(title||'Véhicule')+'">':'🚗')+'</div>'
           +'<div style="flex:1;min-width:0"><div class="veh-name">'+(title||'Véhicule')+'</div>'
           + detailsHtml + '</div>'
+          +'<button class="close-btn" style="width:28px;height:28px;font-size:12px;flex-shrink:0" title="Transférer à un nouveau propriétaire" onclick="event.stopPropagation();homeOpenTransferForm('+i+')">🔄</button>'
           +'<button class="close-btn" style="width:28px;height:28px;font-size:13px;flex-shrink:0" onclick="event.stopPropagation();removeVehicle('+i+')">✕</button>'
           +'</div>';
       }).join('')
@@ -5540,6 +5547,7 @@ function renderHomeDashboard(){
   var vehTopHtml =
       '<div class="acc-section" style="margin-top:0">🚗 Mes véhicules <button class="acc-add" onclick="homeOpenVehicleForm()">+ Ajouter</button></div>'
       + vehHtml
+      + '<div class="acc-claim-link" onclick="homeOpenClaimTransferForm()">🔑 T\'as reçu un véhicule ? Entrer un code de transfert →</div>'
       + (isApp ? renderHealthGrid(vehicles) : '')
       + (isApp ? '<div class="trouble-banner" onclick="ccScrollToForm()"><span class="trouble-ic">⚠️</span><div style="flex:1"><div class="trouble-t">Un problème avec ton auto ?</div><div class="trouble-s">Bruit, voyant, pneu, démarrage... on est là.</div></div><span class="trouble-arrow">→</span></div>' : '');
 
@@ -5571,13 +5579,14 @@ function renderHomeDashboard(){
       +'<div id="home-acc-demandes"><div class="acc-loading">Chargement...</div></div>'
       +'<div class="acc-section">📅 Mes rendez-vous</div>'
       +'<div id="home-acc-rdvs"><div class="acc-loading">Chargement...</div></div>'
-      +'<div class="acc-section">🛠️ Historique & économies</div>'
+      +'<div class="acc-section">🛠️ Historique & économies <button class="acc-add" onclick="homeOpenInvoiceForm()">📸 Ajouter une facture</button></div>'
       +'<div id="home-acc-history"><div class="acc-loading">Chargement...</div></div>'
       +'<div class="acc-section">🎁 Mes récompenses</div>'
       + renderRewards(pts);
 
   body.innerHTML =
     '<div id="home-top-alert"></div>'
+    +'<div id="home-transfer-banner"></div>'
     +'<div class="acc-hero" style="margin-bottom:1.75rem">'
     +'<div class="acc-name">Salut '+(clientData.prenom||'')+' 👋</div>'
     +'<div class="acc-mail">'+(clientData.email||'')+'</div>'
@@ -5605,6 +5614,7 @@ function renderHomeDashboard(){
   renderVehicleValueCard();
   watchClientChatBadge();
   updateMaintenanceAlertBadge();
+  checkPendingTransferConfirmations();
   renderTopAlertFromKm();
 }
 
@@ -5929,6 +5939,8 @@ function loadClientServiceHistory(targetId){
         + (r.vehicle_label ? '<span>🚗 '+r.vehicle_label+'</span>' : '')
         + (r.cost ? '<span>💳 '+Number(r.cost).toLocaleString('fr-CA',{style:'currency',currency:'CAD'})+'</span>' : '')
         + (r.saved ? '<span class="history-saved">💰 '+Number(r.saved).toLocaleString('fr-CA',{style:'currency',currency:'CAD'})+' économisés</span>' : '')
+        + (r.source === 'client' ? '<span style="color:var(--faint)">📸 Ajouté par toi</span>' : '')
+        + (r.facture_url ? '<span><a href="'+r.facture_url+'" target="_blank" rel="noopener" style="color:var(--blue)">📎 Voir la facture</a></span>' : '')
         +'</div></div>';
     }
 
@@ -6224,6 +6236,290 @@ async function removeVehicle(idx){
     renderHomeDashboard();
     updateMaintenanceAlertBadge();
   } catch(e){ toast('Erreur : '+e.message, 'err'); }
+}
+
+function escHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
+
+/* ══════════ FACTURE AJOUTÉE PAR LE CLIENT (photo depuis son cellulaire) ══════════
+   Même collection que le dossier admin (service_history), mais source:'client'
+   — moins "officiel" qu'une entrée entrée par le garage (jamais d'argent
+   "économisé" auto-déclaré), pour garder l'historique fiable. Utilise le
+   même dossier Storage que l'admin (factures/service_history/{uid}/...). */
+function openInvoiceForm(){
+  document.getElementById('account-title').textContent = '📸 Ajouter une facture';
+  var today = new Date().toISOString().slice(0,10);
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="inv-err"></div>'
+    +'<div style="background:var(--bluelt);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--blue2);line-height:1.5;margin-bottom:1.1rem">📷 Prends une photo de ta facture (ou choisis un fichier existant) — ça s\'ajoute directement à ton historique d\'entretien.</div>'
+    +'<div class="ff"><label>Photo ou PDF de la facture *</label>'
+    +'<input type="file" id="inv-file" accept="image/*,application/pdf" capture="environment" style="display:block;width:100%;padding:10px;border:1.5px dashed var(--line);border-radius:10px;font-size:13px" onchange="invoiceFilePreview()">'
+    +'<div id="inv-file-name" style="font-size:11.5px;color:var(--faint);margin-top:5px"></div></div>'
+    +'<div class="ff"><label>Qu\'est-ce qui a été fait ? *</label><input type="text" id="inv-title" placeholder="Ex. Changement d\'huile, pneus d\'hiver..."></div>'
+    +'<div class="ff2"><div class="ff"><label>Date *</label><input type="date" id="inv-date" value="'+today+'"></div>'
+    +'<div class="ff"><label>Montant payé <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="number" id="inv-cost" inputmode="decimal" placeholder="120"></div></div>'
+    +'<div class="ff"><label>Note <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="text" id="inv-note" placeholder="Garage, détails..."></div>'
+    +'<button class="btn-submit blue" id="inv-btn" onclick="saveClientInvoice()">✓ Ajouter à mon historique</button>'
+    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Annuler</button>';
+}
+function homeOpenInvoiceForm(){ homeOpenDrawerThen(function(){ openInvoiceForm(); }); }
+
+function invoiceFilePreview(){
+  var f = document.getElementById('inv-file').files[0];
+  var el = document.getElementById('inv-file-name');
+  if(el) el.textContent = f ? ('✓ ' + f.name) : '';
+}
+
+function uploadClientFacture(file, uid){
+  if(!file) return Promise.resolve(null);
+  var maxMB = 15;
+  if(file.size > maxMB * 1024 * 1024){
+    return Promise.reject(new Error('Le fichier est trop volumineux (max '+maxMB+' Mo).'));
+  }
+  var safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+  var path = 'factures/service_history/' + uid + '/' + Date.now() + '_' + safeName;
+  var ref = firebase.storage().ref(path);
+  return ref.put(file).then(function(snap){ return snap.ref.getDownloadURL(); })
+    .then(function(url){ return { url: url, name: file.name }; });
+}
+
+async function saveClientInvoice(){
+  var errEl = document.getElementById('inv-err');
+  var btn = document.getElementById('inv-btn');
+  errEl.style.display = 'none';
+  var file = document.getElementById('inv-file').files[0] || null;
+  var title = (document.getElementById('inv-title').value||'').trim();
+  var date = document.getElementById('inv-date').value;
+  var cost = document.getElementById('inv-cost').value;
+  var note = (document.getElementById('inv-note').value||'').trim();
+  if(!file){ errEl.textContent = 'Ajoute une photo ou un PDF de ta facture.'; errEl.style.display='block'; return; }
+  if(!title || !date){ errEl.textContent = 'Le titre et la date sont obligatoires.'; errEl.style.display='block'; return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi de la facture...';
+  var v0 = (clientData.vehicles && clientData.vehicles[0]) || {};
+  var vehLabel = [v0.year,v0.make,v0.model].filter(Boolean).join(' ');
+  try {
+    var facture = await uploadClientFacture(file, clientUser.uid);
+    await db.collection('service_history').add({
+      client_uid: clientUser.uid,
+      vehicle_label: vehLabel,
+      date: date, time: '',
+      mechanic_id: '', mechanic_name: '',
+      location: '',
+      service_type: '',
+      title: title,
+      cost: cost ? Number(cost) : 0,
+      saved: 0,
+      note: note,
+      next_due_date: '',
+      facture_url: facture ? facture.url : null,
+      facture_name: facture ? facture.name : null,
+      source: 'client',
+      created_by: 'Client',
+      created_at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    renderAccount();
+    renderHomeDashboard();
+    toast('📸 Facture ajoutée à ton historique ✓', 'ok', 2800);
+  } catch(e){
+    errEl.textContent = 'Erreur : '+(e.message||e); errEl.style.display='block';
+    btn.disabled = false; btn.innerHTML = '✓ Ajouter à mon historique';
+  }
+}
+
+/* ══════════ TRANSFERT DE VÉHICULE ══════════
+   Le vendeur génère un code (doc vehicle_transfers, id = le code lui-même) ;
+   l'acheteur l'entre dans SON compte pour réclamer le véhicule (ajouté tout
+   de suite chez lui) ; le vendeur confirme ensuite (bannière automatique
+   dans son espace) — c'est CE moment-là qui réassigne son historique
+   d'entretien passé (service_history) au nouveau propriétaire et retire le
+   véhicule de son propre compte. Chaque personne n'écrit jamais que dans
+   ses propres documents (règles Firestore), jamais directement dans le
+   compte de l'autre.
+   Limite connue : le rapprochement entre un véhicule et ses entretiens
+   passés se fait par libellé (année+marque+modèle), pas par un identifiant
+   stable — si un client a deux véhicules avec exactement le même libellé,
+   les deux historiques transféreraient ensemble. Cas rare en pratique. */
+function genTransferCode(){
+  var chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // sans I,L,O,0,1 (ambigus à l'oral/écrit)
+  var code = '';
+  for(var i=0;i<7;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function openTransferForm(idx){
+  var v = (clientData.vehicles||[])[idx];
+  if(!v) return;
+  var title = [v.year,v.make,v.model].filter(Boolean).join(' ') || 'ce véhicule';
+  document.getElementById('account-title').textContent = '🔄 Transférer ' + title;
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="trf-err"></div>'
+    +'<div style="background:var(--bluelt);border-radius:12px;padding:13px 15px;font-size:12.5px;color:var(--blue2);line-height:1.6;margin-bottom:1.1rem">🚗 Tu vends ton auto ? Génère un code et donne-le au nouveau propriétaire — une fois qu\'il l\'entre dans son propre compte Greaz, il reçoit TOUT l\'historique d\'entretien de ce véhicule. Le véhicule sera retiré de ton compte une fois le transfert confirmé.</div>'
+    +'<button class="btn-submit blue" id="trf-btn" onclick="startVehicleTransfer('+idx+')">🔄 Générer un code de transfert</button>'
+    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Annuler</button>';
+}
+function homeOpenTransferForm(idx){ homeOpenDrawerThen(function(){ openTransferForm(idx); }); }
+
+async function startVehicleTransfer(idx){
+  var v = (clientData.vehicles||[])[idx];
+  var errEl = document.getElementById('trf-err');
+  var btn = document.getElementById('trf-btn');
+  if(!v){ errEl.textContent='Véhicule introuvable.'; errEl.style.display='block'; return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Création...';
+  var code = genTransferCode();
+  var vehLabel = [v.year,v.make,v.model].filter(Boolean).join(' ');
+  try {
+    await db.collection('vehicle_transfers').doc(code).set({
+      code: code,
+      from_uid: clientUser.uid,
+      from_name: ((clientData.prenom||'') + (clientData.nom ? ' '+clientData.nom : '')).trim() || 'Un membre Greaz',
+      vehicle_index: idx,
+      vehicle: v,
+      vehicle_label: vehLabel,
+      status: 'pending',
+      claimed_by_uid: null, claimed_by_name: null,
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+      claimed_at: null, completed_at: null
+    });
+    document.getElementById('account-body').innerHTML =
+      '<div class="acc-empty" style="padding:1.5rem 1rem">'
+      +'<div class="acc-empty-ic">🔑</div>'
+      +'<div class="acc-empty-t">Donne ce code au nouveau propriétaire</div>'
+      +'<div class="transfer-code">'+code+'</div>'
+      +'<div class="acc-empty-d">Il l\'entre dans son propre compte Greaz (section "Mes véhicules") pour recevoir tout l\'historique de '+escHtml(vehLabel)+'. Le véhicule reste chez toi tant qu\'il n\'a pas été réclamé.</div>'
+      +'<button class="btn-book" style="margin-top:1.25rem;color:var(--rose)" onclick="cancelVehicleTransfer(\''+code+'\')">Annuler ce transfert</button>'
+      +'<button class="btn-book" style="margin-top:.6rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Retour</button>'
+      +'</div>';
+  } catch(e){
+    errEl.textContent = 'Erreur : '+(e.message||e); errEl.style.display='block';
+    btn.disabled = false; btn.innerHTML = '🔄 Générer un code de transfert';
+  }
+}
+
+async function cancelVehicleTransfer(code){
+  try {
+    await db.collection('vehicle_transfers').doc(code).update({ status: 'cancelled' });
+    toast('Transfert annulé', 'ok', 2200);
+    renderAccount();
+  } catch(e){ toast('Erreur : '+e.message, 'err'); }
+}
+
+function openClaimTransferForm(){
+  document.getElementById('account-title').textContent = '🔑 Réclamer un véhicule';
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="clm-err"></div>'
+    +'<div style="background:var(--bluelt);border-radius:12px;padding:13px 15px;font-size:12.5px;color:var(--blue2);line-height:1.6;margin-bottom:1.1rem">🚗 Tu viens d\'acheter une auto d\'un membre Greaz ? Entre le code qu\'il t\'a donné pour recevoir tout l\'historique d\'entretien du véhicule.</div>'
+    +'<div class="ff"><label>Code de transfert</label><input type="text" id="clm-code" placeholder="Ex. AB3XK9P" style="text-transform:uppercase;letter-spacing:.12em;font-weight:700;text-align:center;font-size:1.1rem" maxlength="8"></div>'
+    +'<button class="btn-submit blue" id="clm-btn" onclick="claimVehicleTransfer()">✓ Réclamer ce véhicule</button>'
+    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Annuler</button>';
+}
+function homeOpenClaimTransferForm(){ homeOpenDrawerThen(function(){ openClaimTransferForm(); }); }
+
+async function claimVehicleTransfer(){
+  var errEl = document.getElementById('clm-err');
+  var btn = document.getElementById('clm-btn');
+  errEl.style.display = 'none';
+  var code = (document.getElementById('clm-code').value||'').trim().toUpperCase();
+  if(!code){ errEl.textContent = 'Entre le code de transfert.'; errEl.style.display='block'; return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Vérification...';
+  try {
+    var doc = await db.collection('vehicle_transfers').doc(code).get();
+    if(!doc.exists){ throw new Error('Code introuvable — vérifie qu\'il est bien écrit.'); }
+    var t = doc.data();
+    if(t.status !== 'pending'){ throw new Error('Ce code a déjà été utilisé ou annulé.'); }
+    if(t.from_uid === clientUser.uid){ throw new Error('Tu peux pas réclamer ton propre véhicule.'); }
+    var myName = ((clientData.prenom||'') + (clientData.nom ? ' '+clientData.nom : '')).trim() || 'Un membre Greaz';
+    await db.collection('vehicle_transfers').doc(code).update({
+      status: 'claimed',
+      claimed_by_uid: clientUser.uid,
+      claimed_by_name: myName,
+      claimed_at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // Ajoute le véhicule à mon compte tout de suite — l'historique
+    // (service_history) va apparaître dès que l'ancien propriétaire confirme
+    // de son côté (bannière automatique dans son espace, voir
+    // checkPendingTransferConfirmations / confirmVehicleTransfer).
+    var vehicles = (clientData.vehicles||[]).slice();
+    var newVeh = Object.assign({}, t.vehicle, { photo_url: '' }); // pas de photo dupliquée sans repasser par l'admin
+    vehicles.push(newVeh);
+    await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
+    clientData.vehicles = vehicles;
+    document.getElementById('account-body').innerHTML =
+      '<div class="acc-empty" style="padding:2rem 1rem">'
+      +'<div class="acc-empty-ic">✅</div>'
+      +'<div class="acc-empty-t">Véhicule ajouté !</div>'
+      +'<div class="acc-empty-d">'+escHtml(t.vehicle_label||'Ton véhicule')+' est maintenant dans ton compte. Son historique d\'entretien complet va apparaître ici dès que '+escHtml(t.from_name||'l\'ancien propriétaire')+' confirme le transfert de son côté.</div>'
+      +'<button class="btn-book" style="margin-top:1.25rem" onclick="renderAccount()">Retour</button>'
+      +'</div>';
+    renderHomeDashboard();
+    updateMaintenanceAlertBadge();
+    toast('🔑 Véhicule réclamé ✓', 'ok', 3000);
+  } catch(e){
+    errEl.textContent = e.message || 'Erreur inconnue.'; errEl.style.display = 'block';
+    btn.disabled = false; btn.innerHTML = '✓ Réclamer ce véhicule';
+  }
+}
+
+/* Bannière côté vendeur : quelqu'un a réclamé un de ses transferts, il reste
+   à confirmer pour vraiment transférer l'historique et retirer le véhicule
+   de son propre compte. */
+async function checkPendingTransferConfirmations(){
+  var el = document.getElementById('home-transfer-banner');
+  if(!el || !clientUser) return;
+  try {
+    var snap = await db.collection('vehicle_transfers')
+      .where('from_uid','==',clientUser.uid).where('status','==','claimed').get();
+    if(snap.empty){ el.innerHTML=''; return; }
+    el.innerHTML = snap.docs.map(function(d){
+      var t = d.data();
+      return '<div class="history-next-banner" style="cursor:pointer;background:#ECFDF5;border-color:#6EE7B7" onclick="confirmVehicleTransfer(\''+d.id+'\')">'
+        +'✅ <b>'+escHtml(t.claimed_by_name||'Quelqu\'un')+'</b> a réclamé le transfert de <b>'+escHtml(t.vehicle_label||'ton véhicule')+'</b> — touche ici pour confirmer et transférer l\'historique'
+        +'</div>';
+    }).join('');
+  } catch(e){ console.log('Vérif transferts en attente :', e.message); }
+}
+
+async function confirmVehicleTransfer(code){
+  if(!confirm('Confirmer ce transfert ? Tout l\'historique d\'entretien de ce véhicule sera transféré au nouveau propriétaire, et le véhicule sera retiré de ton compte.')) return;
+  try {
+    var doc = await db.collection('vehicle_transfers').doc(code).get();
+    if(!doc.exists) throw new Error('Transfert introuvable.');
+    var t = doc.data();
+    if(t.status !== 'claimed') throw new Error('Ce transfert n\'est plus en attente de confirmation.');
+    if(t.from_uid !== clientUser.uid) throw new Error('Ce transfert ne t\'appartient pas.');
+
+    // 1) Réassigne mes entretiens passés pour ce véhicule au nouveau propriétaire.
+    var histSnap = await db.collection('service_history')
+      .where('client_uid','==',clientUser.uid)
+      .where('vehicle_label','==',t.vehicle_label)
+      .get();
+    var batch = db.batch();
+    histSnap.docs.forEach(function(d){
+      batch.update(d.ref, { client_uid: t.claimed_by_uid, previous_owner_uid: clientUser.uid });
+    });
+    batch.update(db.collection('vehicle_transfers').doc(code), {
+      status: 'completed', completed_at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await batch.commit();
+
+    // 2) Retire le véhicule de mon propre compte.
+    var idx = (typeof t.vehicle_index === 'number') ? t.vehicle_index : -1;
+    var vehicles = (clientData.vehicles||[]).slice();
+    if(idx >= 0 && idx < vehicles.length){
+      vehicles.splice(idx,1);
+    } else {
+      var vi = vehicles.findIndex(function(v){ return [v.year,v.make,v.model].filter(Boolean).join(' ') === t.vehicle_label; });
+      if(vi >= 0) vehicles.splice(vi,1);
+    }
+    await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
+    clientData.vehicles = vehicles;
+
+    renderHomeDashboard();
+    renderAccount();
+    toast('🔄 Transfert confirmé — l\'historique a été transféré ✓', 'ok', 3200);
+  } catch(e){ toast('Erreur : '+(e.message||e), 'err'); }
 }
 
 /* ── Points après réservation ── */
