@@ -1835,6 +1835,39 @@ firebase.initializeApp({
 });
 var db = firebase.firestore();
 
+/* ══════════ UPLOADS DE FICHIERS — via la fonction Supabase ══════════
+   Firebase Storage demande maintenant le forfait payant Blaze pour être
+   activé, donc tous les envois de fichiers (factures, photos) passent par
+   une petite fonction serveur gratuite (Supabase Edge Function) qui
+   vérifie vraiment le jeton Firebase de la personne avant d'accepter quoi
+   que ce soit — même niveau de sécurité qu'avant, sans carte de crédit.
+   À REMPLACER : mets ici l'URL de TA fonction et ta clé publique "anon"
+   une fois ton projet Supabase créé (Project Settings → API). */
+var SUPABASE_FUNCTION_URL = 'https://cvgdrhxkevneswowtxrt.supabase.co/functions/v1/upload-file';
+var SUPABASE_ANON_KEY = 'sb_publishable_q0SPPhiweAWf3WNULK-7qQ_n2O_9IgG';
+
+function uploadViaFunction(file, purpose, targetUid, extra){
+  if(!file) return Promise.resolve(null);
+  if(!clientUser) return Promise.reject(new Error('Tu dois être connecté pour envoyer un fichier.'));
+  return clientUser.getIdToken().then(function(idToken){
+    var fd = new FormData();
+    fd.append('file', file, file.name || 'fichier.jpg');
+    fd.append('purpose', purpose);
+    fd.append('target_uid', targetUid || clientUser.uid);
+    if(extra) Object.keys(extra).forEach(function(k){ fd.append(k, extra[k]); });
+    return fetch(SUPABASE_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'X-Firebase-Token': idToken },
+      body: fd
+    });
+  }).then(function(r){
+    return r.json().then(function(data){
+      if(!r.ok) throw new Error(data.error || 'Erreur d\'envoi.');
+      return data; // { url, name }
+    });
+  });
+}
+
 /* ═══ TRAFIC — visites / visiteurs uniques / ouvertures de l'app par jour ═══
    Un petit compteur maison dans Firestore (settings/{date} n'existe pas
    déjà pour ça, donc collection dédiée "traffic"), visible dans le
@@ -6274,16 +6307,7 @@ function invoiceFilePreview(){
 }
 
 function uploadClientFacture(file, uid){
-  if(!file) return Promise.resolve(null);
-  var maxMB = 15;
-  if(file.size > maxMB * 1024 * 1024){
-    return Promise.reject(new Error('Le fichier est trop volumineux (max '+maxMB+' Mo).'));
-  }
-  var safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-  var path = 'factures/service_history/' + uid + '/' + Date.now() + '_' + safeName;
-  var ref = firebase.storage().ref(path);
-  return ref.put(file).then(function(snap){ return snap.ref.getDownloadURL(); })
-    .then(function(url){ return { url: url, name: file.name }; });
+  return uploadViaFunction(file, 'client_facture', uid);
 }
 
 async function saveClientInvoice(){
