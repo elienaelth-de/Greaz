@@ -33,6 +33,39 @@ self.addEventListener('activate', function(event){
   self.clients.claim();
 });
 
+// ═══ Notifications push — reçues même quand l'app est complètement
+// fermée. Le serveur (fonction Supabase "send-push") envoie un message
+// chiffré ; c'est ce code qui l'affiche comme une vraie notification. ═══
+self.addEventListener('push', function(event){
+  var data = {};
+  try { data = event.data ? event.data.json() : {}; } catch(e){}
+  var title = data.title || '🔧 Greaz';
+  var body = data.body || 'Nouvelle activité sur ton compte Greaz.';
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: body,
+      icon: 'icon-192.png',
+      badge: 'icon-192.png',
+      tag: 'greaz-client-push-' + Date.now(),
+      data: { tab: data.tab || '' }
+    })
+  );
+});
+
+self.addEventListener('notificationclick', function(event){
+  event.notification.close();
+  var targetUrl = './index.html';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList){
+      for (var i = 0; i < clientList.length; i++){
+        var c = clientList[i];
+        if ('focus' in c) return c.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
+    })
+  );
+});
+
 self.addEventListener('fetch', function(event){
   var req = event.request;
   if(req.method !== 'GET') return;
