@@ -1074,6 +1074,17 @@ footer p{font-size:12.5px;color:var(--faint);line-height:1.7}
 .loy-fill{height:100%;background:linear-gradient(90deg,#E0A800,#B8860B);border-radius:5px;transition:width .6s var(--spring)}
 .loy-next{font-size:11.5px;color:var(--muted);margin-top:7px}
 .loy-next b{color:#8A6508!important}
+.loy-card{width:100%;border-radius:18px;padding:1.4rem 1.6rem;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a1d2e 0%,#12141f 55%,#1f1a12 100%);border:1px solid rgba(255,215,0,.25);box-shadow:0 14px 34px rgba(23,26,32,.22);z-index:1}
+.loy-card-shine{position:absolute;top:-60%;left:-40%;width:75%;height:220%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);transform:rotate(22deg);animation:shine 4.5s ease-in-out infinite}
+.loy-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;position:relative}
+.loy-card-tier{font-size:11px;font-weight:700;padding:4px 11px;border-radius:14px;background:rgba(255,215,0,.14);border:1px solid rgba(255,215,0,.35);color:#FFD700;white-space:nowrap;flex-shrink:0}
+.loy-card-pts{font-family:var(--display);font-size:2.5rem;font-weight:800;line-height:1;letter-spacing:-.04em;background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+.loy-card-lbl{font-size:10.5px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;margin-bottom:12px;position:relative}
+.loy-card-bar{height:5px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden;margin-bottom:10px;position:relative}
+.loy-card-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FFA500);border-radius:4px;transition:width .6s var(--spring)}
+.loy-card-next{font-size:11px;color:rgba(255,255,255,.55);margin-bottom:14px;position:relative}
+.loy-card-next b{color:#FFD700!important}
+.loy-card-foot{display:flex;justify-content:space-between;align-items:center;font-size:9.5px;letter-spacing:.12em;color:rgba(255,255,255,.35);font-weight:600;position:relative}
 .veh-card{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;transition:all .2s;overflow:hidden}
 .veh-card:hover{border-color:rgba(62,106,225,.4);background:var(--bluelt)}
 .veh-banner{width:100%;height:170px;display:block;object-fit:cover;background:linear-gradient(135deg,#EEF3FE,#E9F8F1)}
@@ -1885,6 +1896,65 @@ function notifyAdminsPush(purpose, name, extra){
       body: JSON.stringify({ purpose: purpose, name: (name||'').slice(0,80), extra: (extra||'').slice(0,140) })
     }).catch(function(){});
   } catch(e){}
+}
+
+/* ══════════ ALERTES AU CLIENT — RDV confirmé, facture ajoutée, message ══════════
+   Même mécanique que côté admin : le client accepte une fois de recevoir
+   des notifications, son téléphone/ordi s'abonne, et le garage peut
+   ensuite lui envoyer une vraie alerte même si l'app est fermée. */
+var SUPABASE_SAVE_SUBSCRIPTION_URL = 'https://cvgdrhxkevneswowtxrt.supabase.co/functions/v1/save-push-subscription';
+var VAPID_PUBLIC_KEY = 'BGR9yNl_mysEQ7LHPMnzipdqlp7s6AmrQC1_xBcZxlQtz1yCAwvmF7e0ppvbn73XXSDF3J9QwTXwMCEQNXfRfvQ';
+
+function urlBase64ToUint8Array(base64String){
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData = window.atob(base64);
+  var outputArray = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+function subscribeClientToPush(){
+  if(!('serviceWorker' in navigator) || !('PushManager' in window) || !clientUser) return Promise.resolve();
+  return navigator.serviceWorker.ready.then(function(reg){
+    return reg.pushManager.getSubscription().then(function(existing){
+      if(existing) return existing;
+      return reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    });
+  }).then(function(sub){
+    if(!sub || !clientUser) return;
+    return clientUser.getIdToken().then(function(idToken){
+      return fetch(SUPABASE_SAVE_SUBSCRIPTION_URL, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'X-Firebase-Token': idToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'subscribe', role: 'client', subscription: sub.toJSON ? sub.toJSON() : sub })
+      });
+    });
+  }).catch(function(e){ console.log('Abonnement push client:', e && e.message); });
+}
+
+function requestClientNotifPermission(){
+  if(!('Notification' in window)) return;
+  Notification.requestPermission().then(function(perm){
+    var banner = document.getElementById('home-notif-banner');
+    if(banner) banner.innerHTML = '';
+    if(perm === 'granted') subscribeClientToPush();
+  });
+}
+
+function renderClientNotifBanner(){
+  var banner = document.getElementById('home-notif-banner');
+  if(!banner) return;
+  if(!('Notification' in window) || Notification.permission !== 'default'){ banner.innerHTML = ''; return; }
+  banner.innerHTML = '<div style="display:flex;align-items:center;gap:10px;background:var(--bluelt);border:1px solid rgba(62,106,225,.25);border-radius:12px;padding:11px 14px;margin-bottom:1.25rem;cursor:pointer" onclick="requestClientNotifPermission()">'
+    +'<span style="font-size:20px">🔔</span>'
+    +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--white)">Active tes alertes</div>'
+    +'<div style="font-size:11.5px;color:var(--muted)">Sois avisé quand ton RDV est confirmé ou qu\'un message arrive.</div></div>'
+    +'<span style="font-size:12px;font-weight:700;color:var(--blue)">Activer →</span>'
+    +'</div>';
 }
 
 /* ═══ TRAFIC — visites / visiteurs uniques / ouvertures de l'app par jour ═══
@@ -5647,17 +5717,22 @@ function renderHomeDashboard(){
   body.innerHTML =
     '<div id="home-top-alert"></div>'
     +'<div id="home-transfer-banner"></div>'
+    +'<div id="home-notif-banner"></div>'
     +'<div class="acc-hero" style="margin-bottom:1.75rem">'
     +'<div class="acc-name">Salut '+(clientData.prenom||'')+' 👋</div>'
     +'<div class="acc-mail">'+(clientData.email||'')+'</div>'
-    +'<div class="loyalty">'
-    +'<div class="loy-top"><div><div class="loy-pts">'+pts+'</div><div class="loy-lbl">Points Greaz</div></div>'
-    +'<span class="loy-tier '+tier.cls+'">'+tier.icon+' '+tier.label+'</span></div>'
-    +'<div class="loy-bar"><div class="loy-fill" style="width:'+pct+'%"></div></div>'
-    +'<div class="loy-next">'+(nxt
-      ? 'Encore <b style="color:var(--gold)">'+(nxt.min-pts)+' points</b> pour atteindre '+nxt.icon+' '+nxt.label
+    +'</div>'
+    +'<div class="loy-card" style="margin-bottom:1.75rem">'
+    +'<div class="loy-card-shine"></div>'
+    +'<div class="loy-card-top"><span class="loy-card-tier">'+tier.icon+' '+tier.label+'</span></div>'
+    +'<div class="loy-card-pts">'+pts+'</div>'
+    +'<div class="loy-card-lbl">Points Greaz</div>'
+    +'<div class="loy-card-bar"><div class="loy-card-fill" style="width:'+pct+'%"></div></div>'
+    +'<div class="loy-card-next">'+(nxt
+      ? 'Encore <b>'+(nxt.min-pts)+' points</b> pour atteindre '+nxt.icon+' '+nxt.label
       : '🎉 Tu es au niveau maximum !')+'</div>'
-    +'</div></div>'
+    +'<div class="loy-card-foot"><span>MEMBRE DEPUIS '+((clientData.created_at&&clientData.created_at.toDate)?clientData.created_at.toDate().getFullYear():new Date().getFullYear())+'</span><span>✦✦✦</span></div>'
+    +'</div>'
     + vehTopHtml
     +'<div class="ticker-wrap" id="home-ticker-wrap"></div>'
     +'<div id="home-value-wrap"></div>'
@@ -5676,6 +5751,8 @@ function renderHomeDashboard(){
   updateMaintenanceAlertBadge();
   checkPendingTransferConfirmations();
   renderTopAlertFromKm();
+  renderClientNotifBanner();
+  if('Notification' in window && Notification.permission === 'granted') subscribeClientToPush();
 }
 
 /* ── Recommandation selon la période : dès qu'un entretien approche
