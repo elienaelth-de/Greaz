@@ -5840,6 +5840,51 @@ function openStationDirections(lat, lng){
   window.open(url, '_blank');
 }
 
+/* ── Slideshow des stations proches — commence par la plus proche, puis
+   défile automatiquement (comme un carrousel) à travers toutes celles à
+   ~5 min de route (voir "max_km" côté fonction Supabase). ── */
+var _gasSlideStations = [];
+var _gasSlideIndex = 0;
+var _gasSlideTimer = null;
+function startGasSlideshow(stations){
+  stopGasSlideshow();
+  _gasSlideStations = stations || [];
+  _gasSlideIndex = 0;
+  if(!_gasSlideStations.length) return;
+  renderGasSlide();
+  if(_gasSlideStations.length > 1){
+    _gasSlideTimer = setInterval(function(){
+      _gasSlideIndex = (_gasSlideIndex + 1) % _gasSlideStations.length;
+      renderGasSlide();
+    }, 4500);
+  }
+}
+function stopGasSlideshow(){
+  if(_gasSlideTimer){ clearInterval(_gasSlideTimer); _gasSlideTimer = null; }
+  _gasSlideStations = []; _gasSlideIndex = 0;
+}
+function renderGasSlide(){
+  var wrap = document.getElementById('gas-slide-card');
+  if(!wrap) { stopGasSlideshow(); return; }
+  var st = _gasSlideStations[_gasSlideIndex];
+  if(!st){ wrap.innerHTML = ''; return; }
+  var city = extractCityFromAddress(st.address);
+  var brand = (st.brand && st.brand !== 'Aucun') ? st.brand : 'Station';
+  var sub = '📍 '+brand+(city ? ' · '+city : '')+' · '+st.distance_km+' km';
+  var mapsClick = (typeof st.lat === 'number' && typeof st.lng === 'number')
+    ? ('openStationDirections('+st.lat+','+st.lng+')') : '';
+  var dots = '';
+  if(_gasSlideStations.length > 1){
+    dots = '<div style="display:flex;gap:5px;justify-content:center;padding:6px 0 2px">'
+      + _gasSlideStations.map(function(_, i){
+          var active = i === _gasSlideIndex;
+          return '<span style="width:'+(active?'14px':'5px')+';height:5px;border-radius:3px;background:'+(active?'#00C26F':'rgba(255,255,255,.25)')+';transition:all .3s"></span>';
+        }).join('')
+      + '</div>';
+  }
+  wrap.innerHTML = tickerCardFlat('⛽','Essence ordinaire', st.prices['Régulier'], '$/L', sub, '🟢 En direct', mapsClick) + dots;
+}
+
 /* ── Essence près de toi — position du téléphone + le fichier public de
    stations publié par l'outil officiel du Québec (Régie de l'énergie),
    via notre fonction Supabase "nearby-gas-prices". Si la personne refuse
@@ -5856,7 +5901,7 @@ function getNearbyGasPrice(){
   return new Promise(function(resolve){
     navigator.geolocation.getCurrentPosition(function(pos){
       var lat = pos.coords.latitude, lng = pos.coords.longitude;
-      fetch(SUPABASE_GAS_PRICES_URL+'?lat='+lat+'&lng='+lng+'&limit=1', {
+      fetch(SUPABASE_GAS_PRICES_URL+'?lat='+lat+'&lng='+lng+'&limit=8&max_km=3', {
         headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
       }).then(function(r){ return r.json(); }).then(function(data){
         var stations = (data && data.ok && data.stations) || null;
@@ -5881,20 +5926,13 @@ function renderMarketTicker(){
     var hasElectric = vehicles.some(function(v){ return v.fuel === 'Électrique' || v.fuel === 'Hybride'; });
     var hasGas = !vehicles.length || vehicles.some(function(v){ return v.fuel !== 'Électrique'; });
     var cards = [];
+    var gasSlideStations = [];
     if(hasGas){
-      var nearby = (nearbyStations && nearbyStations[0]) || null;
-      var nearbyPrice = nearby && nearby.prices && typeof nearby.prices['Régulier'] === 'number' ? nearby.prices['Régulier'] : null;
-      if(nearbyPrice){
-        // On affiche la bannière + la ville (ex: "Shell · Montréal"), jamais le
-        // nom légal de la compagnie (ex: "9161-7373 Québec Inc.") — ce
-        // "Québec" dans le nom est juste la mention "compagnie du Québec",
-        // pas une ville, et ça mélangeait le monde.
-        var nearbyCity = extractCityFromAddress(nearby.address);
-        var nearbyBrand = (nearby.brand && nearby.brand !== 'Aucun') ? nearby.brand : 'Station';
-        var sub = '📍 '+nearbyBrand+(nearbyCity ? ' · '+nearbyCity : '')+' · '+nearby.distance_km+' km';
-        var mapsClick = (typeof nearby.lat === 'number' && typeof nearby.lng === 'number')
-          ? ('openStationDirections('+nearby.lat+','+nearby.lng+')') : '';
-        cards.push(tickerCardFlat('⛽','Essence ordinaire', nearbyPrice, '$/L', sub, '🟢 En direct', mapsClick));
+      gasSlideStations = ((nearbyStations || []).filter(function(st){
+        return st.prices && typeof st.prices['Régulier'] === 'number';
+      }));
+      if(gasSlideStations.length){
+        cards.push('<div id="gas-slide-card"></div>');
       } else if(typeof d.fuel_regular === 'number'){
         cards.push(tickerCardDelta('⛽','Essence ordinaire', d.fuel_regular, d.fuel_regular_prev, '$/L'));
       }
@@ -5920,6 +5958,7 @@ function renderMarketTicker(){
 
     var listEl = document.getElementById('home-ticker-list');
     if(listEl) listEl.innerHTML = cards.join('') || '<div class="ticker-empty">Greaz publie les prix de la semaine bientôt.</div>';
+    if(gasSlideStations.length) startGasSlideshow(gasSlideStations); else stopGasSlideshow();
   }).catch(function(e){ console.log('Prix marché:', e); });
 }
 
