@@ -5718,21 +5718,6 @@ function renderHomeDashboard(){
     '<div id="home-top-alert"></div>'
     +'<div id="home-transfer-banner"></div>'
     +'<div id="home-notif-banner"></div>'
-    +'<div class="acc-hero" style="margin-bottom:1.75rem">'
-    +'<div class="acc-name">Salut '+(clientData.prenom||'')+' 👋</div>'
-    +'<div class="acc-mail">'+(clientData.email||'')+'</div>'
-    +'</div>'
-    +'<div class="loy-card" style="margin-bottom:1.75rem">'
-    +'<div class="loy-card-shine"></div>'
-    +'<div class="loy-card-top"><span class="loy-card-tier">'+tier.icon+' '+tier.label+'</span></div>'
-    +'<div class="loy-card-pts">'+pts+'</div>'
-    +'<div class="loy-card-lbl">Points Greaz</div>'
-    +'<div class="loy-card-bar"><div class="loy-card-fill" style="width:'+pct+'%"></div></div>'
-    +'<div class="loy-card-next">'+(nxt
-      ? 'Encore <b>'+(nxt.min-pts)+' points</b> pour atteindre '+nxt.icon+' '+nxt.label
-      : '🎉 Tu es au niveau maximum !')+'</div>'
-    +'<div class="loy-card-foot"><span>MEMBRE DEPUIS '+((clientData.created_at&&clientData.created_at.toDate)?clientData.created_at.toDate().getFullYear():new Date().getFullYear())+'</span><span>✦✦✦</span></div>'
-    +'</div>'
     + vehTopHtml
     +'<div class="ticker-wrap" id="home-ticker-wrap"></div>'
     +'<div id="home-value-wrap"></div>'
