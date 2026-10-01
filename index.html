@@ -8,7 +8,7 @@
 <!-- ═══ FAVICON GREAZ (icône d'onglet) ═══
      SVG intégré : le "G" blanc sur une pastille bleue arrondie.
      Net à toute taille, aucun fichier à uploader. -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%234568D6'/%3E%3Ctext x='50' y='50' font-family='Arial,sans-serif' font-size='62' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='central' letter-spacing='-3'%3EG%3C/text%3E%3C/svg%3E">
+<link id="favicon-link" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%234568D6'/%3E%3Ctext x='50' y='50' font-family='Arial,sans-serif' font-size='62' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='central' letter-spacing='-3'%3EG%3C/text%3E%3C/svg%3E">
 <!-- Secours PNG pour les vieux navigateurs / raccourci écran d'accueil -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%234568D6'/%3E%3Ctext x='50' y='50' font-family='Arial,sans-serif' font-size='62' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='central' letter-spacing='-3'%3EG%3C/text%3E%3C/svg%3E">
 <meta name="theme-color" content="#4568D6">
@@ -4927,7 +4927,7 @@ function nextTier(pts){
 /* ── Auth ── */
 firebase.auth().onAuthStateChanged(function(user){
   if(user){ loadClientProfile(user); }
-  else { clientUser = null; clientData = null; updateNavAccount(); stopClientChatWatch(); renderHomeDashboard(); }
+  else { clientUser = null; clientData = null; updateNavAccount(); stopClientChatWatch(); stopClientRdvWatch(); stopClientHistoryWatch(); _clientNotifCount = 0; updateClientBadgeAndTitle(); renderHomeDashboard(); }
 });
 
 function updateNavAccount(){
@@ -5733,6 +5733,9 @@ function renderHomeDashboard(){
   renderMarketTicker();
   renderVehicleValueCard();
   watchClientChatBadge();
+  watchClientRdvBadge();
+  watchClientHistoryBadge();
+  clearClientNotifBadge();
   updateMaintenanceAlertBadge();
   checkPendingTransferConfirmations();
   renderTopAlertFromKm();
@@ -5939,21 +5942,127 @@ function vehValueCurveSvg(pts){
     + '</svg>';
 }
 
+/* ── Badge sur l'icône de l'app (écran d'accueil du cell) + favori + titre ──
+   Même système que le panneau admin : un numéro rouge sur l'icône tant que
+   tu n'as pas rouvert l'app pour voir la nouveauté (RDV confirmé, facture
+   ajoutée, message du garage). Ça fonctionne tant que l'app est ouverte ou
+   en arrière-plan sur le téléphone/navigateur — pas besoin d'y toucher,
+   c'est séparé des vraies notifications "push" qui, elles, arrivent même
+   app complètement fermée. */
+var _baseTitle = document.title;
+var _clientNotifCount = 0;
+var _faviconBase = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%234568D6'/><text x='50' y='50' font-family='Arial,sans-serif' font-size='62' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='central' letter-spacing='-3'>G</text>{DOT}</svg>";
+var _faviconDot = "<circle cx='82' cy='20' r='16' fill='%23dc2626' stroke='white' stroke-width='5'/>";
+function updateFaviconBadge(showDot){
+  var link = document.getElementById('favicon-link');
+  if(!link) return;
+  var svg = _faviconBase.replace('{DOT}', showDot ? _faviconDot : '');
+  link.href = 'data:image/svg+xml,' + svg;
+}
+function updateClientBadgeAndTitle(){
+  if('setAppBadge' in navigator){
+    if(_clientNotifCount > 0) navigator.setAppBadge(_clientNotifCount).catch(function(){});
+    else if('clearAppBadge' in navigator) navigator.clearAppBadge().catch(function(){});
+  }
+  document.title = (_clientNotifCount > 0 ? '('+(_clientNotifCount>99?'99+':_clientNotifCount)+') ' : '') + _baseTitle;
+  updateFaviconBadge(_clientNotifCount > 0);
+}
+function fireClientNativeNotification(title, body){
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  if(document.visibilityState === 'visible') return;
+  try {
+    var n = new Notification(title, { body: body||'', icon: 'icon-192.png', badge: 'icon-192.png', tag: 'greaz-client-'+Date.now() });
+    n.onclick = function(){ window.focus(); n.close(); };
+  } catch(e){}
+}
+function bumpClientNotif(title, body){
+  _clientNotifCount++;
+  updateClientBadgeAndTitle();
+  fireClientNativeNotification(title, body);
+}
+function clearClientNotifBadge(){
+  if(_clientNotifCount === 0) return;
+  _clientNotifCount = 0;
+  updateClientBadgeAndTitle();
+}
+
 /* ── Chat client ↔ Greaz (temps réel via Firestore) ── */
 var _clientChatUnsub = null;
 var _clientChatOpen = false;
+var _chatBadgeFirstSnap = true;
 
 function watchClientChatBadge(){
   if(!clientUser || _clientChatUnsub) return;
+  _chatBadgeFirstSnap = true;
   _clientChatUnsub = db.collection('chats').doc(clientUser.uid).onSnapshot(function(doc){
     var d = doc.data() || {};
     var badge = document.getElementById('home-chat-badge');
     if(badge) badge.innerHTML = (d.unread_by_client && !_clientChatOpen) ? '<span class="chat-unread-dot"></span>' : '';
     if(_clientChatOpen) renderChatMsgs(d.messages || []);
+    if(d.unread_by_client && !_clientChatOpen && !_chatBadgeFirstSnap){
+      var msgs = d.messages || [];
+      var last = msgs.length ? msgs[msgs.length-1] : null;
+      bumpClientNotif('💬 Nouveau message du garage !', last ? last.text : '');
+    }
+    _chatBadgeFirstSnap = false;
   }, function(e){ console.log('Chat client:', e); });
 }
 function stopClientChatWatch(){
   if(_clientChatUnsub){ _clientChatUnsub(); _clientChatUnsub = null; }
+}
+
+/* ── RDV confirmé (temps réel) — même logique : on ignore l'état déjà en
+   place au moment où on se connecte, on avise seulement sur un VRAI
+   changement pendant que l'app est ouverte. ── */
+var _clientRdvUnsub = null;
+var _rdvBadgeFirstSnap = true;
+var _seenRdvStatus = {};
+function watchClientRdvBadge(){
+  if(!clientUser || _clientRdvUnsub) return;
+  _rdvBadgeFirstSnap = true;
+  _clientRdvUnsub = db.collection('appointments').where('client_uid','==',clientUser.uid)
+    .onSnapshot(function(snap){
+      snap.docChanges().forEach(function(ch){
+        var d = ch.doc.data();
+        var prev = _seenRdvStatus[ch.doc.id];
+        _seenRdvStatus[ch.doc.id] = d.status;
+        if(!_rdvBadgeFirstSnap && prev !== d.status && d.status === 'confirme'){
+          bumpClientNotif('✅ Ton rendez-vous est confirmé !', (d.mechanic_name||'')+(d.date?' · '+d.date:''));
+        }
+      });
+      _rdvBadgeFirstSnap = false;
+    }, function(e){ console.log('RDV client:', e); });
+}
+function stopClientRdvWatch(){
+  if(_clientRdvUnsub){ _clientRdvUnsub(); _clientRdvUnsub = null; }
+  _seenRdvStatus = {};
+}
+
+/* ── Facture/entretien ajouté par le garage (temps réel) — jamais pour
+   les factures que le client a lui-même ajoutées (source:'client'). ── */
+var _clientHistUnsub = null;
+var _histBadgeFirstSnap = true;
+var _seenHistIds = {};
+function watchClientHistoryBadge(){
+  if(!clientUser || _clientHistUnsub) return;
+  _histBadgeFirstSnap = true;
+  _clientHistUnsub = db.collection('service_history').where('client_uid','==',clientUser.uid)
+    .onSnapshot(function(snap){
+      snap.docChanges().forEach(function(ch){
+        if(ch.type !== 'added') return;
+        var d = ch.doc.data();
+        if(_seenHistIds[ch.doc.id]) return;
+        _seenHistIds[ch.doc.id] = true;
+        if(!_histBadgeFirstSnap && d.source !== 'client'){
+          bumpClientNotif('🧾 Nouvelle facture dans ton dossier', d.title || '');
+        }
+      });
+      _histBadgeFirstSnap = false;
+    }, function(e){ console.log('Historique client:', e); });
+}
+function stopClientHistoryWatch(){
+  if(_clientHistUnsub){ _clientHistUnsub(); _clientHistUnsub = null; }
+  _seenHistIds = {};
 }
 
 function openChatDrawer(){
