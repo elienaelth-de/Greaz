@@ -6160,7 +6160,12 @@ function bumpClientNotif(title, body){
   fireClientNativeNotification(title, body);
 }
 function clearClientNotifBadge(){
-  if(_clientNotifCount === 0) return;
+  // Pas de sortie rapide ici même si _clientNotifCount est déjà à 0 en
+  // mémoire : à chaque nouveau lancement de l'app, cette variable REPART
+  // toujours à 0 (nouvelle session JS) — mais le badge numéroté affiché sur
+  // l'icône iOS, lui, peut être resté collé d'une session précédente. Il
+  // faut donc TOUJOURS appeler clearAppBadge() ici, sinon un vieux badge
+  // ne se nettoie jamais au réouverture de l'app.
   _clientNotifCount = 0;
   updateClientBadgeAndTitle();
 }
