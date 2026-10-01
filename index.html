@@ -1904,6 +1904,7 @@ function notifyAdminsPush(purpose, name, extra){
    ensuite lui envoyer une vraie alerte même si l'app est fermée. */
 var SUPABASE_SAVE_SUBSCRIPTION_URL = 'https://cvgdrhxkevneswowtxrt.supabase.co/functions/v1/save-push-subscription';
 var VAPID_PUBLIC_KEY = 'BGR9yNl_mysEQ7LHPMnzipdqlp7s6AmrQC1_xBcZxlQtz1yCAwvmF7e0ppvbn73XXSDF3J9QwTXwMCEQNXfRfvQ';
+var SUPABASE_GAS_PRICES_URL = 'https://cvgdrhxkevneswowtxrt.supabase.co/functions/v1/nearby-gas-prices';
 
 function urlBase64ToUint8Array(base64String){
   var padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -5819,26 +5820,67 @@ function tickerCardDelta(ic, name, val, prev, unit){
     +'<span class="ticker-delta '+cls+'">'+deltaTxt+'</span></div>'
     +'</div>';
 }
-function tickerCardFlat(ic, name, val, unit, sub){
+function tickerCardFlat(ic, name, val, unit, sub, label){
+  var priceTxt = (unit === '$/L' || unit === '$/kWh') ? Number(val).toFixed(3) : Math.round(val);
   return '<div class="ticker-row">'
     +'<div class="ticker-ic">'+ic+'</div>'
     +'<div class="ticker-info"><div class="ticker-name">'+name+'</div><div class="ticker-sub">'+sub+'</div></div>'
-    +'<div class="ticker-right"><div class="ticker-price">'+Math.round(val)+'<span class="ticker-unit">'+unit+'</span></div>'
-    +'<span class="ticker-delta flat">Prix Greaz</span></div>'
+    +'<div class="ticker-right"><div class="ticker-price">'+priceTxt+'<span class="ticker-unit">'+unit+'</span></div>'
+    +'<span class="ticker-delta flat">'+(label||'Prix Greaz')+'</span></div>'
     +'</div>';
+}
+
+/* ── Essence près de toi — position du téléphone + le fichier public de
+   stations publié par l'outil officiel du Québec (Régie de l'énergie),
+   via notre fonction Supabase "nearby-gas-prices". Si la personne refuse
+   la position, ou que ça échoue, on retombe simplement sur le prix
+   manuel que Greaz publie (comme avant) — jamais d'erreur visible. ── */
+var _geoGasCache = null; // { at, stations }
+var GEO_GAS_TTL_MS = 15*60*1000;
+
+function getNearbyGasPrice(){
+  if(_geoGasCache && (Date.now()-_geoGasCache.at) < GEO_GAS_TTL_MS){
+    return Promise.resolve(_geoGasCache.stations);
+  }
+  if(!('geolocation' in navigator)) return Promise.resolve(null);
+  return new Promise(function(resolve){
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat = pos.coords.latitude, lng = pos.coords.longitude;
+      fetch(SUPABASE_GAS_PRICES_URL+'?lat='+lat+'&lng='+lng+'&limit=1', {
+        headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      }).then(function(r){ return r.json(); }).then(function(data){
+        var stations = (data && data.ok && data.stations) || null;
+        _geoGasCache = { at: Date.now(), stations: stations };
+        resolve(stations);
+      }).catch(function(){ resolve(null); });
+    }, function(){ resolve(null); }, { maximumAge: GEO_GAS_TTL_MS, timeout: 8000 });
+  });
 }
 
 function renderMarketTicker(){
   var wrap = document.getElementById('home-ticker-wrap');
   if(!wrap) return;
   wrap.innerHTML = '<div class="ticker-head">💹 Prix du marché — Québec</div><div id="home-ticker-list"><div class="acc-loading" style="color:rgba(255,255,255,.5)">Chargement...</div></div>';
-  db.collection('settings').doc('market_prices').get().then(function(doc){
+  Promise.all([
+    db.collection('settings').doc('market_prices').get(),
+    getNearbyGasPrice()
+  ]).then(function(res){
+    var doc = res[0], nearbyStations = res[1];
     var d = doc.exists ? doc.data() : {};
     var vehicles = (clientData && clientData.vehicles) || [];
     var hasElectric = vehicles.some(function(v){ return v.fuel === 'Électrique' || v.fuel === 'Hybride'; });
     var hasGas = !vehicles.length || vehicles.some(function(v){ return v.fuel !== 'Électrique'; });
     var cards = [];
-    if(hasGas && typeof d.fuel_regular === 'number') cards.push(tickerCardDelta('⛽','Essence ordinaire', d.fuel_regular, d.fuel_regular_prev, '$/L'));
+    if(hasGas){
+      var nearby = (nearbyStations && nearbyStations[0]) || null;
+      var nearbyPrice = nearby && nearby.prices && typeof nearby.prices['Régulier'] === 'number' ? nearby.prices['Régulier'] : null;
+      if(nearbyPrice){
+        var sub = '📍 '+(nearby.name||nearby.brand||'Près de toi')+' · '+nearby.distance_km+' km';
+        cards.push(tickerCardFlat('⛽','Essence ordinaire', nearbyPrice, '$/L', sub, '🟢 En direct'));
+      } else if(typeof d.fuel_regular === 'number'){
+        cards.push(tickerCardDelta('⛽','Essence ordinaire', d.fuel_regular, d.fuel_regular_prev, '$/L'));
+      }
+    }
     if(hasElectric && typeof d.ev_kwh === 'number') cards.push(tickerCardDelta('🔌','Recharge électrique', d.ev_kwh, d.ev_kwh_prev, '$/kWh'));
 
     var myCity = extractCityFromAddress(clientData && clientData.address);
