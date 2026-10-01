@@ -5820,14 +5820,24 @@ function tickerCardDelta(ic, name, val, prev, unit){
     +'<span class="ticker-delta '+cls+'">'+deltaTxt+'</span></div>'
     +'</div>';
 }
-function tickerCardFlat(ic, name, val, unit, sub, label){
+function tickerCardFlat(ic, name, val, unit, sub, label, onclickAttr){
   var priceTxt = (unit === '$/L' || unit === '$/kWh') ? Number(val).toFixed(3) : Math.round(val);
-  return '<div class="ticker-row">'
+  var clickBits = onclickAttr ? ' style="cursor:pointer" onclick="'+onclickAttr+'"' : '';
+  return '<div class="ticker-row"'+clickBits+'>'
     +'<div class="ticker-ic">'+ic+'</div>'
-    +'<div class="ticker-info"><div class="ticker-name">'+name+'</div><div class="ticker-sub">'+sub+'</div></div>'
+    +'<div class="ticker-info"><div class="ticker-name">'+name+'</div><div class="ticker-sub">'+sub+(onclickAttr?' · 🗺️ Itinéraire':'')+'</div></div>'
     +'<div class="ticker-right"><div class="ticker-price">'+priceTxt+'<span class="ticker-unit">'+unit+'</span></div>'
     +'<span class="ticker-delta flat">'+(label||'Prix Greaz')+'</span></div>'
     +'</div>';
+}
+
+/* Ouvre Google Maps (itinéraire depuis la position actuelle jusqu'à la
+   station) — fonctionne pareil peu importe où la personne se trouve,
+   puisque Maps part toujours de sa position du moment. */
+function openStationDirections(lat, lng){
+  if(!lat || !lng) return;
+  var url = 'https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng;
+  window.open(url, '_blank');
 }
 
 /* ── Essence près de toi — position du téléphone + le fichier public de
@@ -5875,8 +5885,16 @@ function renderMarketTicker(){
       var nearby = (nearbyStations && nearbyStations[0]) || null;
       var nearbyPrice = nearby && nearby.prices && typeof nearby.prices['Régulier'] === 'number' ? nearby.prices['Régulier'] : null;
       if(nearbyPrice){
-        var sub = '📍 '+(nearby.name||nearby.brand||'Près de toi')+' · '+nearby.distance_km+' km';
-        cards.push(tickerCardFlat('⛽','Essence ordinaire', nearbyPrice, '$/L', sub, '🟢 En direct'));
+        // On affiche la bannière + la ville (ex: "Shell · Montréal"), jamais le
+        // nom légal de la compagnie (ex: "9161-7373 Québec Inc.") — ce
+        // "Québec" dans le nom est juste la mention "compagnie du Québec",
+        // pas une ville, et ça mélangeait le monde.
+        var nearbyCity = extractCityFromAddress(nearby.address);
+        var nearbyBrand = (nearby.brand && nearby.brand !== 'Aucun') ? nearby.brand : 'Station';
+        var sub = '📍 '+nearbyBrand+(nearbyCity ? ' · '+nearbyCity : '')+' · '+nearby.distance_km+' km';
+        var mapsClick = (typeof nearby.lat === 'number' && typeof nearby.lng === 'number')
+          ? ('openStationDirections('+nearby.lat+','+nearby.lng+')') : '';
+        cards.push(tickerCardFlat('⛽','Essence ordinaire', nearbyPrice, '$/L', sub, '🟢 En direct', mapsClick));
       } else if(typeof d.fuel_regular === 'number'){
         cards.push(tickerCardDelta('⛽','Essence ordinaire', d.fuel_regular, d.fuel_regular_prev, '$/L'));
       }
