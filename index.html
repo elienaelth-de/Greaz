@@ -1905,6 +1905,7 @@ function notifyAdminsPush(purpose, name, extra){
 var SUPABASE_SAVE_SUBSCRIPTION_URL = 'https://cvgdrhxkevneswowtxrt.supabase.co/functions/v1/save-push-subscription';
 var VAPID_PUBLIC_KEY = 'BGR9yNl_mysEQ7LHPMnzipdqlp7s6AmrQC1_xBcZxlQtz1yCAwvmF7e0ppvbn73XXSDF3J9QwTXwMCEQNXfRfvQ';
 var SUPABASE_GAS_PRICES_URL = 'https://cvgdrhxkevneswowtxrt.supabase.co/functions/v1/nearby-gas-prices';
+var SUPABASE_EV_CHARGING_URL = 'https://cvgdrhxkevneswowtxrt.supabase.co/functions/v1/nearby-ev-charging';
 
 function urlBase64ToUint8Array(base64String){
   var padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -5885,30 +5886,102 @@ function renderGasSlide(){
   wrap.innerHTML = tickerCardFlat('⛽','Essence ordinaire', st.prices['Régulier'], '$/L', sub, '🟢 En direct', mapsClick) + dots;
 }
 
+/* ── Slideshow des bornes de recharge proches — même principe que l'essence,
+   via Open Charge Map (pas de prix ni de statut occupée/libre en direct,
+   juste l'emplacement, la puissance et le type de bornes). ── */
+var _evSlideStations = [];
+var _evSlideIndex = 0;
+var _evSlideTimer = null;
+function startEvSlideshow(stations){
+  stopEvSlideshow();
+  _evSlideStations = stations || [];
+  _evSlideIndex = 0;
+  if(!_evSlideStations.length) return;
+  renderEvSlide();
+  if(_evSlideStations.length > 1){
+    _evSlideTimer = setInterval(function(){
+      _evSlideIndex = (_evSlideIndex + 1) % _evSlideStations.length;
+      renderEvSlide();
+    }, 4500);
+  }
+}
+function stopEvSlideshow(){
+  if(_evSlideTimer){ clearInterval(_evSlideTimer); _evSlideTimer = null; }
+  _evSlideStations = []; _evSlideIndex = 0;
+}
+function renderEvSlide(){
+  var wrap = document.getElementById('ev-slide-card');
+  if(!wrap) { stopEvSlideshow(); return; }
+  var st = _evSlideStations[_evSlideIndex];
+  if(!st){ wrap.innerHTML = ''; return; }
+  var city = extractCityFromAddress(st.address);
+  var sub = '📍 '+(city || st.name || 'Près de toi')+' · '+st.distance_km+' km'+(st.connectors ? ' · '+st.connectors : '');
+  var mapsClick = (typeof st.lat === 'number' && typeof st.lng === 'number')
+    ? ('openStationDirections('+st.lat+','+st.lng+')') : '';
+  var dots = '';
+  if(_evSlideStations.length > 1){
+    dots = '<div style="display:flex;gap:5px;justify-content:center;padding:6px 0 2px">'
+      + _evSlideStations.map(function(_, i){
+          var active = i === _evSlideIndex;
+          return '<span style="width:'+(active?'14px':'5px')+';height:5px;border-radius:3px;background:'+(active?'#00C26F':'rgba(255,255,255,.25)')+';transition:all .3s"></span>';
+        }).join('')
+      + '</div>';
+  }
+  wrap.innerHTML = tickerCardFlat('🔌','Recharge électrique', st.max_power_kw, 'kW', sub, st.operator||'Borne', mapsClick) + dots;
+}
+
 /* ── Essence près de toi — position du téléphone + le fichier public de
    stations publié par l'outil officiel du Québec (Régie de l'énergie),
    via notre fonction Supabase "nearby-gas-prices". Si la personne refuse
    la position, ou que ça échoue, on retombe simplement sur le prix
    manuel que Greaz publie (comme avant) — jamais d'erreur visible. ── */
+var GEO_POS_TTL_MS = 15*60*1000;
+var _geoPosCache = null; // { at, lat, lng } — partagé entre essence et recharge électrique
+function getDevicePosition(){
+  if(_geoPosCache && (Date.now()-_geoPosCache.at) < GEO_POS_TTL_MS) return Promise.resolve(_geoPosCache);
+  if(!('geolocation' in navigator)) return Promise.resolve(null);
+  return new Promise(function(resolve){
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var p = { at: Date.now(), lat: pos.coords.latitude, lng: pos.coords.longitude };
+      _geoPosCache = p;
+      resolve(p);
+    }, function(){ resolve(null); }, { maximumAge: GEO_POS_TTL_MS, timeout: 8000 });
+  });
+}
+
 var _geoGasCache = null; // { at, stations }
 var GEO_GAS_TTL_MS = 15*60*1000;
-
 function getNearbyGasPrice(){
   if(_geoGasCache && (Date.now()-_geoGasCache.at) < GEO_GAS_TTL_MS){
     return Promise.resolve(_geoGasCache.stations);
   }
-  if(!('geolocation' in navigator)) return Promise.resolve(null);
-  return new Promise(function(resolve){
-    navigator.geolocation.getCurrentPosition(function(pos){
-      var lat = pos.coords.latitude, lng = pos.coords.longitude;
-      fetch(SUPABASE_GAS_PRICES_URL+'?lat='+lat+'&lng='+lng+'&limit=8&max_km=3', {
-        headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
-      }).then(function(r){ return r.json(); }).then(function(data){
-        var stations = (data && data.ok && data.stations) || null;
-        _geoGasCache = { at: Date.now(), stations: stations };
-        resolve(stations);
-      }).catch(function(){ resolve(null); });
-    }, function(){ resolve(null); }, { maximumAge: GEO_GAS_TTL_MS, timeout: 8000 });
+  return getDevicePosition().then(function(pos){
+    if(!pos) return null;
+    return fetch(SUPABASE_GAS_PRICES_URL+'?lat='+pos.lat+'&lng='+pos.lng+'&limit=8&max_km=3', {
+      headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(r){ return r.json(); }).then(function(data){
+      var stations = (data && data.ok && data.stations) || null;
+      _geoGasCache = { at: Date.now(), stations: stations };
+      return stations;
+    }).catch(function(){ return null; });
+  });
+}
+
+var _geoEvCache = null; // { at, stations }
+var GEO_EV_TTL_MS = 15*60*1000;
+function getNearbyEvCharging(){
+  if(_geoEvCache && (Date.now()-_geoEvCache.at) < GEO_EV_TTL_MS){
+    return Promise.resolve(_geoEvCache.stations);
+  }
+  return getDevicePosition().then(function(pos){
+    if(!pos) return null;
+    return fetch(SUPABASE_EV_CHARGING_URL+'?lat='+pos.lat+'&lng='+pos.lng+'&limit=8&max_km=5', {
+      headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(r){ return r.json(); }).then(function(data){
+      var stations = (data && data.ok && data.stations) || null;
+      _geoEvCache = { at: Date.now(), stations: stations };
+      return stations;
+    }).catch(function(){ return null; });
   });
 }
 
@@ -5916,17 +5989,20 @@ function renderMarketTicker(){
   var wrap = document.getElementById('home-ticker-wrap');
   if(!wrap) return;
   wrap.innerHTML = '<div class="ticker-head">💹 Prix du marché — Québec</div><div id="home-ticker-list"><div class="acc-loading" style="color:rgba(255,255,255,.5)">Chargement...</div></div>';
+  var vehicles0 = (clientData && clientData.vehicles) || [];
+  var hasElectric0 = vehicles0.some(function(v){ return v.fuel === 'Électrique' || v.fuel === 'Hybride'; });
+  var hasGas0 = !vehicles0.length || vehicles0.some(function(v){ return v.fuel !== 'Électrique'; });
   Promise.all([
     db.collection('settings').doc('market_prices').get(),
-    getNearbyGasPrice()
+    hasGas0 ? getNearbyGasPrice() : Promise.resolve(null),
+    hasElectric0 ? getNearbyEvCharging() : Promise.resolve(null)
   ]).then(function(res){
-    var doc = res[0], nearbyStations = res[1];
+    var doc = res[0], nearbyStations = res[1], nearbyEvStations = res[2];
     var d = doc.exists ? doc.data() : {};
-    var vehicles = (clientData && clientData.vehicles) || [];
-    var hasElectric = vehicles.some(function(v){ return v.fuel === 'Électrique' || v.fuel === 'Hybride'; });
-    var hasGas = !vehicles.length || vehicles.some(function(v){ return v.fuel !== 'Électrique'; });
+    var hasElectric = hasElectric0, hasGas = hasGas0;
     var cards = [];
     var gasSlideStations = [];
+    var evSlideStations = [];
     if(hasGas){
       gasSlideStations = ((nearbyStations || []).filter(function(st){
         return st.prices && typeof st.prices['Régulier'] === 'number';
@@ -5937,7 +6013,16 @@ function renderMarketTicker(){
         cards.push(tickerCardDelta('⛽','Essence ordinaire', d.fuel_regular, d.fuel_regular_prev, '$/L'));
       }
     }
-    if(hasElectric && typeof d.ev_kwh === 'number') cards.push(tickerCardDelta('🔌','Recharge électrique', d.ev_kwh, d.ev_kwh_prev, '$/kWh'));
+    if(hasElectric){
+      evSlideStations = ((nearbyEvStations || []).filter(function(st){
+        return typeof st.max_power_kw === 'number' && st.max_power_kw > 0;
+      }));
+      if(evSlideStations.length){
+        cards.push('<div id="ev-slide-card"></div>');
+      } else if(typeof d.ev_kwh === 'number'){
+        cards.push(tickerCardDelta('🔌','Recharge électrique', d.ev_kwh, d.ev_kwh_prev, '$/kWh'));
+      }
+    }
 
     var myCity = extractCityFromAddress(clientData && clientData.address);
     var list = Array.isArray(d.city_prices) ? d.city_prices : [];
@@ -5959,6 +6044,7 @@ function renderMarketTicker(){
     var listEl = document.getElementById('home-ticker-list');
     if(listEl) listEl.innerHTML = cards.join('') || '<div class="ticker-empty">Greaz publie les prix de la semaine bientôt.</div>';
     if(gasSlideStations.length) startGasSlideshow(gasSlideStations); else stopGasSlideshow();
+    if(evSlideStations.length) startEvSlideshow(evSlideStations); else stopEvSlideshow();
   }).catch(function(e){ console.log('Prix marché:', e); });
 }
 
