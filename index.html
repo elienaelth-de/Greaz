@@ -5707,10 +5707,6 @@ function renderHomeDashboard(){
         + '<div class="acc-join-d">Pour qu\'on s\'occupe de ton auto au complet — '+GREAZ_PRICE+'/mois</div></div>'
         + '<div class="acc-join-btn">S\'abonner →</div>'
         + '</div>')
-      +'<div class="acc-section">🔧 Mes demandes en cours</div>'
-      +'<div id="home-acc-demandes"><div class="acc-loading">Chargement...</div></div>'
-      +'<div class="acc-section">📅 Mes rendez-vous</div>'
-      +'<div id="home-acc-rdvs"><div class="acc-loading">Chargement...</div></div>'
       +'<div class="acc-section">🛠️ Historique & économies <button class="acc-add" onclick="homeOpenInvoiceForm()">📸 Ajouter une facture</button></div>'
       +'<div id="home-acc-history"><div class="acc-loading">Chargement...</div></div>'
       +'<div class="acc-section">🎁 Mes récompenses</div>'
@@ -5729,8 +5725,6 @@ function renderHomeDashboard(){
     +'</div>'
     +'<button class="btn-book" style="margin-top:1.5rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="clientLogout()">Me déconnecter</button>';
 
-  loadClientDemandes('home-acc-demandes');
-  loadClientRdvs('home-acc-rdvs');
   loadClientServiceHistory('home-acc-history');
   renderMarketTicker();
   renderVehicleValueCard();
