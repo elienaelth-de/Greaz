@@ -6,7 +6,7 @@
    jamais les appels Firebase/EmailJS, pour ne jamais servir de données
    clients périmées. */
 
-var CACHE_NAME = 'greaz-shell-v3';
+var CACHE_NAME = 'greaz-shell-v4';
 var CORE_ASSETS = [
   './',
   './index.html',
@@ -79,8 +79,14 @@ self.addEventListener('fetch', function(event){
   // installée sur le téléphone. Le cache ne sert que de filet si jamais
   // le téléphone est hors-ligne au moment d'ouvrir l'app.
   if(req.mode === 'navigate'){
+    // { cache: 'no-store' } est essentiel ici : sans ça, "fetch premier"
+    // peut quand même recevoir une copie périmée depuis le cache HTTP du
+    // navigateur (ou d'un CDN en avant de l'hébergement) au lieu d'aller
+    // vraiment chercher la dernière version — c'est ce qui faisait rester
+    // l'app figée sur une vieille version côté ordinateur, même après un
+    // rafraîchissement normal.
     event.respondWith(
-      fetch(req).then(function(res){
+      fetch(req, { cache: 'no-store' }).then(function(res){
         var clone = res.clone();
         caches.open(CACHE_NAME).then(function(cache){ cache.put(req, clone); });
         return res;
@@ -95,7 +101,7 @@ self.addEventListener('fetch', function(event){
   // mise à jour silencieuse en arrière-plan.
   event.respondWith(
     caches.match(req).then(function(cached){
-      var network = fetch(req).then(function(res){
+      var network = fetch(req, { cache: 'no-store' }).then(function(res){
         if(res && res.status === 200){
           var clone = res.clone();
           caches.open(CACHE_NAME).then(function(cache){ cache.put(req, clone); });
