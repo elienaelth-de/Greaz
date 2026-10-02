@@ -6538,6 +6538,10 @@ function openVehicleForm(idx){
 
 async function saveVehicle(idx){
   var editing = (typeof idx === 'number');
+  // Véhicule existant (si on modifie) — sert à garder son photo_url intact,
+  // vu que cette photo est gérée seulement par l'admin, jamais depuis ce
+  // formulaire client.
+  var existing = editing ? ((clientData.vehicles||[])[idx] || {}) : {};
   var make = (document.getElementById('v-make').value||'').trim();
   var model = (document.getElementById('v-model').value||'').trim();
   var errEl = document.getElementById('veh-err');
@@ -6554,7 +6558,7 @@ async function saveVehicle(idx){
     fuel: document.getElementById('v-fuel').value||'',
     financed: financedEl ? (financedEl.dataset.value||'') : '',
     vin: (document.getElementById('v-vin').value||'').trim().toUpperCase(),
-    photo_url: v.photo_url || '', // géré seulement par l'admin, jamais touché ici
+    photo_url: existing.photo_url || '', // géré seulement par l'admin, jamais touché ici
   };
   var vehicles = (clientData.vehicles||[]).slice();
   if(editing){ vehicles[idx] = entry; } else { vehicles.push(entry); }
