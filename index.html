@@ -1178,9 +1178,12 @@ body.logged-in .hero-scroll{display:none}
 .chat-bubble.me{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
 .chat-bubble.them{align-self:flex-start;background:#F4F4F5;color:#111;border-bottom-left-radius:4px}
 .chat-time{font-size:10px;color:var(--faint);margin-top:2px}
-.chat-cta{display:flex;align-items:center;gap:12px;background:#F4F4F5;border-radius:15px;padding:14px 16px;cursor:pointer;transition:background .2s}
-.chat-cta:hover{background:#ECECEE}
-.chat-cta-ic{font-size:22px}
+.chat-cta{display:flex;align-items:center;gap:15px;background:linear-gradient(135deg,#EEF3FF,#F8FAFF);border:1px solid rgba(62,106,225,.14);border-radius:20px;padding:20px 19px;cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s var(--ease);box-shadow:0 14px 30px -20px rgba(62,106,225,.5)}
+.chat-cta:hover{transform:translateY(-1px);box-shadow:0 18px 34px -18px rgba(62,106,225,.55)}
+.chat-cta-ic{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;font-size:25px;flex-shrink:0;box-shadow:0 10px 20px -8px rgba(62,106,225,.6);position:relative}
+.chat-cta-online{position:absolute;bottom:-1px;right:-1px;width:15px;height:15px;border-radius:50%;background:#1ED760;border:2.5px solid #fff;animation:chatPulse 1.8s ease-in-out infinite}
+@keyframes chatPulse{0%,100%{box-shadow:0 0 0 0 rgba(30,215,96,.55)}50%{box-shadow:0 0 0 6px rgba(30,215,96,0)}}
+.chat-cta-arrow{font-size:20px;color:var(--blue);flex-shrink:0}
 .chat-unread-dot{width:9px;height:9px;border-radius:50%;background:#E11D48;display:inline-block;margin-left:6px;flex-shrink:0}
 
 /* ═══ CALENDRIER D'ENTRETIEN ═══ */
@@ -5755,19 +5758,21 @@ function renderHomeDashboard(){
       + (isApp ? renderHealthGrid(vehicles) : '')
       + (isApp ? '<div class="trouble-banner" onclick="ccScrollToForm()"><span class="trouble-ic">⚠️</span><div style="flex:1"><div class="trouble-t">Un problème avec ton auto ?</div><div class="trouble-s">Bruit, voyant, pneu, démarrage... on est là.</div></div><span class="trouble-arrow">→</span></div>' : '');
 
+  // "Mon profil" et "Mes récompenses" (explications des points) ne sont
+  // affichés QUE dans le tiroir "Mon espace" (renderAccount) — pas ici sur
+  // l'accueil, pour garder l'accueil concentré sur le véhicule et l'action.
   var leftCol =
-      '<div class="acc-section">👤 Mon profil</div>'
-      + renderProfileSection(true)
-      + (vehicles.length ? '<div class="acc-section">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection(true) : '');
+      (vehicles.length ? '<div class="acc-section" style="margin-top:0">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection(true) : '');
 
   var rightCol =
       (isApp ? '<div id="home-spend-card"></div>' : '')
-      +'<div class="acc-section" style="margin-top:0">💬 Discuter avec Greaz</div>'
       +'<div class="chat-cta" onclick="openChatDrawer()">'
-      +'<span class="chat-cta-ic">💬</span>'
-      +'<div style="flex:1"><div style="font-weight:700;font-size:13.5px">Une question ? Écris-nous</div>'
-      +'<div style="font-size:11.5px;color:var(--faint);margin-top:1px">On répond directement dans ton espace</div></div>'
+      +'<span class="chat-cta-ic">💬<span class="chat-cta-online"></span></span>'
+      +'<div style="flex:1"><div style="font-weight:800;font-size:15.5px;color:var(--white)">Discute avec Greaz</div>'
+      +'<div style="font-size:12px;color:#1A9F56;font-weight:700;margin-top:2px">🟢 En ligne · réponse rapide</div>'
+      +'<div style="font-size:11.5px;color:var(--faint);margin-top:2px">Une question sur ton char ? Écris-nous ici</div></div>'
       +'<span id="home-chat-badge"></span>'
+      +'<span class="chat-cta-arrow">→</span>'
       +'</div>'
       +'<div class="acc-join" onclick="homeOpenRentalForm()" style="margin-top:12px;background:linear-gradient(135deg,var(--green),#00875A);box-shadow:0 6px 20px rgba(0,168,98,.28)">'
       +'<div class="acc-join-l"><div class="acc-join-t">💰 Loue ton auto — jusqu\'à 50$/jour</div>'
@@ -5780,9 +5785,7 @@ function renderHomeDashboard(){
         + '<div class="acc-join-btn">S\'abonner →</div>'
         + '</div>')
       +'<div class="acc-section">🛠️ Historique & économies <button class="acc-add" onclick="homeOpenInvoiceForm()">📸 Ajouter une facture</button></div>'
-      +'<div id="home-acc-history"><div class="acc-loading">Chargement...</div></div>'
-      +'<div class="acc-section">🎁 Mes récompenses</div>'
-      + renderRewards(pts);
+      +'<div id="home-acc-history"><div class="acc-loading">Chargement...</div></div>';
 
   body.innerHTML =
     '<div id="home-top-alert"></div>'
