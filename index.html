@@ -6965,21 +6965,51 @@ function renderExpenseList(list){
   list.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
   el.innerHTML = list.map(function(e){
     var c = expenseCategoryInfo(e.category);
-    return '<div class="exp-card">'
+    return '<div class="exp-card" style="cursor:pointer" onclick="openExpenseDetail(\''+e.id+'\')">'
       +'<div class="exp-card-ic">'+c.ic+'</div>'
       +'<div style="flex:1;min-width:0">'
-      +'<div class="exp-card-t">'+(e.merchant||c.label)+'</div>'
+      +'<div class="exp-card-t">'+(e.merchant||c.label)+(e.facture_url?' 📎':'')+'</div>'
       +'<div class="exp-card-d">'+fmtExpDate(e.date)+(e.vehicle_label?' · '+e.vehicle_label:'')+'</div>'
       +'</div>'
       +'<div class="exp-card-amt">'+fmtMoney(e.total)+'</div>'
-      +'<button class="close-btn" style="width:26px;height:26px;font-size:11px;flex-shrink:0" onclick="deleteExpense(\''+e.id+'\')">✕</button>'
+      +'<button class="close-btn" style="width:26px;height:26px;font-size:11px;flex-shrink:0" onclick="event.stopPropagation();deleteExpense(\''+e.id+'\')">✕</button>'
       +'</div>';
   }).join('');
 }
 
+/* ── Détail d'une dépense — affiche la photo de la facture (preuve) et tous
+   les champs. C'est ICI que le client retrouve sa photo après coup, par
+   exemple pour prouver une dépense (impôt, remboursement, etc.). ── */
+function openExpenseDetail(id){
+  var e = _clientExpenses.find(function(x){ return x.id===id; });
+  if(!e) return;
+  var c = expenseCategoryInfo(e.category);
+  document.getElementById('account-title').textContent = '🧾 Détail de la dépense';
+  document.getElementById('account-body').innerHTML =
+    (e.facture_url
+      ? '<img src="'+e.facture_url+'" style="width:100%;max-height:320px;object-fit:contain;background:#000;border-radius:12px;margin-bottom:1rem;cursor:zoom-in" onclick="window.open(\''+e.facture_url.replace(/'/g,"\\'")+'\',\'_blank\')">'
+      + '<div style="text-align:center;font-size:11.5px;color:var(--faint);margin-top:-.6rem;margin-bottom:1rem">Touche la photo pour l\'ouvrir en plein écran / l\'enregistrer</div>'
+      : '<div class="acc-empty"><div class="acc-empty-ic">📷</div><div class="acc-empty-t">Aucune photo jointe</div><div class="acc-empty-d">Cette dépense a été ajoutée sans photo de facture.</div></div>')
+    +'<div class="veh-card" style="padding:1rem 1.1rem">'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--muted);font-size:12.5px">Catégorie</span><b style="font-size:13px">'+c.ic+' '+c.label+'</b></div>'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--muted);font-size:12.5px">Véhicule</span><b style="font-size:13px">'+(e.vehicle_label||'—')+'</b></div>'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--muted);font-size:12.5px">Date</span><b style="font-size:13px">'+fmtExpDate(e.date)+'</b></div>'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--muted);font-size:12.5px">Commerçant</span><b style="font-size:13px">'+(e.merchant||'—')+'</b></div>'
+    + (e.subtotal!=null ? '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--muted);font-size:12.5px">Avant taxes</span><b style="font-size:13px">'+fmtMoney(e.subtotal)+'</b></div>' : '')
+    + (e.taxes!=null ? '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--muted);font-size:12.5px">Taxes</span><b style="font-size:13px">'+fmtMoney(e.taxes)+'</b></div>' : '')
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--muted);font-size:12.5px">Total</span><b style="font-size:14px;color:var(--blue2)">'+fmtMoney(e.total)+'</b></div>'
+    + (e.invoice_number ? '<div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:12.5px">N° de facture</span><b style="font-size:13px">'+e.invoice_number+'</b></div>' : '')
+    +'</div>'
+    +'<button class="btn-book" style="margin-top:1.1rem;background:#FDECEA;border:1px solid #F5C6C0;color:#B3261E" onclick="deleteExpense(\''+e.id+'\')">🗑 Supprimer cette dépense</button>'
+    +'<button class="btn-book" style="margin-top:.6rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="openExpenses()">← Retour</button>';
+}
+
 function deleteExpense(id){
   if(!confirm('Supprimer cette dépense ?')) return;
-  db.collection('expenses').doc(id).delete().then(loadClientExpenses).catch(function(e){ toast('Erreur : '+e.message, 'err', 3200); });
+  db.collection('expenses').doc(id).delete().then(function(){
+    toast('🗑 Dépense supprimée', 'ok', 2200);
+    openExpenses();
+  }).catch(function(e){ toast('Erreur : '+e.message, 'err', 3200); });
 }
 
 /* ── Photo de facture + lecture automatique GRATUITE (Tesseract.js — OCR
@@ -7198,7 +7228,8 @@ function generateExpenseReport(){
 
   document.getElementById('account-title').textContent = '📄 Rapport de dépenses';
   document.getElementById('account-body').innerHTML =
-    '<div class="print-report" id="print-report">'
+    '<div class="alert-err" id="exp-report-err"></div>'
+    +'<div class="print-report" id="print-report">'
     +'<div style="font-size:20px;font-weight:800;margin-bottom:2px">🔧 Greaz — Rapport de dépenses</div>'
     +'<div style="font-size:13px;color:#666;margin-bottom:18px">'+scopeLabel+' · '+periodLabel+' · généré le '+new Date().toLocaleDateString('fr-CA')+'</div>'
     +'<table style="width:100%;border-collapse:collapse;margin-bottom:22px">'+catRowsHtml
@@ -7208,8 +7239,88 @@ function generateExpenseReport(){
     +'<table style="width:100%;border-collapse:collapse"><tbody>'+itemsHtml+'</tbody></table>'
     +'<div style="font-size:11px;color:#999;margin-top:24px">Document généré automatiquement par Greaz à partir des dépenses saisies par le client — à titre indicatif, conserve tes factures originales pour tes déclarations.</div>'
     +'</div>'
-    +'<button class="btn-submit blue" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button>'
-    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="openExpenses()">← Retour</button>';
+    +'<button class="btn-submit blue" id="exp-pdf-btn" onclick="downloadExpenseReportPdf()">📄 Télécharger le PDF</button>'
+    +'<button class="btn-book" style="margin-top:.6rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="window.print()">🖨️ Imprimer (sur ordinateur)</button>'
+    +'<button class="btn-book" style="margin-top:.6rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="openExpenses()">← Retour</button>';
+}
+
+/* ── Téléchargement PDF du rapport (jsPDF, chargé seulement ici — gratuit,
+   aucun service tiers). Remplace "Imprimer" comme méthode principale car
+   window.print() ne fonctionne pas de façon fiable dans une app installée
+   sur l'écran d'accueil d'un iPhone (mode "standalone", sans barre Safari) —
+   le téléchargement direct du fichier, lui, marche partout. ── */
+var _jspdfLoadPromise = null;
+function loadJsPdfScript(){
+  if(window.jspdf) return Promise.resolve();
+  if(_jspdfLoadPromise) return _jspdfLoadPromise;
+  _jspdfLoadPromise = new Promise(function(resolve, reject){
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ reject(new Error('Chargement du générateur PDF impossible.')); };
+    document.head.appendChild(s);
+  });
+  return _jspdfLoadPromise;
+}
+
+async function downloadExpenseReportPdf(){
+  var btn = document.getElementById('exp-pdf-btn');
+  var errEl = document.getElementById('exp-report-err');
+  if(errEl) errEl.style.display = 'none';
+  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Préparation du PDF...'; }
+  try {
+    await loadJsPdfScript();
+    var list = expFilteredByPeriod().slice().sort(function(a,b){ return (a.date||'').localeCompare(b.date||''); });
+    var vehicles = clientData.vehicles||[];
+    var v = vehicles.find(function(x){ return x.vehicle_id===_expState.vehicleId; });
+    var scopeLabel = v ? expVehicleLabel(v) : 'Tous mes véhicules';
+    var monthsFr = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    var periodLabel = _expState.month==='all' ? _expState.year : (monthsFr[Number(_expState.month)]+' '+_expState.year);
+    var byCat = {}; var total = 0;
+    list.forEach(function(e){ var c=e.category||'autres'; byCat[c]=(byCat[c]||0)+Number(e.total||0); total+=Number(e.total||0); });
+
+    var JsPdfCtor = window.jspdf.jsPDF;
+    var doc = new JsPdfCtor();
+    var y = 18;
+    doc.setFontSize(16); doc.text('Greaz — Rapport de dépenses', 14, y); y+=7;
+    doc.setFontSize(10); doc.setTextColor(110);
+    doc.text(scopeLabel+' · '+periodLabel+' · généré le '+new Date().toLocaleDateString('fr-CA'), 14, y); y+=10;
+    doc.setTextColor(20);
+
+    doc.setFontSize(12); doc.text('Résumé par catégorie', 14, y); y+=6;
+    doc.setFontSize(10);
+    EXPENSE_CATEGORIES.forEach(function(c){
+      if(!byCat[c.key]) return;
+      doc.text(c.label, 16, y);
+      doc.text(fmtMoney(byCat[c.key]), 196, y, { align:'right' });
+      y+=6;
+    });
+    doc.setLineWidth(0.3); doc.line(14,y,196,y); y+=6;
+    doc.setFontSize(11); doc.text('Total', 16, y); doc.text(fmtMoney(total), 196, y, {align:'right'}); y+=12;
+
+    doc.setFontSize(12); doc.text('Détail des factures', 14, y); y+=7;
+    doc.setFontSize(9);
+    if(!list.length){ doc.text('Aucune dépense pour cette période.', 14, y); y+=6; }
+    list.forEach(function(e){
+      if(y > 280){ doc.addPage(); y = 18; }
+      var c = expenseCategoryInfo(e.category);
+      doc.text(fmtExpDate(e.date)+'  ·  '+c.label+'  ·  '+(e.merchant||'—'), 14, y);
+      doc.text(fmtMoney(e.total), 196, y, {align:'right'});
+      y+=5.5;
+    });
+
+    y += 8;
+    if(y > 280){ doc.addPage(); y = 18; }
+    doc.setFontSize(8); doc.setTextColor(140);
+    doc.text('Document généré automatiquement par Greaz à partir des dépenses saisies par le client.', 14, y); y+=4;
+    doc.text('À titre indicatif — conserve tes factures originales pour tes déclarations.', 14, y);
+
+    doc.save('rapport-depenses-greaz-'+_expState.year+'.pdf');
+  } catch(e){
+    console.log('PDF dépenses:', e);
+    if(errEl){ errEl.textContent = 'Erreur de génération du PDF — réessaie, ou utilise "Imprimer" à la place.'; errEl.style.display = 'block'; }
+  }
+  if(btn){ btn.disabled = false; btn.innerHTML = '📄 Télécharger le PDF'; }
 }
 
 /* ══════════ TRANSFERT DE VÉHICULE ══════════
