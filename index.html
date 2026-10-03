@@ -5013,6 +5013,16 @@ function updateNavAccount(){
     lbl.textContent = 'Mon espace';
   }
   if(typeof updateMaintenanceAlertBadge === 'function') updateMaintenanceAlertBadge();
+  updateMembershipCardVisibility();
+}
+
+// Cache la carte de points + paliers (section "Programme Greaz" de la
+// page publique) quand la personne est déjà connectée — elle a déjà son
+// vrai total de points dans "Mon espace", pas besoin de lui remontrer
+// une carte d'exemple sur la page d'accueil publique.
+function updateMembershipCardVisibility(){
+  var el = document.querySelector('.membership .mb-right');
+  if(el) el.style.display = clientUser ? 'none' : '';
 }
 
 async function loadClientProfile(user){
