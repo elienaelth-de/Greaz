@@ -1426,6 +1426,28 @@ body.logged-in .hero-scroll{display:none}
   #greaz-map{height:78vh;min-height:280px}
   .drawer{max-height:96vh}
 }
+
+/* ── 🧾 Mes dépenses ── */
+.exp-scan-btn{width:100%;padding:16px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-size:14.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:0 10px 24px -10px rgba(62,106,225,.55);margin-bottom:.6rem}
+.exp-manual-link{text-align:center;font-size:12px;color:var(--blue);font-weight:600;cursor:pointer;margin-bottom:1.1rem;text-decoration:underline;text-decoration-color:transparent}
+.exp-manual-link:hover{text-decoration-color:var(--blue)}
+.exp-filters{display:flex;gap:8px;margin-bottom:1rem}
+.exp-filters select{flex:1;padding:9px 10px;border-radius:9px;border:1.5px solid var(--line);font-size:12.5px;font-family:var(--body);background:#fff;color:var(--white)}
+.exp-total-row{display:flex;align-items:center;justify-content:space-between;padding:8px 2px;font-size:13px;color:rgba(255,255,255,.85)}
+.exp-total-row .exp-cat-lbl{display:flex;align-items:center;gap:8px;font-weight:600}
+.exp-total-row .exp-cat-amt{font-weight:800;color:#fff}
+.exp-total-grand{display:flex;align-items:center;justify-content:space-between;padding:12px 2px 2px;margin-top:6px;border-top:1px solid rgba(255,255,255,.12);font-size:14px;font-weight:800;color:#fff}
+.exp-card{background:#FAFAFB;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.exp-card-ic{width:38px;height:38px;border-radius:11px;background:var(--bluelt);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.exp-card-t{font-size:13.5px;font-weight:700;color:var(--white)}
+.exp-card-d{font-size:11.5px;color:var(--muted);margin-top:2px}
+.exp-card-amt{font-size:14px;font-weight:800;color:var(--white);flex-shrink:0}
+.print-report{display:none}
+@media print{
+  body *{visibility:hidden}
+  .print-report, .print-report *{visibility:visible}
+  .print-report{display:block;position:absolute;top:0;left:0;width:100%;padding:0}
+}
 </style>
 </head>
 <body>
@@ -4908,6 +4930,46 @@ var clientUser = null;   // user Firebase
 var clientData = null;   // doc clients/{uid}
 var _authMode = 'login';
 
+/* ── 🧾 Mes dépenses — catégories, génération d'id stable de véhicule ── */
+var EXPENSE_CATEGORIES = [
+  { key:'carburant',     ic:'⛽', label:'Carburant' },
+  { key:'recharge',      ic:'⚡', label:'Recharge' },
+  { key:'entretien',     ic:'🛢️', label:'Entretien' },
+  { key:'stationnement', ic:'🅿️', label:'Stationnement' },
+  { key:'assurance',     ic:'🛡️', label:'Assurance' },
+  { key:'autres',        ic:'🚘', label:'Autres' },
+];
+function expenseCategoryInfo(key){
+  return EXPENSE_CATEGORIES.find(function(c){ return c.key===key; }) || EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length-1];
+}
+function genVehicleId(){
+  if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return 'v_'+Date.now()+'_'+Math.random().toString(36).slice(2,10);
+}
+/* Les véhicules créés avant l'ajout de "Mes dépenses" n'ont pas d'identifiant
+   stable (jusqu'ici on s'y référait seulement par position dans le tableau).
+   On en ajoute un ici, une seule fois, la première fois que le profil est
+   chargé — nécessaire pour relier une dépense à UN véhicule précis même si
+   l'ordre ou le nombre de véhicules change ensuite. */
+function ensureVehicleIds(){
+  if(!clientData || !clientUser) return;
+  var vehicles = clientData.vehicles || [];
+  var changed = false;
+  vehicles.forEach(function(v){
+    if(!v.vehicle_id){ v.vehicle_id = genVehicleId(); changed = true; }
+  });
+  if(changed){
+    db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles }).catch(function(e){ console.log('Ids véhicules:', e); });
+  }
+}
+/* Détecte un usage "chauffeur" (livraison/taxi/VTC) à partir du choix fait
+   à l'inscription ou dans la fiche véhicule — sert juste à mettre en valeur
+   "Mes dépenses" pour ces clients-là ; la section reste visible pour tous. */
+function isChauffeurUsage(usage){
+  var u = (usage||'').toLowerCase();
+  return u.indexOf('livraison')!==-1 || u.indexOf('taxi')!==-1 || u.indexOf('uber')!==-1 || u.indexOf('vtc')!==-1;
+}
+
 /* Niveaux de fidélité */
 var TIERS = [
   { id:'bronze', label:'Bronze',  min:0,   cls:'tier-bronze', icon:'🥉' },
@@ -4963,6 +5025,7 @@ async function loadClientProfile(user){
       }));
     }
     window.clientData = clientData;
+    ensureVehicleIds();
     updateNavAccount();
     renderHomeDashboard();
     if(document.getElementById('overlay-account').classList.contains('open')) renderAccount();
@@ -5277,6 +5340,7 @@ function renderSignupStep(step){
       +'<div class="ff2"><div class="ff"><label>Modèle</label><input type="text" id="s-vmodel" placeholder="Corolla" value="'+(_signupData.veh_model||'')+'"></div>'
       +'<div class="ff"><label>Année</label><select id="s-vyear">'+yearOptions(_signupData.veh_year)+'</select></div></div>'
       +'<div class="ff"><label>Comptant ou financé ?</label>'+wizChips('wiz-financed', ['Comptant','Financé / Crédit'], _signupData.veh_financed, {'Comptant':'💵','Financé / Crédit':'🏦'})+'</div>'
+      +'<div class="ff"><label>Tu t\'en sers pour...</label>'+wizChips('wiz-usage', ['Usage personnel','Livraison','Taxi / VTC (Uber...)','Autre usage commercial'], _signupData.veh_usage, {'Usage personnel':'🏠','Livraison':'📦','Taxi / VTC (Uber...)':'🚕','Autre usage commercial':'💼'})+'</div>'
       +'<div class="wiz-nav"><button type="button" class="wiz-back" onclick="signupBack()">← Retour</button><button class="btn-submit blue" id="wiz-btn" onclick="signupNext()">Continuer →</button></div>';
   } else if(step===4){
     html += '<div class="wiz-step-lbl">Étape 4 sur '+SIGNUP_TOTAL_STEPS+' · Dernière !</div>'
@@ -5382,6 +5446,7 @@ async function signupNext(){
     if(!brand){ errEl.textContent='Choisis la marque de ton véhicule (ou "Autre").'; errEl.style.display='block'; return; }
     if(!financed){ errEl.textContent='Dis-nous si ton auto est comptant ou financée.'; errEl.style.display='block'; return; }
     _signupData.veh_make=brand; _signupData.veh_model=val('s-vmodel'); _signupData.veh_year=val('s-vyear'); _signupData.veh_financed=financed;
+    _signupData.veh_usage=chipVal('wiz-usage');
     _signupStep=4; renderSignupStep(4); return;
   }
   if(_signupStep===4){
@@ -5402,13 +5467,14 @@ async function finalizeSignup(){
     var cred = await firebase.auth().createUserWithEmailAndPassword(d.email, d.pass);
     var vehicles = [];
     if(d.veh_make){
-      vehicles.push({ make:d.veh_make, model:d.veh_model||'', year:d.veh_year||'', financed:d.veh_financed||'', plate:'', km:'', color:'', fuel:'', vin:'' });
+      vehicles.push({ vehicle_id:genVehicleId(), make:d.veh_make, model:d.veh_model||'', year:d.veh_year||'', financed:d.veh_financed||'', plate:'', km:'', color:'', fuel:'', vin:'', usage:d.veh_usage||'' });
     }
     await db.collection('clients').doc(cred.user.uid).set({
       prenom: d.prenom, nom: d.nom||'', email: d.email, phone: d.phone,
       address: d.address, birthdate: d.birthdate||'',
       insurer: d.insurer||'', insurer_since: d.insurer_since||'',
       vehicles: vehicles, points: SIGNUP_BONUS_PTS,
+      is_chauffeur: isChauffeurUsage(d.veh_usage),
       referral_code: getReferralCode(),
       created_at: firebase.firestore.FieldValue.serverTimestamp(),
     });
@@ -5517,6 +5583,12 @@ function renderAccount(){
     + vehClaimLinkHtml
 
     + (vehicles.length ? '<div class="acc-section">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection() : '')
+
+    + (vehicles.length ? '<div class="acc-section">🧾 Mes dépenses <button class="acc-add" onclick="openExpenses()">Ouvrir →</button></div>'
+        + '<div class="acc-empty" style="cursor:pointer;padding:1.1rem 1.25rem" onclick="openExpenses()">'
+        + '<div class="acc-empty-t">⛽ 🛢️ 🅿️ 🛡️ — suis toutes tes dépenses auto</div>'
+        + '<div class="acc-empty-d">'+(clientData.is_chauffeur ? 'Parfait pour tes dépenses de livraison/taxi : scanne tes factures, on calcule tout.' : 'Scanne tes factures, Greaz les classe et calcule tes totaux automatiquement.')+'</div>'
+        + '</div>' : '')
 
     +'<div class="acc-section">🛠️ Historique & économies <button class="acc-add" onclick="openInvoiceForm()">📸 Ajouter une facture</button></div>'
     +'<div id="acc-history"><div class="acc-loading">Chargement...</div></div>'
@@ -6531,6 +6603,7 @@ function openVehicleForm(idx){
     +'<div class="ff2"><div class="ff"><label>Couleur</label><input type="text" id="v-color" placeholder="Noir" value="'+(v.color||'')+'"></div>'
     +'<div class="ff"><label>Carburant</label><select id="v-fuel">'+fuelOpts+'</select></div></div>'
     +'<div class="ff"><label>Comptant ou financé ?</label>'+wizChips('veh-financed', ['Comptant','Financé / Crédit'], v.financed, {'Comptant':'💵','Financé / Crédit':'🏦'})+'</div>'
+    +'<div class="ff"><label>Tu t\'en sers pour...</label>'+wizChips('veh-usage', ['Usage personnel','Livraison','Taxi / VTC (Uber...)','Autre usage commercial'], v.usage, {'Usage personnel':'🏠','Livraison':'📦','Taxi / VTC (Uber...)':'🚕','Autre usage commercial':'💼'})+'</div>'
     +'<div class="ff"><label>NIV / VIN <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="text" id="v-vin" placeholder="Numéro d\'identification" style="text-transform:uppercase" value="'+(v.vin||'')+'"></div>'
     +'<button class="btn-submit blue" id="veh-btn" onclick="saveVehicle('+(editing?idx:'')+')">✓ Enregistrer</button>'
     +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Annuler</button>';
@@ -6549,7 +6622,10 @@ async function saveVehicle(idx){
   if(!make || !model){ errEl.textContent='La marque et le modèle sont obligatoires.'; errEl.style.display='block'; return; }
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Enregistrement...';
   var financedEl = document.getElementById('veh-financed');
+  var usageEl = document.getElementById('veh-usage');
+  var usage = usageEl ? (usageEl.dataset.value||'') : '';
   var entry = {
+    vehicle_id: existing.vehicle_id || genVehicleId(),
     make: make, model: model,
     year: document.getElementById('v-year').value||'',
     plate: (document.getElementById('v-plate').value||'').trim().toUpperCase(),
@@ -6557,13 +6633,14 @@ async function saveVehicle(idx){
     color: (document.getElementById('v-color').value||'').trim(),
     fuel: document.getElementById('v-fuel').value||'',
     financed: financedEl ? (financedEl.dataset.value||'') : '',
+    usage: usage,
     vin: (document.getElementById('v-vin').value||'').trim().toUpperCase(),
     photo_url: existing.photo_url || '', // géré seulement par l'admin, jamais touché ici
   };
   var vehicles = (clientData.vehicles||[]).slice();
   if(editing){ vehicles[idx] = entry; } else { vehicles.push(entry); }
   try {
-    await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles });
+    await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles, is_chauffeur: clientData.is_chauffeur || isChauffeurUsage(usage) });
     clientData.vehicles = vehicles;
     renderAccount();
     renderHomeDashboard();
@@ -6753,6 +6830,386 @@ async function saveClientInvoice(){
     errEl.textContent = 'Erreur : '+(e.message||e); errEl.style.display='block';
     btn.disabled = false; btn.innerHTML = '✓ Ajouter à mon historique';
   }
+}
+
+/* ══════════ 🧾 MES DÉPENSES ══════════
+   Suivi des dépenses auto par catégorie, avec scan de facture (Greaz lit la
+   photo automatiquement via l'IA et pré-remplit les champs — le client peut
+   toujours corriger avant d'enregistrer). Pensé en premier pour les
+   chauffeurs (livraison/taxi) qui doivent garder leurs factures pour
+   l'impôt, mais utile à n'importe quel client. Chaque dépense est liée à un
+   véhicule par vehicle_id (stable), pas par position dans le tableau. */
+var _expState = { vehicleId:'', category:'all', year:String(new Date().getFullYear()), month:'all' };
+var _clientExpenses = [];
+
+function expVehicleLabel(v){ return [v.year,v.make,v.model].filter(Boolean).join(' ') || 'Véhicule'; }
+function fmtMoney(n){ return Number(n||0).toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFractionDigits:2})+' $'; }
+function fmtExpDate(d){ try { return new Date(d+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short',year:'numeric'}); } catch(e){ return d||''; } }
+
+function openExpenses(){
+  if(!clientData) return;
+  var vehicles = clientData.vehicles||[];
+  if(!_expState.vehicleId && vehicles.length) _expState.vehicleId = vehicles[0].vehicle_id||'';
+  document.getElementById('account-title').textContent = '🧾 Mes dépenses';
+  var vehOpts = '<option value="">Tous mes véhicules</option>' + vehicles.map(function(v){
+    return '<option value="'+(v.vehicle_id||'')+'"'+(v.vehicle_id===_expState.vehicleId?' selected':'')+'>'+expVehicleLabel(v)+'</option>';
+  }).join('');
+  var years = []; var curY = new Date().getFullYear();
+  for(var y=curY; y>=curY-4; y--) years.push(y);
+  var yearOpts = years.map(function(y){ return '<option value="'+y+'"'+(String(y)===_expState.year?' selected':'')+'>'+y+'</option>'; }).join('');
+  var months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  var monthOpts = '<option value="all">Toute l\'année</option>' + months.map(function(m,i){ return '<option value="'+i+'"'+(String(i)===_expState.month?' selected':'')+'>'+m+'</option>'; }).join('');
+
+  document.getElementById('account-body').innerHTML =
+    '<div style="background:var(--bluelt);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--blue2);line-height:1.5;margin-bottom:1.1rem">📸 Prends ta facture en photo et classe-la en 2 clics — Greaz calcule tes totaux automatiquement.</div>'
+    +'<button class="exp-scan-btn" onclick="openScanExpenseForm()">📸 Ajouter une facture</button>'
+    +'<div class="exp-manual-link" onclick="openManualExpenseForm()">Ou ajouter manuellement, sans photo</div>'
+    +'<div class="exp-filters">'
+    +'<select id="exp-f-vehicle" onchange="expenseFilterChanged()">'+vehOpts+'</select>'
+    +'<select id="exp-f-month" onchange="expenseFilterChanged()">'+monthOpts+'</select>'
+    +'<select id="exp-f-year" onchange="expenseFilterChanged()">'+yearOpts+'</select>'
+    +'</div>'
+    +'<div id="exp-totals"><div class="acc-loading">Chargement...</div></div>'
+    +'<div class="acc-section">Détail des dépenses</div>'
+    +'<div id="exp-tabs"></div>'
+    +'<div id="exp-list"><div class="acc-loading">Chargement...</div></div>'
+    +'<button class="btn-submit blue" style="margin-top:1.4rem" onclick="generateExpenseReport()">📄 Générer mon rapport de dépenses</button>'
+    +'<button class="btn-book" style="margin-top:.6rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">← Retour à Mon espace</button>';
+
+  loadClientExpenses();
+}
+
+function expenseFilterChanged(){
+  _expState.vehicleId = document.getElementById('exp-f-vehicle').value||'';
+  _expState.month = document.getElementById('exp-f-month').value||'all';
+  _expState.year = document.getElementById('exp-f-year').value||String(new Date().getFullYear());
+  renderExpenseTotalsAndList();
+}
+
+async function loadClientExpenses(){
+  try {
+    var snap = await db.collection('expenses').where('client_uid','==',clientUser.uid).get();
+    _clientExpenses = snap.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); });
+  } catch(e){
+    console.log('Dépenses:', e);
+    _clientExpenses = [];
+  }
+  renderExpenseTotalsAndList();
+}
+
+/* Filtre selon véhicule + mois + année choisis (la catégorie, elle, ne
+   filtre QUE la liste détaillée ci-dessous — les totaux par catégorie
+   restent toujours sur la période complète pour rester lisibles). */
+function expFilteredByPeriod(){
+  return _clientExpenses.filter(function(e){
+    if(_expState.vehicleId && e.vehicle_id !== _expState.vehicleId) return false;
+    if(!e.date) return false;
+    var parts = e.date.split('-');
+    if(parts[0] !== _expState.year) return false;
+    if(_expState.month !== 'all' && String(Number(parts[1])-1) !== _expState.month) return false;
+    return true;
+  });
+}
+
+function renderExpenseTotalsAndList(){
+  var periodList = expFilteredByPeriod();
+  renderExpenseTotals(periodList);
+  renderExpenseTabs();
+  var shown = _expState.category==='all' ? periodList : periodList.filter(function(e){ return e.category===_expState.category; });
+  renderExpenseList(shown);
+}
+
+function renderExpenseTotals(list){
+  var byCat = {}; var total = 0;
+  list.forEach(function(e){ var c=e.category||'autres'; byCat[c]=(byCat[c]||0)+Number(e.total||0); total+=Number(e.total||0); });
+  var rows = EXPENSE_CATEGORIES.filter(function(c){ return byCat[c.key]>0; }).map(function(c){
+    return '<div class="exp-total-row"><span class="exp-cat-lbl">'+c.ic+' '+c.label+'</span><span class="exp-cat-amt">'+fmtMoney(byCat[c.key])+'</span></div>';
+  }).join('');
+  var el = document.getElementById('exp-totals');
+  if(!el) return;
+  if(!list.length){
+    el.innerHTML = '<div class="acc-empty"><div class="acc-empty-ic">🧾</div><div class="acc-empty-t">Aucune dépense pour cette période</div><div class="acc-empty-d">Scanne ta première facture pour commencer à suivre tes dépenses.</div></div>';
+    return;
+  }
+  el.innerHTML = '<div class="ticker-wrap">'
+    +'<div class="ticker-head">Vos dépenses automobiles — '+_expState.year+'</div>'
+    + rows
+    +'<div class="exp-total-grand"><span>Total</span><span>'+fmtMoney(total)+'</span></div>'
+    +'</div>';
+}
+
+function renderExpenseTabs(){
+  var el = document.getElementById('exp-tabs');
+  if(!el) return;
+  var vehicles = clientData.vehicles||[];
+  var v = vehicles.find(function(x){ return x.vehicle_id===_expState.vehicleId; });
+  var cats = EXPENSE_CATEGORIES.filter(function(c){
+    if(c.key==='carburant' && v && v.fuel==='Électrique') return false;
+    if(c.key==='recharge' && v && v.fuel && v.fuel!=='Électrique' && v.fuel!=='Hybride') return false;
+    return true;
+  });
+  var all = [{key:'all', ic:'📋', label:'Toutes'}].concat(cats);
+  el.innerHTML = '<div class="chip-grid">' + all.map(function(c){
+    return '<button type="button" class="chip-btn'+(_expState.category===c.key?' sel':'')+'" onclick="expPickCategoryTab(\''+c.key+'\')">'+c.ic+' '+c.label+'</button>';
+  }).join('') + '</div>';
+}
+function expPickCategoryTab(key){
+  _expState.category = key;
+  renderExpenseTotalsAndList();
+}
+
+function renderExpenseList(list){
+  var el = document.getElementById('exp-list');
+  if(!el) return;
+  if(!list.length){ el.innerHTML = '<div class="acc-empty-mini">Aucune dépense dans cette catégorie pour la période choisie.</div>'; return; }
+  list.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+  el.innerHTML = list.map(function(e){
+    var c = expenseCategoryInfo(e.category);
+    return '<div class="exp-card">'
+      +'<div class="exp-card-ic">'+c.ic+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div class="exp-card-t">'+(e.merchant||c.label)+'</div>'
+      +'<div class="exp-card-d">'+fmtExpDate(e.date)+(e.vehicle_label?' · '+e.vehicle_label:'')+'</div>'
+      +'</div>'
+      +'<div class="exp-card-amt">'+fmtMoney(e.total)+'</div>'
+      +'<button class="close-btn" style="width:26px;height:26px;font-size:11px;flex-shrink:0" onclick="deleteExpense(\''+e.id+'\')">✕</button>'
+      +'</div>';
+  }).join('');
+}
+
+function deleteExpense(id){
+  if(!confirm('Supprimer cette dépense ?')) return;
+  db.collection('expenses').doc(id).delete().then(loadClientExpenses).catch(function(e){ toast('Erreur : '+e.message, 'err', 3200); });
+}
+
+/* ── Photo de facture + lecture automatique GRATUITE (Tesseract.js — OCR
+   open source qui tourne dans le téléphone du client, aucun serveur,
+   aucune clé API, aucun abonnement). On lit le texte brut de la photo puis
+   on devine la date/le montant/la catégorie avec des mots-clés — moins
+   précis qu'une vraie IA, donc les champs restent TOUJOURS modifiables et
+   on avertit le client de vérifier avant d'enregistrer. Si la lecture
+   échoue ou que la librairie ne charge pas (pas de connexion, etc.), le
+   formulaire reste utilisable en saisie 100% manuelle, rien ne bloque. */
+var _tesseractLoadPromise = null;
+function loadTesseractScript(){
+  if(window.Tesseract) return Promise.resolve();
+  if(_tesseractLoadPromise) return _tesseractLoadPromise;
+  _tesseractLoadPromise = new Promise(function(resolve, reject){
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ reject(new Error('Chargement de la lecture automatique impossible.')); };
+    document.head.appendChild(s);
+  });
+  return _tesseractLoadPromise;
+}
+var _ocrWorker = null;
+async function runReceiptOcr(file, onProgress){
+  await loadTesseractScript();
+  if(typeof Tesseract === 'undefined') return null;
+  if(!_ocrWorker){
+    _ocrWorker = await Tesseract.createWorker('fra', 1, {
+      logger: function(m){ if(onProgress && m.status==='recognizing text') onProgress(Math.round((m.progress||0)*100)); }
+    });
+  }
+  var result = await _ocrWorker.recognize(file);
+  return (result && result.data) ? result.data.text : null;
+}
+
+/* Devine les champs à partir du texte brut lu sur la facture — simples
+   règles par mots-clés et patrons de dates/montants, PAS de compréhension
+   réelle du contenu (contrairement à une IA). À corriger par le client. */
+function parseReceiptText(text){
+  var pad = function(n){ n=String(n); return n.length<2?'0'+n:n; };
+  var out = { date:null, merchant:null, category:'autres', subtotal:null, taxes:null, total:null, invoice_number:null };
+  var lines = String(text||'').split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+  var fullLower = String(text||'').toLowerCase();
+
+  for(var i=0;i<lines.length;i++){
+    if(/[a-zA-ZÀ-ÿ]{3,}/.test(lines[i]) && !/^\d/.test(lines[i])){ out.merchant = lines[i].slice(0,60); break; }
+  }
+
+  var catKeywords = {
+    carburant: ['essence','carburant','petro','ultramar','esso\\b','shell','couche-tard','olco'],
+    recharge: ['recharge','borne','electrique','supercharger','\\bflo\\b','chargepoint','circuit electrique'],
+    entretien: ['garage','mecanique','atelier','pneu','frein','huile','entretien','vidange','canadian tire'],
+    stationnement: ['stationnement','parking','parcometre','indigo'],
+    assurance: ['assurance','intact','desjardins assurance','belairdirect'],
+  };
+  Object.keys(catKeywords).forEach(function(cat){
+    catKeywords[cat].forEach(function(kw){ if(new RegExp(kw,'i').test(fullLower)) out.category = cat; });
+  });
+
+  var dm = fullLower.match(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/) || fullLower.match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+  if(dm){
+    out.date = dm[1].length===4 ? (dm[1]+'-'+pad(dm[2])+'-'+pad(dm[3])) : (dm[3]+'-'+pad(dm[2])+'-'+pad(dm[1]));
+  }
+
+  var amounts = [];
+  lines.forEach(function(l){
+    var ll = l.toLowerCase();
+    var amtMatch = l.match(/(\d{1,4}[.,]\d{2})/);
+    if(!amtMatch) return;
+    var amt = parseFloat(amtMatch[1].replace(',','.'));
+    amounts.push(amt);
+    if(/sous-total|subtotal/.test(ll)) out.subtotal = amt;
+    else if(/total/.test(ll)) out.total = amt;
+    else if(/tps|tvq|gst|qst|taxe/.test(ll)) out.taxes = (out.taxes||0) + amt;
+    else if(/facture|invoice|transaction|re[cç]u\s*#|commande/.test(ll)){
+      var numMatch = l.match(/([A-Za-z0-9-]{4,})\s*$/);
+      if(numMatch) out.invoice_number = numMatch[1];
+    }
+  });
+  if(!out.total && amounts.length) out.total = Math.max.apply(null, amounts);
+  return out;
+}
+
+function openScanExpenseForm(){
+  document.getElementById('account-title').textContent = '📸 Ajouter une facture';
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="exp-scan-err"></div>'
+    +'<div style="background:var(--bluelt);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--blue2);line-height:1.5;margin-bottom:1.1rem">📷 Prends ta facture en photo (ou choisis-en une) — on essaie de lire le montant, la date et le type de dépense automatiquement. Vérifie toujours avant d\'enregistrer, ça peut se tromper.</div>'
+    +'<input type="file" id="exp-scan-file" accept="image/*" capture="environment" style="display:block;width:100%;padding:16px;border:1.5px dashed var(--line);border-radius:12px;font-size:13px;text-align:center" onchange="startExpenseScan()">'
+    +'<div id="exp-scan-status" style="font-size:12.5px;color:var(--faint);margin-top:10px;text-align:center"></div>'
+    +'<button class="btn-book" style="margin-top:1.1rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="openExpenses()">Annuler</button>';
+}
+
+async function startExpenseScan(){
+  var file = document.getElementById('exp-scan-file').files[0];
+  var statusEl = document.getElementById('exp-scan-status');
+  var errEl = document.getElementById('exp-scan-err');
+  if(!file) return;
+  statusEl.textContent = '📤 Envoi et lecture de la facture...';
+  errEl.style.display = 'none';
+  var photoUrl = null, photoName = null, guessed = null;
+  var uploadPromise = uploadViaFunction(file, 'client_expense', clientUser.uid).catch(function(e){ console.log('Photo facture:', e); return null; });
+  var ocrPromise = runReceiptOcr(file, function(pct){ statusEl.textContent = '🔎 Lecture de la facture... '+pct+'%'; }).catch(function(e){ console.log('OCR facture:', e); return null; });
+  var results = await Promise.all([uploadPromise, ocrPromise]);
+  var up = results[0], text = results[1];
+  photoUrl = up ? up.url : null;
+  photoName = up ? up.name : null;
+  if(!up){
+    errEl.textContent = 'Erreur d\'envoi de la photo — tu peux continuer sans, ou réessayer.';
+    errEl.style.display = 'block';
+  }
+  if(text && text.trim()){
+    guessed = parseReceiptText(text);
+    guessed.source = 'ocr';
+  } else {
+    toast('Lecture automatique indisponible — remplis les champs manuellement 🙂', 'ok', 3600);
+  }
+  renderExpenseConfirmForm(guessed||{}, photoUrl, photoName);
+}
+
+function openManualExpenseForm(){
+  renderExpenseConfirmForm({}, null, null);
+}
+
+function renderExpenseConfirmForm(data, photoUrl, photoName){
+  data = data || {};
+  var vehicles = clientData.vehicles||[];
+  var vehId = data.vehicle_id || _expState.vehicleId || (vehicles[0]&&vehicles[0].vehicle_id) || '';
+  var vehOpts = vehicles.map(function(v){ return '<option value="'+v.vehicle_id+'"'+(v.vehicle_id===vehId?' selected':'')+'>'+expVehicleLabel(v)+'</option>'; }).join('');
+  var today = new Date().toISOString().slice(0,10);
+  var cats = EXPENSE_CATEGORIES.map(function(c){ return c.label; });
+  var catIconMap = {}; EXPENSE_CATEGORIES.forEach(function(c){ catIconMap[c.label]=c.ic; });
+  var selectedCatLabel = data.category ? (expenseCategoryInfo(data.category).label) : '';
+
+  document.getElementById('account-title').textContent = '🧾 Confirmer la dépense';
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="exp-conf-err"></div>'
+    + (data.source==='ocr' ? '<div style="background:#FFF4E0;border:1px solid #F2D49A;color:#8A5A00;border-radius:10px;padding:10px 13px;font-size:12px;line-height:1.5;margin-bottom:1rem">🔎 Lecture automatique (gratuite, pas toujours exacte) — vérifie bien chaque champ avant d\'enregistrer, surtout le montant total.</div>' : '')
+    + (photoUrl ? '<img src="'+photoUrl+'" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:1rem">' : '')
+    +'<div class="ff"><label>Catégorie *</label>'+wizChips('exp-cat', cats, selectedCatLabel, catIconMap)+'</div>'
+    + (vehicles.length>1 ? '<div class="ff"><label>Véhicule</label><select id="exp-c-vehicle">'+vehOpts+'</select></div>' : '')
+    +'<div class="ff2"><div class="ff"><label>Date *</label><input type="date" id="exp-c-date" value="'+(data.date||today)+'"></div>'
+    +'<div class="ff"><label>Commerçant / Garage</label><input type="text" id="exp-c-merchant" placeholder="Ex. Petro-Canada" value="'+(data.merchant||'')+'"></div></div>'
+    +'<div class="ff2"><div class="ff"><label>Avant taxes</label><input type="number" inputmode="decimal" id="exp-c-subtotal" placeholder="0.00" value="'+(data.subtotal!=null?data.subtotal:'')+'"></div>'
+    +'<div class="ff"><label>Taxes</label><input type="number" inputmode="decimal" id="exp-c-taxes" placeholder="0.00" value="'+(data.taxes!=null?data.taxes:'')+'"></div></div>'
+    +'<div class="ff"><label>Montant total *</label><input type="number" inputmode="decimal" id="exp-c-total" placeholder="0.00" value="'+(data.total!=null?data.total:'')+'"></div>'
+    +'<div class="ff"><label>N° de facture <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="text" id="exp-c-invnum" value="'+(data.invoice_number||'')+'"></div>'
+    +'<button class="btn-submit blue" id="exp-conf-btn" onclick="saveExpenseConfirm('+(photoUrl?'\''+photoUrl.replace(/'/g,"\\'")+'\'':'null')+','+(photoName?'\''+photoName.replace(/'/g,"\\'")+'\'':'null')+',\''+(data.source||(photoUrl?'photo':'manual'))+'\')">✓ Enregistrer la dépense</button>'
+    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="openExpenses()">Annuler</button>';
+}
+
+async function saveExpenseConfirm(photoUrl, photoName, source){
+  var errEl = document.getElementById('exp-conf-err');
+  var btn = document.getElementById('exp-conf-btn');
+  errEl.style.display = 'none';
+  var catEl = document.getElementById('exp-cat');
+  var catLabel = catEl ? (catEl.dataset.value||'') : '';
+  var catKey = (EXPENSE_CATEGORIES.find(function(c){ return c.label===catLabel; })||{}).key;
+  var date = document.getElementById('exp-c-date').value;
+  var total = parseFloat(document.getElementById('exp-c-total').value);
+  if(!catKey){ errEl.textContent='Choisis une catégorie.'; errEl.style.display='block'; return; }
+  if(!date){ errEl.textContent='La date est obligatoire.'; errEl.style.display='block'; return; }
+  if(!total || total<=0){ errEl.textContent='Entre un montant total valide.'; errEl.style.display='block'; return; }
+  var vehicles = clientData.vehicles||[];
+  var vehSelect = document.getElementById('exp-c-vehicle');
+  var vehId = vehSelect ? vehSelect.value : (_expState.vehicleId || (vehicles[0]&&vehicles[0].vehicle_id) || '');
+  var veh = vehicles.find(function(v){ return v.vehicle_id===vehId; }) || vehicles[0] || {};
+  var subtotalVal = document.getElementById('exp-c-subtotal').value;
+  var taxesVal = document.getElementById('exp-c-taxes').value;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Enregistrement...';
+  try {
+    await db.collection('expenses').add({
+      client_uid: clientUser.uid,
+      vehicle_id: veh.vehicle_id || '',
+      vehicle_label: expVehicleLabel(veh),
+      category: catKey,
+      date: date,
+      merchant: (document.getElementById('exp-c-merchant').value||'').trim(),
+      subtotal: subtotalVal ? Number(subtotalVal) : null,
+      taxes: taxesVal ? Number(taxesVal) : null,
+      total: total,
+      invoice_number: (document.getElementById('exp-c-invnum').value||'').trim() || null,
+      facture_url: photoUrl || null,
+      facture_name: photoName || null,
+      source: source || 'manual',
+      created_at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    toast('🧾 Dépense enregistrée ✓', 'ok', 2800);
+    openExpenses();
+  } catch(e){
+    errEl.textContent = 'Erreur : '+(e.message||e); errEl.style.display='block';
+    btn.disabled = false; btn.innerHTML = '✓ Enregistrer la dépense';
+  }
+}
+
+/* ── Rapport de dépenses imprimable (couvre la période/véhicule filtrés) ── */
+function generateExpenseReport(){
+  var list = expFilteredByPeriod().slice().sort(function(a,b){ return (a.date||'').localeCompare(b.date||''); });
+  var vehicles = clientData.vehicles||[];
+  var v = vehicles.find(function(x){ return x.vehicle_id===_expState.vehicleId; });
+  var scopeLabel = v ? expVehicleLabel(v) : 'Tous mes véhicules';
+  var periodLabel = _expState.month==='all' ? _expState.year : (['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'][Number(_expState.month)]+' '+_expState.year);
+  var byCat = {}; var total = 0;
+  list.forEach(function(e){ var c=e.category||'autres'; byCat[c]=(byCat[c]||0)+Number(e.total||0); total+=Number(e.total||0); });
+  var catRowsHtml = EXPENSE_CATEGORIES.filter(function(c){ return byCat[c.key]>0; }).map(function(c){
+    return '<tr><td style="padding:7px 0">'+c.ic+' '+c.label+'</td><td style="padding:7px 0;text-align:right;font-weight:700">'+fmtMoney(byCat[c.key])+'</td></tr>';
+  }).join('');
+  var itemsHtml = list.length ? list.map(function(e){
+    var c = expenseCategoryInfo(e.category);
+    return '<tr><td style="padding:6px 0;font-size:12.5px">'+fmtExpDate(e.date)+'</td>'
+      +'<td style="padding:6px 0;font-size:12.5px">'+c.ic+' '+c.label+'</td>'
+      +'<td style="padding:6px 0;font-size:12.5px">'+(e.merchant||'—')+'</td>'
+      +'<td style="padding:6px 0;font-size:12.5px;text-align:right">'+fmtMoney(e.total)+'</td></tr>';
+  }).join('') : '<tr><td colspan="4" style="padding:10px 0;color:#888">Aucune dépense pour cette période.</td></tr>';
+
+  document.getElementById('account-title').textContent = '📄 Rapport de dépenses';
+  document.getElementById('account-body').innerHTML =
+    '<div class="print-report" id="print-report">'
+    +'<div style="font-size:20px;font-weight:800;margin-bottom:2px">🔧 Greaz — Rapport de dépenses</div>'
+    +'<div style="font-size:13px;color:#666;margin-bottom:18px">'+scopeLabel+' · '+periodLabel+' · généré le '+new Date().toLocaleDateString('fr-CA')+'</div>'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:22px">'+catRowsHtml
+    +'<tr style="border-top:2px solid #222"><td style="padding:10px 0;font-weight:800">Total</td><td style="padding:10px 0;text-align:right;font-weight:800">'+fmtMoney(total)+'</td></tr>'
+    +'</table>'
+    +'<div style="font-size:13px;font-weight:700;margin-bottom:8px">Détail des factures</div>'
+    +'<table style="width:100%;border-collapse:collapse"><tbody>'+itemsHtml+'</tbody></table>'
+    +'<div style="font-size:11px;color:#999;margin-top:24px">Document généré automatiquement par Greaz à partir des dépenses saisies par le client — à titre indicatif, conserve tes factures originales pour tes déclarations.</div>'
+    +'</div>'
+    +'<button class="btn-submit blue" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button>'
+    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="openExpenses()">← Retour</button>';
 }
 
 /* ══════════ TRANSFERT DE VÉHICULE ══════════
