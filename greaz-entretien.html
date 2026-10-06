@@ -435,9 +435,20 @@ var BRAND_NOTES = {
   'Lincoln':  { rating:'Variable', color:'amber', note:'Luxe américain. Entretien plus élevé. Vérifie bien avant.' },
   'Mitsubishi':{ rating:'Correcte', color:'blue', note:'Abordable. Garantie souvent longue. Reste dans les modèles récents.' },
   'Tesla':    { rating:'Différent', color:'blue', note:'Électrique : pas de vidange ni courroie. Mais surveille l\'état de la batterie (coûteuse à remplacer).' },
+  'Mini':     { rating:'Coûteux', color:'rose', note:'Amusant à conduire, mais mécanique BMW = pièces et main-d\'œuvre chères. Prévois un bon budget entretien avant d\'acheter.' },
+  'Genesis':  { rating:'Bonne', color:'blue', note:'Luxe coréen (groupe Hyundai) à bon rapport qualité-prix. Marque encore jeune ici, mais fiabilité prometteuse.' },
+  'Porsche':  { rating:'Coûteux', color:'rose', note:'Mécanique superbe, mais entretien parmi les plus chers du marché. Pièces et main-d\'œuvre spécialisées.' },
+  'Land Rover':{ rating:'Coûteux', color:'rose', note:'Très capable hors route, mais réputation de pépins électriques et entretien très élevé. Vérifie bien avant d\'acheter.' },
+  'Jaguar':   { rating:'Coûteux', color:'rose', note:'Élégante, mais entretien britannique dispendieux. Vérifie l\'historique de près avant d\'acheter.' },
+  'Alfa Romeo':{ rating:'À surveiller', color:'amber', note:'Belle conduite à l\'italienne, mais fiabilité historiquement inégale et entretien plus cher que la moyenne.' },
+  'Fiat':     { rating:'Variable', color:'amber', note:'Petites citadines sympathiques (surtout la 500), mais le réseau de pièces s\'est pas mal réduit depuis l\'arrêt des ventes au Canada.' },
+  'Scion':    { rating:'Excellente', color:'mint', note:'Marque jeunesse de Toyota (arrêtée en 2016) — même fiabilité que Toyota, et les pièces restent faciles à trouver.' },
+  'Saab':     { rating:'À surveiller', color:'amber', note:'Marque arrêtée depuis 2012 — bonne mécanique à la base, mais les pièces se font plus rares et plus chères à trouver.' },
+  'Pontiac':  { rating:'Variable', color:'amber', note:'Marque arrêtée depuis 2010 (GM). Fiabilité très variable selon le modèle — informe-toi avant d\'acheter.' },
+  'Suzuki':   { rating:'Bonne', color:'blue', note:'A quitté le marché nord-américain en 2013 — bonne fiabilité de base, mais réseau de pièces plus limité aujourd\'hui.' },
 };
-var MAKES = ['Acura','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Ford','GMC','Honda','Hyundai','Infiniti','Jeep','Kia','Lexus','Lincoln','Mazda','Mercedes-Benz','Mitsubishi','Nissan','RAM','Subaru','Tesla','Toyota','Volkswagen','Volvo','Autre'];
-var LUXE = ['Acura','Audi','BMW','Cadillac','Infiniti','Lexus','Lincoln','Mercedes-Benz','Tesla','Volvo'];
+var MAKES = ['Acura','Alfa Romeo','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Fiat','Ford','Genesis','GMC','Honda','Hyundai','Infiniti','Jaguar','Jeep','Kia','Land Rover','Lexus','Lincoln','Mazda','Mercedes-Benz','Mini','Mitsubishi','Nissan','Pontiac','Porsche','RAM','Saab','Scion','Subaru','Suzuki','Tesla','Toyota','Volkswagen','Volvo','Autre'];
+var LUXE = ['Acura','Alfa Romeo','Audi','BMW','Cadillac','Genesis','Infiniti','Jaguar','Land Rover','Lexus','Lincoln','Mercedes-Benz','Mini','Porsche','Tesla','Volvo'];
 // Profil de l'utilisateur : 'proprietaire' (a déjà l'auto) ou 'acheteur' (pense l'acheter)
 var _profile = 'proprietaire';
 var _payMode = 'credit';
@@ -495,6 +506,17 @@ var MODELS_BY_MAKE = {
   'Cadillac':['CT4','CT5','XT4','XT5','XT6','Escalade','Lyriq ⚡'],
   'Lincoln':['Corsair','Nautilus','Aviator','Navigator'],
   'Infiniti':['Q50','QX50','QX55','QX60','QX80'],
+  'Mini':['Cooper','Cooper S','Cooper SE ⚡','Countryman','Countryman SE ALL4 🔋','Clubman','Cabriolet','John Cooper Works'],
+  'Genesis':['G70','G80','G90','GV60 ⚡','GV70','GV80'],
+  'Porsche':['718 Cayman','718 Boxster','911','Macan','Cayenne','Panamera','Taycan ⚡'],
+  'Land Rover':['Defender','Discovery','Discovery Sport','Range Rover','Range Rover Sport','Range Rover Evoque','Range Rover Velar'],
+  'Jaguar':['XE','XF','F-Type','E-Pace','F-Pace','I-Pace ⚡'],
+  'Alfa Romeo':['Giulia','Stelvio','Tonale'],
+  'Fiat':['500','500X','500L'],
+  'Scion':['tC','xB','xD','iQ','FR-S'],
+  'Saab':['9-3','9-5','9-2X','9-4X'],
+  'Pontiac':['G5','G6','Vibe','Torrent','Solstice','Grand Prix'],
+  'Suzuki':['Swift+','SX4','Grand Vitara','Kizashi'],
 };
 // t = motorisations où l'entretien s'applique : g=essence, d=diesel, h=hybride, e=électrique
 var MAINTENANCE = [
