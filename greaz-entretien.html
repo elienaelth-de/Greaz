@@ -150,6 +150,7 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
 .motor-elec{background:linear-gradient(135deg,#EDF7FF,#E4F0FE);border-color:rgba(62,106,225,.3);color:#1E3A6E}
 .motor-hyb{background:var(--mintlt,#E4F7EE);border-color:rgba(0,168,98,.3);color:#065F46}
 .motor-dies{background:#FDF6E3;border-color:rgba(201,146,9,.3);color:#8A6508}
+.motor-warn{background:#FDF6E3;border-color:rgba(201,146,9,.3);color:#8A6508}
 /* Recommandation par marque */
 .brand-note{border-radius:16px;padding:16px 18px;margin:16px 0;border:1px solid}
 .brand-note-head{font-family:var(--display,'Space Grotesk');font-weight:700;font-size:14px;margin-bottom:5px}
@@ -275,7 +276,7 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
       </div>
       <div class="fld">
         <label>Kilométrage</label>
-        <div class="fld-wrap"><span class="fld-ic">📊</span><input type="number" id="km" placeholder="85000" inputmode="numeric"></div>
+        <div class="fld-wrap"><span class="fld-ic">📊</span><input type="number" id="km" placeholder="85000" inputmode="numeric" min="0"></div>
       </div>
     </div>
     <div class="fld">
@@ -343,6 +344,66 @@ var _db = null;
 try { _db = firebase.firestore(); } catch(e){}
 // Lien d'abonnement Stripe (récurrent 14,99$/mois)
 var GREAZ_SUB_LINK = 'https://buy.stripe.com/8x2aEQ1ehbZCdZ81JH0gw00';
+// ═══════════ FIABILITÉ DE LA CAPTURE DE PROSPECT ═══════════
+// Si l'envoi vers Firestore échoue (panne réseau passagère, Firebase lent, etc.),
+// on garde quand même le prospect — localement, dans ce navigateur — au lieu de le
+// perdre silencieusement. On retente de l'envoyer automatiquement à chaque visite,
+// et quelques secondes après une tentative ratée (sans jamais faire attendre la personne).
+var LEAD_QUEUE_KEY = 'greaz_lead_queue_v1';
+function queueLeadLocally(lead){
+  try {
+    var raw = localStorage.getItem(LEAD_QUEUE_KEY);
+    var arr = raw ? JSON.parse(raw) : [];
+    // On stocke une date ISO — une FieldValue Firestore (serverTimestamp) ne se sérialise pas en JSON.
+    arr.push(Object.assign({}, lead, { created_at: new Date().toISOString() }));
+    localStorage.setItem(LEAD_QUEUE_KEY, JSON.stringify(arr));
+  } catch(e){}
+}
+async function flushQueuedLeads(){
+  if(!_db) return;
+  var raw = null;
+  try { raw = localStorage.getItem(LEAD_QUEUE_KEY); } catch(e){ return; }
+  if(!raw) return;
+  var arr = [];
+  try { arr = JSON.parse(raw) || []; } catch(e){ arr = []; }
+  if(!arr.length) return;
+  var remaining = [];
+  for(var i=0;i<arr.length;i++){
+    try {
+      var toSave = Object.assign({}, arr[i]);
+      toSave.created_at = firebase.firestore.FieldValue.serverTimestamp();
+      await _db.collection('leads').add(toSave);
+    } catch(e){ remaining.push(arr[i]); }
+  }
+  try {
+    if(remaining.length) localStorage.setItem(LEAD_QUEUE_KEY, JSON.stringify(remaining));
+    else localStorage.removeItem(LEAD_QUEUE_KEY);
+  } catch(e){}
+}
+// On tente de renvoyer les prospects en attente dès que la page se charge
+// (ex. quelqu'un revient après une panne réseau de la fois d'avant).
+try { flushQueuedLeads(); } catch(e){}
+// Petit utilitaire : essaie un fetch JSON, avec délai d'attente et une reprise
+// automatique en cas d'échec passager — pour ne jamais rester bloqué trop longtemps.
+async function fetchJsonReliable(url, timeoutMs){
+  var attempts = 0, lastErr = null;
+  while(attempts < 2){
+    attempts++;
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = controller ? setTimeout(function(){ controller.abort(); }, timeoutMs || 8000) : null;
+    try {
+      var res = await fetch(url, controller ? {signal:controller.signal} : {});
+      if(timer) clearTimeout(timer);
+      if(!res.ok) throw new Error('http '+res.status);
+      return await res.json();
+    } catch(e){
+      if(timer) clearTimeout(timer);
+      lastErr = e;
+      if(attempts < 2){ await new Promise(function(r){ setTimeout(r, 500); }); }
+    }
+  }
+  throw lastErr;
+}
 // ═══════════ RECOMMANDATIONS PAR MARQUE ═══════════
 // Tendances générales connues par marque (fiabilité, points à surveiller).
 // Basé sur les tendances de l'industrie — à confirmer avec le manuel du véhicule.
@@ -437,19 +498,19 @@ var MODELS_BY_MAKE = {
 };
 // t = motorisations où l'entretien s'applique : g=essence, d=diesel, h=hybride, e=électrique
 var MAINTENANCE = [
-  { nom:'Vidange d\'huile + filtre', ic:'🛢️', km:10000, min:60, max:110, imp:'critique', t:['g','d','h'], why:'Sans huile propre, le moteur s\'use vite. Le plus important.' },
+  { nom:'Vidange d\'huile + filtre', ic:'🛢️', km:10000, min:55, max:140, imp:'critique', t:['g','d','h'], why:'Sans huile propre, le moteur s\'use vite. Le plus important.' },
   { nom:'Rotation des pneus', ic:'🔄', km:10000, min:30, max:55, imp:'recommande', t:['g','d','h','e'], why:'Fait durer tes pneus 2 fois plus longtemps.' },
   { nom:'Inspection des freins', ic:'🔍', km:20000, min:0, max:45, imp:'recommande', t:['g','d','h','e'], why:'Détecte l\'usure avant que ça coûte cher.' },
   { nom:'Filtre à air habitacle', ic:'🌬️', km:25000, min:40, max:70, imp:'preventif', t:['g','d','h','e'], why:'Air plus propre, système de ventilation protégé.' },
   { nom:'Filtre à air moteur', ic:'💨', km:30000, min:40, max:75, imp:'recommande', t:['g','d','h'], why:'Un moteur qui respire mal consomme plus de carburant.' },
-  { nom:'Alignement des roues', ic:'📐', km:40000, min:80, max:130, imp:'recommande', t:['g','d','h','e'], why:'Mauvais alignement = pneus usés d\'un bord, char qui tire.' },
+  { nom:'Alignement des roues', ic:'📐', km:40000, min:80, max:180, imp:'recommande', t:['g','d','h','e'], why:'Mauvais alignement = pneus usés d\'un bord, char qui tire.' },
   { nom:'Liquide de frein', ic:'🧪', km:45000, min:100, max:160, imp:'recommande', t:['g','d','h','e'], why:'Vieux liquide = freinage moins efficace, danger.' },
-  { nom:'Plaquettes de frein (avant)', ic:'🛑', km:50000, min:200, max:420, imp:'critique', t:['g','d','h'], why:'Négligées, elles abîment les disques (bien plus cher).' },
+  { nom:'Plaquettes de frein (avant)', ic:'🛑', km:50000, min:220, max:480, imp:'critique', t:['g','d','h'], why:'Négligées, elles abîment les disques (bien plus cher).' },
   { nom:'Plaquettes de frein (avant)', ic:'🛑', km:90000, min:200, max:420, imp:'recommande', t:['e'], why:'Le freinage régénératif les use bien moins vite. Bonne nouvelle !' },
   { nom:'Batterie de démarrage (12V)', ic:'🔋', km:70000, min:150, max:320, imp:'preventif', t:['g','d','h','e'], why:'La petite batterie qui démarre ton auto pis fait rouler l\'électronique (toutes les autos en ont une). Elle dure 4-6 ans pis lâche souvent l\'hiver au Québec.' },
   { nom:'Bougies d\'allumage', ic:'⚡', km:100000, min:150, max:380, imp:'recommande', t:['g','h'], why:'Vieilles bougies = moteur qui broute, plus d\'essence.' },
   { nom:'Liquide de refroidissement (moteur)', ic:'❄️', km:100000, min:110, max:200, imp:'critique', t:['g','d','h'], why:'Protège le moteur de la surchauffe (réparation à 2000$+).' },
-  { nom:'Liquide de transmission', ic:'⚙️', km:90000, min:180, max:350, imp:'critique', t:['g','d','h'], why:'Une transmission grillée = 3000 à 5000$. On l\'évite ici.' },
+  { nom:'Liquide de transmission', ic:'⚙️', km:90000, min:180, max:420, imp:'critique', t:['g','d','h'], why:'Une transmission grillée = 3000 à 5000$. On l\'évite ici.' },
   { nom:'Disques de frein', ic:'💿', km:95000, min:300, max:650, imp:'recommande', t:['g','d','h','e'], why:'Vibrations au freinage = disques voilés à changer.' },
   { nom:'Pneus (jeu de 4)', ic:'🛞', km:60000, min:700, max:1500, imp:'critique', t:['e'], why:'Les électriques usent leurs pneus plus vite (poids + couple).' },
   { nom:'Courroie de distribution', ic:'🔗', km:130000, min:600, max:1300, imp:'critique', t:['g','d'], why:'Si elle casse, le moteur est FINI. À faire absolument à temps.' },
@@ -457,6 +518,8 @@ var MAINTENANCE = [
   { nom:'Vérification système haute tension', ic:'⚡', km:30000, min:80, max:160, imp:'recommande', t:['e'], why:'Inspection de la batterie, du chargeur et de l\'onduleur.' },
   { nom:'Liquide de refroidissement (batterie)', ic:'🔋', km:100000, min:150, max:300, imp:'critique', t:['e'], why:'Garde la batterie à bonne température = elle dure plus longtemps.' },
 ];
+// Changement de pneus saisonnier — réalité incontournable au Québec (hiver/été), pas liée au kilométrage
+var SEASONAL_TIRE = { nom:'Changement pneus hiver ⇄ été', ic:'🛞', min:60, max:120, why:'Quasi obligatoire l\'hiver au Québec, et ça protège tes pneus (et ta sécurité) à l\'année.' };
 // Mots-clés pour auto-détecter un véhicule électrique d'après le modèle
 var EV_KEYWORDS = ['mach-e','mach e','tesla','model 3','model y','model s','model x','bolt','leaf','ioniq 5','ioniq5','ioniq 6','ev6','id.4','id4','ariya','e-tron','etron','i4','ix','eqs','eqb','eqe','taycan','polestar','lyriq','blazer ev','equinox ev','lightning','solterra','bz4x','kona electric','niro ev','soul ev'];
 var HYBRID_KEYWORDS = ['prius','hybrid','hybride','rav4 prime','phev'];
@@ -506,9 +569,9 @@ async function decodeNiv(){
   var oldTxt = btn.textContent;
   btn.textContent = '...';
   try {
-    var res = await fetch('https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/' + encodeURIComponent(vin) + '?format=json');
-    if(!res.ok) throw new Error('http '+res.status);
-    var data = await res.json();
+    // Délai d'attente + une reprise automatique si le service est lent ou flanche une fois —
+    // le formulaire manuel reste toujours disponible en dessous, donc ça bloque jamais la personne.
+    var data = await fetchJsonReliable('https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/' + encodeURIComponent(vin) + '?format=json', 8000);
     var r = data.Results && data.Results[0];
     if(!r || !r.Make){
       msg.textContent = 'On a pas réussi à décoder ce NIV. Vérifie-le, ou entre les infos à la main en dessous.';
@@ -524,7 +587,10 @@ async function decodeNiv(){
       msg.className = 'niv-msg err';
     }
   } catch(e){
-    msg.textContent = 'Impossible de joindre le service de décodage en ce moment. Entre les infos à la main en dessous.';
+    var isTimeout = e && (e.name === 'AbortError');
+    msg.textContent = isTimeout
+      ? 'Le service de décodage prend trop de temps à répondre. Entre les infos à la main en dessous — c\'est aussi rapide.'
+      : 'Impossible de joindre le service de décodage en ce moment. Entre les infos à la main en dessous.';
     msg.className = 'niv-msg err';
   } finally {
     btn.disabled = false;
@@ -689,6 +755,15 @@ function generate(){
   }
   var now = new Date().getFullYear();
   var age = Math.max(1, now - year);
+  // Vérification de cohérence km/année — un chiffre très inhabituel change beaucoup l'estimation,
+  // donc on avertit (sans bloquer) si ça semble être une coquille.
+  var rawKmPerYear = km / age;
+  var kmWarning = null;
+  if(age >= 2 && rawKmPerYear < 2000){
+    kmWarning = 'Ce kilométrage semble bas pour une '+year+' (~'+kmFmt(rawKmPerYear)+' km/an). Si c\'est une erreur de frappe, corrige-le — ça change pas mal l\'estimation.';
+  } else if(rawKmPerYear > 45000){
+    kmWarning = 'Ce kilométrage semble élevé pour une '+year+' (~'+kmFmt(rawKmPerYear)+' km/an). Vérifie le chiffre — ça change pas mal l\'estimation.';
+  }
   var kmPerYear = Math.min(35000, Math.max(8000, Math.round(km / age)));
   var costMult = isLuxe ? 1.4 : 1.0;
   var dueNow = [], soon = [], upcoming = [];
@@ -709,6 +784,11 @@ function generate(){
   dueNow.sort(function(a,b){ return a.kmUntil - b.kmUntil; });
   soon.sort(function(a,b){ return a.kmUntil - b.kmUntil; });
   upcoming.sort(function(a,b){ return a.kmUntil - b.kmUntil; });
+  // Pneus saisonniers : 2 changements par année, peu importe le kilométrage — un vrai coût
+  // récurrent au Québec qu'on inclut maintenant dans le total pour un chiffre plus juste.
+  var seasonalAvg = (SEASONAL_TIRE.min + SEASONAL_TIRE.max) / 2 * costMult;
+  var seasonalAnnual = seasonalAvg * 2;
+  annualCost += seasonalAnnual;
   var cost5y = annualCost * 5;
   var savings = annualCost * 0.32;
   var lifePct = Math.min(100, Math.round(km / 250000 * 100));
@@ -744,9 +824,10 @@ function generate(){
       kmPerYear:kmPerYear, dueNow:dueNow, soon:soon, upcoming:upcoming,
       annualCost:annualCost, cost5y:cost5y, savings:savings, lifePct:lifePct,
       usage:usage, distribType:distribType, ownership:ownership,
+      seasonalAvg:seasonalAvg, kmWarning:kmWarning,
     });
     if(gBtn){ gBtn.innerHTML = 'Voir mon plan <span class="btn-arrow">→</span>'; gBtn.style.pointerEvents=''; }
-  }, 280);
+  }, 60);
 }
 function itemHtml(e, state, idx){
   var m = e.m;
@@ -787,6 +868,10 @@ function renderResults(d){
     +   '<div class="km-gauge-lbl"><span>0 km</span><span>aujourd\'hui</span><span>250k</span></div>'
     + '</div>'
     + '</div></div>';
+  // Avertissement si le kilométrage semble incohérent avec l'année (coquille probable)
+  if(d.kmWarning){
+    html += '<div class="motor-banner motor-warn">⚠️ '+d.kmWarning+'</div>';
+  }
   // Bannière contextuelle selon la motorisation
   if(d.motor === 'electrique'){
     html += '<div class="motor-banner motor-elec">⚡ <b>Ton électrique, c\'est différent :</b> pas de vidange, pas de bougies, pas de courroie. On surveille surtout ta <b>batterie</b>, tes <b>freins</b> (qui durent plus longtemps grâce au freinage régénératif) pis tes <b>pneus</b> (qui s\'usent plus vite). Voici ton vrai plan.</div>';
@@ -814,9 +899,20 @@ function renderResults(d){
     html += d.upcoming.map(function(e,i){ return itemHtml(e,'ok',i); }).join('');
     html += '</div>';
   }
+  // Pneus saisonniers — toujours affiché, pas lié au kilométrage
+  html += '<div class="sec"><div class="sec-head"><span class="sec-title">🍁❄️ Pneus saisonniers</span><span class="sec-pill mint">2x / année</span></div>'
+    + '<div class="item ok">'
+    +   '<div class="item-ic">🛞</div>'
+    +   '<div class="item-main">'
+    +     '<div class="item-name">'+SEASONAL_TIRE.nom+'</div>'
+    +     '<div class="item-why">'+SEASONAL_TIRE.why+'</div>'
+    +     '<div class="item-when ok">Printemps + automne, chaque année</div>'
+    +   '</div>'
+    +   '<div class="item-cost"><div class="item-cost-val">'+money(d.seasonalAvg)+'</div><div class="item-cost-lbl">par changement</div></div>'
+    + '</div></div>';
   html += '<div class="sec"><div class="sec-head"><span class="sec-title">💰 Ce que ça représente</span></div>'
     + '<div class="cost-block">'
-    +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>Entretien bien fait</div><div class="cost-row-sub" style="margin-left:31px">par année, en moyenne</div></div><div class="cost-row-v" data-count="'+Math.round(d.annualCost)+'">0 $</div></div>'
+    +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>Entretien bien fait</div><div class="cost-row-sub" style="margin-left:31px">par année, en moyenne (pneus saisonniers inclus)</div></div><div class="cost-row-v" data-count="'+Math.round(d.annualCost)+'">0 $</div></div>'
     +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">📆</span>Sur 5 ans</div><div class="cost-row-sub" style="margin-left:31px">durée typique d\'un financement</div></div><div class="cost-row-v" data-count="'+Math.round(d.cost5y)+'">0 $</div></div>'
     +   '<div class="cost-row hero"><div><div class="cost-row-l"><span class="cost-ic">🎉</span>Greaz te fait économiser</div><div class="cost-row-sub" style="margin-left:31px">par année, en magasinant pour toi</div></div><div class="cost-row-v" data-count="'+Math.round(d.savings)+'">0 $</div></div>'
     + '</div></div>';
@@ -832,10 +928,10 @@ function renderResults(d){
       + '</div>'
       + '<div class="cost-block" style="margin-top:12px">'
       +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🚗</span>La voiture</div><div class="cost-row-sub" style="margin-left:31px">'+m2(o.monthly)+'/mois'+(o.interest>0?' · dont '+m2(o.interest)+' d\'intérêts':'')+'</div></div><div class="cost-row-v">'+m2(o.totalCar)+'</div></div>'
-      +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>L\'entretien prévu</div><div class="cost-row-sub" style="margin-left:31px">sur '+o.term+' ans</div></div><div class="cost-row-v">'+m2(o.maintTotal)+'</div></div>'
+      +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>L\'entretien prévu</div><div class="cost-row-sub" style="margin-left:31px">sur '+o.term+' ans, pneus saisonniers inclus</div></div><div class="cost-row-v">'+m2(o.maintTotal)+'</div></div>'
       +   '<div class="cost-row hero"><div><div class="cost-row-l"><span class="cost-ic">🎉</span>Greaz t\'aide à économiser</div><div class="cost-row-sub" style="margin-left:31px">estimation prudente sur l\'entretien</div></div><div class="cost-row-v">~'+m2(o.greazSaves)+'</div></div>'
       + '</div>'
-      + '<div class="own-note">💡 Le paiement de la voiture pis les intérêts sont des <b>calculs exacts</b>. L\'entretien est estimé selon les intervalles constructeurs. L\'économie Greaz est une estimation prudente (magasinage des prix + éviter les réparations d\'urgence).</div>'
+      + '<div class="own-note">💡 Le paiement de la voiture pis les intérêts sont des <b>calculs exacts</b>. L\'entretien est estimé selon les intervalles constructeurs (pneus saisonniers inclus). L\'économie Greaz est une estimation prudente (magasinage des prix + éviter les réparations d\'urgence).</div>'
       + '</div>';
   }
   html += '<div class="fin-note'+(_isFinanced?' show':'')+'" id="fin-note">'
@@ -884,7 +980,7 @@ function renderResults(d){
     + '<button class="lead-btn" id="lead-btn" onclick="saveLead()">Recevoir mon accompagnement →</button>'
     + '<div class="lead-note">Gratuit, sans engagement. On te répond vite.</div>'
     + '</div>';
-  html += '<div class="disclaimer"><b>D\'où viennent ces chiffres ?</b> Les intervalles sont basés sur les recommandations moyennes des constructeurs et de l\'industrie'+(d.usage==='ville'?', ajustés pour la conduite en ville (trajets courts = usure plus rapide)':(d.usage==='autoroute'?', ajustés pour la conduite sur autoroute':''))+'. Les prix sont des moyennes observées au Québec. <b>La référence exacte reste le manuel de ton véhicule</b> — les intervalles varient selon le moteur, l\'année et les conditions. Confirme toujours avec ton mécano.</div>';
+  html += '<div class="disclaimer"><b>D\'où viennent ces chiffres ?</b> Les intervalles sont basés sur les recommandations moyennes des constructeurs et de l\'industrie'+(d.usage==='ville'?', ajustés pour la conduite en ville (trajets courts = usure plus rapide)':(d.usage==='autoroute'?', ajustés pour la conduite sur autoroute':''))+'. Les prix sont des moyennes observées au Québec, pneus saisonniers inclus. <b>La référence exacte reste le manuel de ton véhicule</b> — les intervalles varient selon le moteur, l\'année et les conditions. Confirme toujours avec ton mécano.</div>';
   window._lastPlan = d;   // pour la sauvegarde du prospect
   document.getElementById('results').innerHTML = html;
   document.getElementById('form-card').style.display = 'none';
@@ -939,9 +1035,31 @@ async function saveLead(){
     status:'nouveau',
     created_at: firebase.firestore.FieldValue.serverTimestamp(),
   };
-  try {
-    if(_db) await _db.collection('leads').add(lead);
-  } catch(e){ console.log('Sauvegarde prospect:', e && e.message); }
+  // On essaie d'envoyer tout de suite ; si ça flanche une première fois (réseau lent,
+  // Firebase qui niaise), on retente une fois après un court délai ; si ça flanche encore,
+  // on garde le prospect en lieu sûr localement plutôt que de le perdre — il repartira
+  // tout seul dès que la connexion revient (voir flushQueuedLeads plus haut).
+  var saved = false;
+  if(_db){
+    try {
+      await _db.collection('leads').add(lead);
+      saved = true;
+    } catch(e1){
+      try {
+        await new Promise(function(r){ setTimeout(r, 600); });
+        await _db.collection('leads').add(lead);
+        saved = true;
+      } catch(e2){
+        console.log('Sauvegarde prospect (2 essais) :', e2 && e2.message);
+      }
+    }
+  }
+  if(!saved){
+    queueLeadLocally(lead);
+    // Une dernière tentative silencieuse un peu plus tard dans la même visite, au cas où
+    // la panne était très courte (ex. perte de signal de 5-10 secondes).
+    setTimeout(function(){ flushQueuedLeads(); }, 8000);
+  }
   var cap = document.getElementById('lead-capture');
   if(cap){
     cap.innerHTML =
