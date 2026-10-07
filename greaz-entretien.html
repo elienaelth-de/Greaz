@@ -288,7 +288,33 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
       </select></div>
     </div>
     <div class="buy-section">
-      <div class="buy-head" id="buy-head">💰 Tu penses acheter ce véhicule ? <span>(optionnel)</span></div>
+      <div class="buy-head">💸 Tes dépenses récurrentes <span>(optionnel)</span></div>
+      <div class="buy-sub">Ajoute ce que tu dépenses déjà — on te donne ton <b>vrai coût de char</b>, chaque semaine, pas juste l'entretien.</div>
+      <div class="fld">
+        <label id="fuel-field-label">⛽ Essence (ce que tu dépenses)</label>
+        <div class="row2">
+          <div class="fld-wrap"><span class="fld-ic">💵</span><input type="number" id="fuel-amount" placeholder="60" inputmode="numeric"></div>
+          <div class="fld-wrap"><span class="fld-ic">🔁</span><select id="fuel-freq">
+            <option value="week" selected>par semaine</option>
+            <option value="biweek">aux 2 semaines</option>
+            <option value="month">par mois</option>
+          </select></div>
+        </div>
+      </div>
+      <div class="fld">
+        <label>🛡️ Assurance</label>
+        <div class="row2">
+          <div class="fld-wrap"><span class="fld-ic">💵</span><input type="number" id="ins-amount" placeholder="120" inputmode="numeric"></div>
+          <div class="fld-wrap"><span class="fld-ic">🔁</span><select id="ins-freq">
+            <option value="month" selected>par mois</option>
+            <option value="biweek">aux 2 semaines</option>
+            <option value="week">par semaine</option>
+          </select></div>
+        </div>
+      </div>
+    </div>
+    <div class="buy-section">
+      <div class="buy-head" id="buy-head">🚗 Ton véhicule — financement <span>(optionnel)</span></div>
       <div class="buy-sub" id="buy-sub">Ajoute le prix pour voir ton <b>vrai coût total</b> — pas juste le char.</div>
       <div class="fld">
         <label id="buy-price-lbl">Prix d'achat</label>
@@ -299,6 +325,19 @@ body::after{content:'';position:fixed;bottom:-160px;left:-140px;width:360px;heig
         <div class="profile-btns">
           <button type="button" class="profile-btn active" id="pay-credit" onclick="setPayMode('credit')">💳 À crédit</button>
           <button type="button" class="profile-btn" id="pay-cash" onclick="setPayMode('comptant')">💵 Comptant</button>
+        </div>
+      </div>
+      <div id="direct-payment-fields" style="display:none">
+        <div class="fld">
+          <label>Ton paiement auto (ce que tu paies déjà)</label>
+          <div class="row2">
+            <div class="fld-wrap"><span class="fld-ic">💵</span><input type="number" id="pay-amount" placeholder="90" inputmode="numeric"></div>
+            <div class="fld-wrap"><span class="fld-ic">🔁</span><select id="pay-freq">
+              <option value="week">par semaine</option>
+              <option value="biweek" selected>aux 2 semaines</option>
+              <option value="month">par mois</option>
+            </select></div>
+          </div>
         </div>
       </div>
       <div id="credit-fields">
@@ -465,17 +504,34 @@ function setProfile(p){
     if(sub) sub.innerHTML = 'Ajoute le prix pour voir ton <b>vrai coût total</b> avant d\'acheter.';
     if(priceLbl) priceLbl.textContent = 'Prix demandé';
   } else {
-    if(head) head.innerHTML = '💰 Ton véhicule actuel <span>(optionnel)</span>';
+    if(head) head.innerHTML = '🚗 Ton véhicule actuel <span>(optionnel)</span>';
     if(sub) sub.innerHTML = 'Ajoute le prix payé pour voir ton <b>vrai coût total</b>.';
     if(priceLbl) priceLbl.textContent = 'Prix payé';
   }
+  updatePaymentFieldsVisibility();
 }
 function setPayMode(m){
   _payMode = m;
   document.getElementById('pay-credit').classList.toggle('active', m==='credit');
   document.getElementById('pay-cash').classList.toggle('active', m==='comptant');
+  updatePaymentFieldsVisibility();
+}
+// Propriétaire actuel qui est à crédit → il connaît déjà son vrai paiement, pas besoin de le
+// recalculer (taux/durée). Acheteur qui magasine → on lui estime le paiement avec taux/durée.
+// Comptant → aucun paiement récurrent, les deux blocs restent cachés.
+function updatePaymentFieldsVisibility(){
   var cf = document.getElementById('credit-fields');
-  if(cf) cf.style.display = (m==='comptant') ? 'none' : 'block';
+  var df = document.getElementById('direct-payment-fields');
+  if(_payMode === 'comptant'){
+    if(cf) cf.style.display = 'none';
+    if(df) df.style.display = 'none';
+  } else if(_profile === 'proprietaire'){
+    if(cf) cf.style.display = 'none';
+    if(df) df.style.display = 'block';
+  } else {
+    if(cf) cf.style.display = 'block';
+    if(df) df.style.display = 'none';
+  }
 }
 // Modèles populaires par marque au Québec. Suffixe ⚡ = électrique, 🔋 = hybride branchable
 var MODELS_BY_MAKE = {
@@ -554,13 +610,35 @@ var HYBRID_KEYWORDS = ['prius','hybrid','hybride','rav4 prime','phev'];
 })();
 function money(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; }
 function kmFmt(n){ return Math.round(n).toLocaleString('fr-CA'); }
+// Convertit un montant récurrent (semaine / 2 semaines / mois) en équivalents hebdo/mensuel/annuel —
+// pour pouvoir additionner carburant, assurance et paiement auto peu importe comment la personne les entre.
+function normalizeFreq(amount, freq){
+  if(!amount || amount <= 0) return { week:0, month:0, year:0 };
+  if(freq === 'week') return { week:amount, month:amount*52/12, year:amount*52 };
+  if(freq === 'biweek') return { week:amount/2, month:amount*26/12, year:amount*26 };
+  return { week:amount*12/52, month:amount, year:amount*12 };
+}
 var _isFinanced = false;
 var _motorManual = false;  // devient true si l'utilisateur choisit à la main (ou si le NIV a trouvé la motorisation)
 var MOTOR_ICONS = { essence:'⛽', hybride:'🔋', diesel:'🛢️', electrique:'⚡' };
+var FUEL_LABELS = {
+  essence: '⛽ Essence (ce que tu dépenses)',
+  diesel: '🛢️ Diesel (ce que tu dépenses)',
+  hybride: '⛽ Essence (ce que tu dépenses) — en partie compensé par la batterie',
+  electrique: '⚡ Recharge (ce que tu dépenses)',
+};
+// Le champ "dépenses récurrentes" s'adapte au type de moteur — un électrique "recharge",
+// il "fait pas le plein".
+function updateFuelLabel(){
+  var v = document.getElementById('motor').value;
+  var lbl = document.getElementById('fuel-field-label');
+  if(lbl) lbl.textContent = FUEL_LABELS[v] || FUEL_LABELS.essence;
+}
 function updateMotorIcon(){
   _motorManual = true;
   var v = document.getElementById('motor').value;
   document.getElementById('motor-ic').textContent = MOTOR_ICONS[v] || '⛽';
+  updateFuelLabel();
 }
 // ═══════════ DÉCODAGE NIV (gratuit — API vPIC du NHTSA, aucune clé requise) ═══════════
 // On décode SEULEMENT les specs du véhicule (marque/modèle/année/moteur) pour pré-remplir
@@ -689,6 +767,7 @@ function applyDecodedVehicle(r){
     motorSel.value = motorVal;
     document.getElementById('motor-ic').textContent = MOTOR_ICONS[motorVal];
     _motorManual = true; // empêche autoDetectMotor() d'écraser ce que le NIV vient de trouver
+    updateFuelLabel();
   }
   return applied;
 }
@@ -728,6 +807,7 @@ function autoDetectMotor(){
   if(found){
     sel.value = found;
     document.getElementById('motor-ic').textContent = MOTOR_ICONS[found];
+    updateFuelLabel();
   }
 }
 // ═══════════ DISTRIBUTION : courroie vs chaîne ═══════════
@@ -814,29 +894,69 @@ function generate(){
   var cost5y = annualCost * 5;
   var savings = annualCost * 0.32;
   var lifePct = Math.min(100, Math.round(km / 250000 * 100));
+  // ═══════════ DÉPENSES RÉCURRENTES (carburant/recharge, assurance) ═══════════
+  // On demande ce que la personne dépense déjà, peu importe sa fréquence préférée, et on
+  // ramène tout à un mois/une semaine commun pour pouvoir tout additionner ensemble.
+  var fuelAmount = parseFloat(document.getElementById('fuel-amount').value) || 0;
+  var fuelFreq = document.getElementById('fuel-freq').value;
+  var fuelCost = normalizeFreq(fuelAmount, fuelFreq);
+  var insAmount = parseFloat(document.getElementById('ins-amount').value) || 0;
+  var insFreq = document.getElementById('ins-freq').value;
+  var insCost = normalizeFreq(insAmount, insFreq);
+  var maintMonthly = annualCost / 12;
   // ═══════════ PLAN DE POSSESSION (si prix d'achat fourni) ═══════════
   var buyPrice = parseFloat(document.getElementById('buy-price').value);
   var ownership = null;
+  var carPaymentMonthly = 0;
+  var isCash = (_payMode === 'comptant');
   if(buyPrice && buyPrice > 0){
-    var rate = parseFloat(document.getElementById('buy-rate').value) || 0;
     var term = parseInt(document.getElementById('buy-term').value) || 5;
-    var down = parseFloat(document.getElementById('buy-down').value) || 0;
-    var financed = Math.max(0, buyPrice - down);
-    var n = term * 12;
-    var r = rate / 100 / 12;
-    var monthly = r === 0 ? financed / n : financed * r * Math.pow(1+r,n) / (Math.pow(1+r,n) - 1);
-    var totalCar = monthly * n + down;          // total payé pour la voiture
-    var interest = totalCar - buyPrice;          // intérêts payés
-    var maintTotal = annualCost * term;          // entretien sur la durée du financement
-    var grandTotal = totalCar + maintTotal;      // vrai coût total
-    // Économie Greaz PRUDENTE : ~15% de l'entretien (magasinage + éviter urgences)
+    var totalCar, interest, monthly, rate, down, knowsPayment;
+    if(isCash){
+      // Payé comptant : le prix EST le coût — pas d'étalement, pas d'intérêts à inventer.
+      rate = 0; down = buyPrice; monthly = 0; totalCar = buyPrice; interest = 0;
+      knowsPayment = false;
+    } else if(_profile === 'proprietaire'){
+      // Propriétaire actuel à crédit : il connaît déjà son vrai paiement — on l'utilise
+      // directement plutôt que de le réestimer avec un taux qui pourrait pas matcher son contrat.
+      var payAmount = parseFloat(document.getElementById('pay-amount').value) || 0;
+      var payFreqV = document.getElementById('pay-freq').value;
+      var payNorm = normalizeFreq(payAmount, payFreqV);
+      monthly = payNorm.month;
+      totalCar = monthly * term * 12;
+      interest = null; // inconnu — on invente pas un chiffre qu'on n'a pas
+      rate = null; down = 0;
+      knowsPayment = true;
+    } else {
+      // Acheteur qui magasine : on estime le paiement avec taux/durée/mise de fonds.
+      rate = parseFloat(document.getElementById('buy-rate').value) || 0;
+      down = parseFloat(document.getElementById('buy-down').value) || 0;
+      var financed = Math.max(0, buyPrice - down);
+      var n = term * 12;
+      var r = rate / 100 / 12;
+      monthly = r === 0 ? financed / n : financed * r * Math.pow(1+r,n) / (Math.pow(1+r,n) - 1);
+      totalCar = monthly * n + down;
+      interest = totalCar - buyPrice;
+      knowsPayment = false;
+    }
+    var maintTotal = annualCost * term;          // entretien sur la durée choisie
+    var fuelTotal = fuelCost.year * term;         // carburant/recharge sur la même durée
+    var insTotal = insCost.year * term;           // assurance sur la même durée
+    var grandTotal = totalCar + maintTotal + fuelTotal + insTotal;  // vrai coût total, tout inclus
+    // Économie Greaz PRUDENTE : ~15% de l'entretien seulement (magasinage + éviter urgences) —
+    // Greaz compare des prix de garages, pas l'assurance ou le carburant.
     var greazSaves = Math.round(maintTotal * 0.15);
     ownership = {
-      price: buyPrice, down: down, rate: rate, term: term,
+      price: buyPrice, down: down, rate: rate, term: term, isCash: isCash, knowsPayment: knowsPayment,
       monthly: monthly, totalCar: totalCar, interest: interest,
-      maintTotal: maintTotal, grandTotal: grandTotal, greazSaves: greazSaves,
+      maintTotal: maintTotal, fuelTotal: fuelTotal, insTotal: insTotal,
+      grandTotal: grandTotal, greazSaves: greazSaves,
     };
+    carPaymentMonthly = monthly;
   }
+  // Le vrai coût de char, chaque mois / chaque semaine — carburant + assurance + paiement + entretien
+  var totalMonthly = maintMonthly + fuelCost.month + insCost.month + carPaymentMonthly;
+  var totalWeekly = totalMonthly * 12 / 52;
   // Petit feedback sur le bouton pour un rendu premium
   var gBtn = document.querySelector('.btn');
   if(gBtn){ gBtn.innerHTML = '<span class="btn-spin"></span> On calcule...'; gBtn.style.pointerEvents='none'; }
@@ -847,6 +967,9 @@ function generate(){
       annualCost:annualCost, cost5y:cost5y, savings:savings, lifePct:lifePct,
       usage:usage, distribType:distribType, ownership:ownership,
       seasonalAvg:seasonalAvg, kmWarning:kmWarning,
+      fuelCost:fuelCost, insCost:insCost, maintMonthly:maintMonthly,
+      carPaymentMonthly:carPaymentMonthly, totalMonthly:totalMonthly, totalWeekly:totalWeekly,
+      isCash:isCash,
     });
     if(gBtn){ gBtn.innerHTML = 'Voir mon plan <span class="btn-arrow">→</span>'; gBtn.style.pointerEvents=''; }
   }, 60);
@@ -932,7 +1055,17 @@ function renderResults(d){
     +   '</div>'
     +   '<div class="item-cost"><div class="item-cost-val">'+money(d.seasonalAvg)+'</div><div class="item-cost-lbl">par changement</div></div>'
     + '</div></div>';
-  html += '<div class="sec"><div class="sec-head"><span class="sec-title">💰 Ce que ça représente</span></div>'
+  var moneyOrDash = function(n){ return (n && n>0) ? money(n) : '—'; };
+  // ═══════════ TON VRAI COÛT DE CHAR, CHAQUE MOIS (carburant + assurance + paiement + entretien) ═══════════
+  html += '<div class="sec"><div class="sec-head"><span class="sec-title">💳 Ton vrai coût de char</span></div>'
+    + '<div class="cost-block">'
+    +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">⛽</span>Carburant / recharge</div><div class="cost-row-sub" style="margin-left:31px">'+(d.fuelCost.month>0?'par mois':'ajoute-le plus haut pour un portrait complet')+'</div></div><div class="cost-row-v">'+moneyOrDash(d.fuelCost.month)+'</div></div>'
+    +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🛡️</span>Assurance</div><div class="cost-row-sub" style="margin-left:31px">'+(d.insCost.month>0?'par mois':'ajoute-la plus haut pour un portrait complet')+'</div></div><div class="cost-row-v">'+moneyOrDash(d.insCost.month)+'</div></div>'
+    +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🚗</span>Paiement auto</div><div class="cost-row-sub" style="margin-left:31px">'+(d.isCash?'payé comptant':(d.carPaymentMonthly>0?'par mois':'pas de financement entré'))+'</div></div><div class="cost-row-v">'+(d.isCash?'0 $':moneyOrDash(d.carPaymentMonthly))+'</div></div>'
+    +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>Entretien</div><div class="cost-row-sub" style="margin-left:31px">par mois, pneus saisonniers inclus</div></div><div class="cost-row-v">'+money(d.maintMonthly)+'</div></div>'
+    +   '<div class="cost-row hero"><div><div class="cost-row-l"><span class="cost-ic">💰</span>Ton vrai total</div><div class="cost-row-sub" style="margin-left:31px">environ '+money(d.totalWeekly)+' par semaine</div></div><div class="cost-row-v" data-count="'+Math.round(d.totalMonthly)+'">0 $</div></div>'
+    + '</div></div>';
+  html += '<div class="sec"><div class="sec-head"><span class="sec-title">💰 Juste l\'entretien</span></div>'
     + '<div class="cost-block">'
     +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>Entretien bien fait</div><div class="cost-row-sub" style="margin-left:31px">par année, en moyenne (pneus saisonniers inclus)</div></div><div class="cost-row-v" data-count="'+Math.round(d.annualCost)+'">0 $</div></div>'
     +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">📆</span>Sur 5 ans</div><div class="cost-row-sub" style="margin-left:31px">durée typique d\'un financement</div></div><div class="cost-row-v" data-count="'+Math.round(d.cost5y)+'">0 $</div></div>'
@@ -942,18 +1075,31 @@ function renderResults(d){
   if(d.ownership){
     var o = d.ownership;
     var m2 = function(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; };
+    var carRowSub, carRowVal;
+    if(o.isCash){
+      carRowSub = 'payée comptant — pas d\'intérêts';
+      carRowVal = m2(o.totalCar);
+    } else if(o.knowsPayment){
+      carRowSub = m2(o.monthly)+'/mois (ton paiement actuel) · sur '+o.term+' ans à ce rythme';
+      carRowVal = m2(o.totalCar);
+    } else {
+      carRowSub = m2(o.monthly)+'/mois'+(o.interest>0?' · dont '+m2(o.interest)+' d\'intérêts':'');
+      carRowVal = m2(o.totalCar);
+    }
     html += '<div class="sec"><div class="sec-head"><span class="sec-title">🛒 Ton vrai coût sur '+o.term+' ans</span></div>'
       + '<div class="own-hero">'
       +   '<div class="own-hero-top">Ce char te coûte pas '+m2(o.price)+'…</div>'
       +   '<div class="own-hero-big">'+m2(o.grandTotal)+'</div>'
-      +   '<div class="own-hero-sub">c\'est ton vrai coût sur '+o.term+' ans, tout inclus</div>'
+      +   '<div class="own-hero-sub">c\'est ton vrai coût sur '+o.term+' ans, tout inclus — char, assurance, carburant et entretien</div>'
       + '</div>'
       + '<div class="cost-block" style="margin-top:12px">'
-      +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🚗</span>La voiture</div><div class="cost-row-sub" style="margin-left:31px">'+m2(o.monthly)+'/mois'+(o.interest>0?' · dont '+m2(o.interest)+' d\'intérêts':'')+'</div></div><div class="cost-row-v">'+m2(o.totalCar)+'</div></div>'
+      +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🚗</span>La voiture</div><div class="cost-row-sub" style="margin-left:31px">'+carRowSub+'</div></div><div class="cost-row-v">'+carRowVal+'</div></div>'
+      +   (o.insTotal>0 ? '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🛡️</span>Assurance</div><div class="cost-row-sub" style="margin-left:31px">sur '+o.term+' ans, au rythme actuel</div></div><div class="cost-row-v">'+m2(o.insTotal)+'</div></div>' : '')
+      +   (o.fuelTotal>0 ? '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">⛽</span>Carburant / recharge</div><div class="cost-row-sub" style="margin-left:31px">sur '+o.term+' ans, au rythme actuel</div></div><div class="cost-row-v">'+m2(o.fuelTotal)+'</div></div>' : '')
       +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>L\'entretien prévu</div><div class="cost-row-sub" style="margin-left:31px">sur '+o.term+' ans, pneus saisonniers inclus</div></div><div class="cost-row-v">'+m2(o.maintTotal)+'</div></div>'
       +   '<div class="cost-row hero"><div><div class="cost-row-l"><span class="cost-ic">🎉</span>Greaz t\'aide à économiser</div><div class="cost-row-sub" style="margin-left:31px">estimation prudente sur l\'entretien</div></div><div class="cost-row-v">~'+m2(o.greazSaves)+'</div></div>'
       + '</div>'
-      + '<div class="own-note">💡 Le paiement de la voiture pis les intérêts sont des <b>calculs exacts</b>. L\'entretien est estimé selon les intervalles constructeurs (pneus saisonniers inclus). L\'économie Greaz est une estimation prudente (magasinage des prix + éviter les réparations d\'urgence).</div>'
+      + '<div class="own-note">💡 '+(o.isCash ? 'Payé comptant, le prix du char est un montant fixe, sans intérêts.' : (o.knowsPayment ? 'On a utilisé ton vrai paiement actuel, en supposant qu\'il reste pareil sur '+o.term+' ans.' : 'Le paiement de la voiture pis les intérêts sont des <b>calculs exacts</b> selon le taux et la durée entrés.'))+' L\'entretien est estimé selon les intervalles constructeurs (pneus saisonniers inclus). L\'assurance et le carburant/la recharge sont projetés au rythme que t\'as entré — ça peut changer avec le temps. L\'économie Greaz est une estimation prudente (magasinage des prix + éviter les réparations d\'urgence).</div>'
       + '</div>';
   }
   html += '<div class="fin-note'+(_isFinanced?' show':'')+'" id="fin-note">'
@@ -1035,12 +1181,18 @@ async function saveLead(){
   var payTxt = (p.ownership ? (_payMode==='comptant'?'comptant':'à crédit') : 'non précisé');
   var priceTxt = (p.ownership ? Math.round(p.ownership.price)+'$' : 'non précisé');
   var totalTxt = (p.ownership ? Math.round(p.ownership.grandTotal)+'$' : 'non calculé');
+  var fuelTxt = (p.fuelCost && p.fuelCost.month>0) ? Math.round(p.fuelCost.month)+'$/mois' : 'non précisé';
+  var insTxt = (p.insCost && p.insCost.month>0) ? Math.round(p.insCost.month)+'$/mois' : 'non précisé';
+  var totalMonthlyTxt = (p.totalMonthly ? Math.round(p.totalMonthly)+'$/mois (~'+Math.round(p.totalWeekly)+'$/semaine)' : 'non calculé');
   var desc = (isBuyer ? '🛒 VEUT ACHETER' : '🚗 PROPRIÉTAIRE ACTUEL') + '\n'
     + 'Véhicule : '+(veh||'non précisé')+'\n'
     + 'Kilométrage : '+(p.km?Number(p.km).toLocaleString('fr-CA')+' km':'non précisé')+'\n'
     + 'Prix '+(isBuyer?'demandé':'payé')+' : '+priceTxt+' ('+payTxt+')\n'
+    + 'Carburant/recharge : '+fuelTxt+'\n'
+    + 'Assurance : '+insTxt+'\n'
     + 'Entretien estimé : '+(p.annualCost?Math.round(p.annualCost)+'$/an':'—')+'\n'
-    + 'Coût total prévisionnel : '+totalTxt
+    + 'Vrai coût total (tout inclus) : '+totalMonthlyTxt+'\n'
+    + 'Coût total prévisionnel sur la durée : '+totalTxt
     + (isBuyer ? '\nAchat prévu : '+(timeline||'non précisé')+'\nBudget : '+(budget||'non précisé') : '');
   var lead = {
     type:'client', source:'simulateur',
@@ -1053,6 +1205,9 @@ async function saveLead(){
     pay_mode: (p.ownership?_payMode:null),
     est_total: (p.ownership?Math.round(p.ownership.grandTotal):null),
     est_annual: (p.annualCost?Math.round(p.annualCost):null),
+    fuel_monthly: (p.fuelCost && p.fuelCost.month>0 ? Math.round(p.fuelCost.month) : null),
+    insurance_monthly: (p.insCost && p.insCost.month>0 ? Math.round(p.insCost.month) : null),
+    total_monthly_cost: (p.totalMonthly ? Math.round(p.totalMonthly) : null),
     buy_timeline: timeline, buy_budget: budget,
     status:'nouveau',
     created_at: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1131,6 +1286,10 @@ function restart(){
   document.getElementById('form-card').style.display = 'block';
   window.scrollTo({ top:0, behavior:'smooth' });
 }
+// Initialisation finale — tout le reste du script (fonctions, listes de données) est déjà
+// défini à ce stade, donc c'est l'endroit sûr pour mettre le formulaire dans son état de départ.
+updatePaymentFieldsVisibility();
+updateFuelLabel();
 </script>
 </body>
 </html>
