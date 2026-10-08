@@ -618,6 +618,50 @@ function normalizeFreq(amount, freq){
   if(freq === 'biweek') return { week:amount/2, month:amount*26/12, year:amount*26 };
   return { week:amount*12/52, month:amount, year:amount*12 };
 }
+// ═══════════ VALEUR MARCHANDE ESTIMÉE ═══════════
+// Pas d'accès à un service d'évaluation (Otogo, CBB, etc. gardent leurs données privées et
+// scraper leurs prix serait pas fiable ni légal pour un outil commercial). Alors on estime avec
+// les mêmes tendances de dépréciation publiées par l'industrie qu'on a utilisées pour les prix
+// d'entretien : prix neuf typique selon le segment, courbe de dépréciation par âge, ajustement
+// selon le kilométrage par rapport à la moyenne. C'est une fourchette, pas une évaluation exacte.
+var TIER_BASE_PRICE = { mainstream:46000, truck:58000, luxury:68000 };
+var TRUCK_MAKES = ['RAM'];
+function brandTier(make){
+  if(TRUCK_MAKES.indexOf(make) !== -1) return 'truck';
+  if(LUXE.indexOf(make) !== -1) return 'luxury';
+  return 'mainstream';
+}
+// Courbe de rétention de valeur (% du prix neuf restant), basée sur des taux de dépréciation
+// moyens publiés (~20% an 1, puis 10-15%/an jusqu'à l'an 5, ~50% de perte totale à 5 ans —
+// cohérent avec les rapports Canadian Black Book / Fitch). Après 10 ans, la baisse ralentit
+// (pièces, valeur d'usage) avec un plancher à 12% du prix neuf.
+var VALUE_RETENTION = [1, .80, .68, .598, .539, .485, .43, .385, .345, .31, .28];
+function retentionForAge(age){
+  if(age <= 0) return VALUE_RETENTION[0];
+  if(age >= 10){
+    return Math.max(VALUE_RETENTION[10] - (age-10)*0.015, 0.12);
+  }
+  var lower = Math.floor(age), upper = Math.ceil(age);
+  if(lower === upper) return VALUE_RETENTION[lower];
+  var frac = age - lower;
+  return VALUE_RETENTION[lower] + (VALUE_RETENTION[upper]-VALUE_RETENTION[lower])*frac;
+}
+// ~18 000 km/an est la moyenne typique au Québec. Un écart notable ajuste la valeur, modestement —
+// l'état réel du véhicule compte pour bien plus que le kilométrage seul.
+function mileageAdjustment(age, km){
+  var expected = Math.max(age, 0.5) * 18000;
+  var ratio = km / expected;
+  if(ratio <= 0.7) return 0.08;
+  if(ratio <= 1.3) return 0;
+  if(ratio <= 1.8) return -0.08;
+  return -0.15;
+}
+function estimateMarketValue(make, age, km){
+  var base = TIER_BASE_PRICE[brandTier(make)];
+  var center = base * retentionForAge(age) * (1 + mileageAdjustment(age, km || 0));
+  var round50 = function(n){ return Math.max(500, Math.round(n/50)*50); };
+  return { min: round50(center*0.85), max: round50(center*1.15), center: round50(center) };
+}
 var _isFinanced = false;
 var _motorManual = false;  // devient true si l'utilisateur choisit à la main (ou si le NIV a trouvé la motorisation)
 var MOTOR_ICONS = { essence:'⛽', hybride:'🔋', diesel:'🛢️', electrique:'⚡' };
@@ -904,6 +948,9 @@ function generate(){
   var insFreq = document.getElementById('ins-freq').value;
   var insCost = normalizeFreq(insAmount, insFreq);
   var maintMonthly = annualCost / 12;
+  // Valeur marchande estimée — toujours calculée, peu importe si un prix d'achat est entré,
+  // pour qu'on puisse comparer "ce que t'as payé" à "ce que ça vaut typiquement".
+  var marketValue = estimateMarketValue(make, age, km);
   // ═══════════ PLAN DE POSSESSION (si prix d'achat fourni) ═══════════
   var buyPrice = parseFloat(document.getElementById('buy-price').value);
   var ownership = null;
@@ -969,7 +1016,7 @@ function generate(){
       seasonalAvg:seasonalAvg, kmWarning:kmWarning,
       fuelCost:fuelCost, insCost:insCost, maintMonthly:maintMonthly,
       carPaymentMonthly:carPaymentMonthly, totalMonthly:totalMonthly, totalWeekly:totalWeekly,
-      isCash:isCash,
+      isCash:isCash, marketValue:marketValue,
     });
     if(gBtn){ gBtn.innerHTML = 'Voir mon plan <span class="btn-arrow">→</span>'; gBtn.style.pointerEvents=''; }
   }, 60);
@@ -1065,6 +1112,29 @@ function renderResults(d){
     +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>Entretien</div><div class="cost-row-sub" style="margin-left:31px">par mois, pneus saisonniers inclus</div></div><div class="cost-row-v">'+money(d.maintMonthly)+'</div></div>'
     +   '<div class="cost-row hero"><div><div class="cost-row-l"><span class="cost-ic">💰</span>Ton vrai total</div><div class="cost-row-sub" style="margin-left:31px">environ '+money(d.totalWeekly)+' par semaine</div></div><div class="cost-row-v" data-count="'+Math.round(d.totalMonthly)+'">0 $</div></div>'
     + '</div></div>';
+  // ═══════════ VALEUR MARCHANDE ESTIMÉE ═══════════
+  html += '<div class="sec"><div class="sec-head"><span class="sec-title">🚘 Valeur marchande estimée</span></div>'
+    + '<div class="own-hero">'
+    +   '<div class="own-hero-top">Fourchette typique pour ce véhicule, au Québec</div>'
+    +   '<div class="own-hero-big">'+money(d.marketValue.min)+' – '+money(d.marketValue.max)+'</div>'
+    +   '<div class="own-hero-sub">'+vehName+' · '+kmFmt(d.km)+' km</div>'
+    + '</div>';
+  if(d.ownership){
+    var mv = d.marketValue, paid = d.ownership.price, cmpCls, cmpTxt;
+    if(paid < mv.min){
+      cmpCls = 'motor-hyb';
+      cmpTxt = '👍 T\'as payé '+money(paid)+' — en dessous de la valeur typique. Possiblement une bonne affaire (ou ça vaut la peine de vérifier pourquoi — kilométrage réel, accidents, condition).';
+    } else if(paid > mv.max){
+      cmpCls = 'motor-dies';
+      cmpTxt = '💬 T\'as payé '+money(paid)+' — au-dessus de la valeur typique. Pas nécessairement mauvais si le char est en excellent état ou bien équipé, mais ça vaut la peine de valider.';
+    } else {
+      cmpCls = 'motor-elec';
+      cmpTxt = '✅ T\'as payé '+money(paid)+' — dans la fourchette typique du marché.';
+    }
+    html += '<div class="motor-banner '+cmpCls+'" style="margin-bottom:0;margin-top:14px">'+cmpTxt+'</div>';
+  }
+  html += '<div class="own-note">📊 Estimation approximative basée sur les tendances générales de dépréciation au Canada (pas une évaluation exacte de TON véhicule précis — l\'état, les options, les accidents, la région et la demande locale font varier le prix réel). Pour une évaluation précise, un outil spécialisé ou un évaluateur reste la meilleure référence.</div>'
+    + '</div>';
   html += '<div class="sec"><div class="sec-head"><span class="sec-title">💰 Juste l\'entretien</span></div>'
     + '<div class="cost-block">'
     +   '<div class="cost-row"><div><div class="cost-row-l"><span class="cost-ic">🔧</span>Entretien bien fait</div><div class="cost-row-sub" style="margin-left:31px">par année, en moyenne (pneus saisonniers inclus)</div></div><div class="cost-row-v" data-count="'+Math.round(d.annualCost)+'">0 $</div></div>'
@@ -1184,10 +1254,12 @@ async function saveLead(){
   var fuelTxt = (p.fuelCost && p.fuelCost.month>0) ? Math.round(p.fuelCost.month)+'$/mois' : 'non précisé';
   var insTxt = (p.insCost && p.insCost.month>0) ? Math.round(p.insCost.month)+'$/mois' : 'non précisé';
   var totalMonthlyTxt = (p.totalMonthly ? Math.round(p.totalMonthly)+'$/mois (~'+Math.round(p.totalWeekly)+'$/semaine)' : 'non calculé');
+  var marketValueTxt = (p.marketValue ? Math.round(p.marketValue.min)+'$ - '+Math.round(p.marketValue.max)+'$' : 'non calculé');
   var desc = (isBuyer ? '🛒 VEUT ACHETER' : '🚗 PROPRIÉTAIRE ACTUEL') + '\n'
     + 'Véhicule : '+(veh||'non précisé')+'\n'
     + 'Kilométrage : '+(p.km?Number(p.km).toLocaleString('fr-CA')+' km':'non précisé')+'\n'
     + 'Prix '+(isBuyer?'demandé':'payé')+' : '+priceTxt+' ('+payTxt+')\n'
+    + 'Valeur marchande estimée : '+marketValueTxt+'\n'
     + 'Carburant/recharge : '+fuelTxt+'\n'
     + 'Assurance : '+insTxt+'\n'
     + 'Entretien estimé : '+(p.annualCost?Math.round(p.annualCost)+'$/an':'—')+'\n'
@@ -1202,6 +1274,8 @@ async function saveLead(){
     description: desc,
     vehicle_make: veh, vehicle_year: p.year||'', vehicle_km: p.km||'',
     buy_price: (p.ownership?Math.round(p.ownership.price):null),
+    market_value_min: (p.marketValue?Math.round(p.marketValue.min):null),
+    market_value_max: (p.marketValue?Math.round(p.marketValue.max):null),
     pay_mode: (p.ownership?_payMode:null),
     est_total: (p.ownership?Math.round(p.ownership.grandTotal):null),
     est_annual: (p.annualCost?Math.round(p.annualCost):null),
