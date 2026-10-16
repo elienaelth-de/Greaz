@@ -1538,6 +1538,9 @@ body.logged-in .hero-scroll{display:none}
 
     <!-- FORMULAIRE CONCIERGERIE (caché au départ) -->
     <div class="cc-form cc-form-hidden" id="cc-form">
+      <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:-.25rem">
+        <button type="button" class="close-btn" onclick="ccCloseForm()" title="Fermer">✕</button>
+      </div>
       <label class="cc-label">C'est quoi le problème ?</label>
       <div class="cc-prob-grid">
         <div class="cc-prob" data-prob="Moteur" onclick="ccSelProb(this)"><div class="cc-prob-ic">🔧</div><div class="cc-prob-t">Moteur</div></div>
@@ -2297,6 +2300,16 @@ function ccOpenForm(){
     ccUpdateReferralField();
     setTimeout(function(){ form.scrollIntoView({behavior:'smooth',block:'center'}); }, 120);
   }
+}
+
+/* Referme le formulaire concierge sans envoyer de demande — remet le bouton
+   "Décris ton problème" en place. Appelé par le ✕ du formulaire. */
+function ccCloseForm(){
+  var wrap = document.getElementById('cc-open-wrap');
+  var form = document.getElementById('cc-form');
+  if(form){ form.classList.add('cc-form-hidden'); form.classList.remove('cc-reveal'); }
+  if(wrap) wrap.classList.remove('cc-gone');
+  if(typeof mtabSetActive === 'function') mtabSetActive('mtab-home');
 }
 
 /* Depuis le tableau de bord permanent (usager connecté) : remonte vers le
@@ -5882,8 +5895,8 @@ function renderAccount(){
     +'<div class="acc-join-btn" style="color:#00875A">Ça m\'intéresse →</div>'
     +'</div>'
 
-    + (vehicles.length ? '<div class="acc-section">🧾 Mes dépenses <button class="acc-add" onclick="openExpenses()">Ouvrir →</button></div>'
-        + '<div class="acc-empty" style="cursor:pointer;padding:1.1rem 1.25rem" onclick="openExpenses()">'
+    + (vehicles.length ? '<div class="acc-section">🧾 Mes dépenses <button class="acc-add" onclick="openExpenses(\'account\')">Ouvrir →</button></div>'
+        + '<div class="acc-empty" style="cursor:pointer;padding:1.1rem 1.25rem" onclick="openExpenses(\'account\')">'
         + '<div class="acc-empty-t">⛽ 🛢️ 🅿️ 🛡️ — suis toutes tes dépenses auto</div>'
         + '<div class="acc-empty-d">'+(clientData.is_chauffeur ? 'Parfait pour tes dépenses de livraison/taxi : scanne tes factures, on calcule tout.' : 'Scanne tes factures, Greaz les classe et calcule tes totaux automatiquement.')+'</div>'
         + '</div>' : '')
@@ -5910,13 +5923,20 @@ function renderHistoryView(){
   if(!clientData){ renderAuth('login'); return; }
   document.getElementById('account-title').textContent = '🛠️ Historique';
   document.getElementById('account-body').innerHTML =
-    '<div class="acc-section" style="margin-top:0">📅 Réparations à venir</div>'
+    '<div class="ff2" style="margin-bottom:1.1rem">'
+    +'<button type="button" class="btn-submit blue" style="padding:12px 10px;font-size:12.5px" onclick="openInvoiceForm(\'history\')">📸 Scanner une réparation</button>'
+    +'<button type="button" class="btn-submit" style="padding:12px 10px;font-size:12.5px;background:linear-gradient(135deg,var(--green),#00875A)" onclick="openScanExpenseForm(\'history\')">⛽ Scanner un plein</button>'
+    +'</div>'
+
+    +'<div class="acc-section" style="margin-top:0">📅 Réparations à venir</div>'
     +'<div id="acc-demandes"><div class="acc-loading">Chargement...</div></div>'
     +'<div id="acc-rdvs"><div class="acc-loading">Chargement...</div></div>'
 
-    +'<div class="acc-section">🛠️ Historique & économies <button class="acc-add" onclick="openInvoiceForm()">📸 Ajouter une facture</button></div>'
+    +'<div class="acc-section">🛠️ Historique & économies <button class="acc-add" onclick="openInvoiceForm(\'history\')">📸 Ajouter une facture</button></div>'
     +'<div id="acc-history"><div class="acc-loading">Chargement...</div></div>'
+    +'<button class="btn-book" id="hist-pdf-btn" style="margin-top:.6rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="downloadServiceHistoryPdf()">📄 Télécharger mon historique (PDF)</button>'
 
+    +'<div class="acc-claim-link" onclick="openExpenses(\'history\')">🧾 Voir mes dépenses (carburant, etc.) & générer un rapport PDF →</div>'
     +'<div class="acc-claim-link" onclick="renderAccount()">→ Voir tout Mon espace</div>';
 
   loadClientDemandes();
@@ -7072,50 +7092,100 @@ function escHtml(s){
    — moins "officiel" qu'une entrée entrée par le garage (jamais d'argent
    "économisé" auto-déclaré), pour garder l'historique fiable. Utilise le
    même dossier Storage que l'admin (factures/service_history/{uid}/...). */
-function openInvoiceForm(){
-  document.getElementById('account-title').textContent = '📸 Ajouter une facture';
-  var today = new Date().toISOString().slice(0,10);
-  document.getElementById('account-body').innerHTML =
-    '<div class="alert-err" id="inv-err"></div>'
-    +'<div style="background:var(--bluelt);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--blue2);line-height:1.5;margin-bottom:1.1rem">📷 Prends une photo de ta facture (ou choisis un fichier existant) — ça s\'ajoute directement à ton historique d\'entretien.</div>'
-    +'<div class="ff"><label>Photo ou PDF de la facture *</label>'
-    +'<input type="file" id="inv-file" accept="image/*,application/pdf" capture="environment" style="display:block;width:100%;padding:10px;border:1.5px dashed var(--line);border-radius:10px;font-size:13px" onchange="invoiceFilePreview()">'
-    +'<div id="inv-file-name" style="font-size:11.5px;color:var(--faint);margin-top:5px"></div></div>'
-    +'<div class="ff"><label>Qu\'est-ce qui a été fait ? *</label><input type="text" id="inv-title" placeholder="Ex. Changement d\'huile, pneus d\'hiver..."></div>'
-    +'<div class="ff2"><div class="ff"><label>Date *</label><input type="date" id="inv-date" value="'+today+'"></div>'
-    +'<div class="ff"><label>Montant payé <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="number" id="inv-cost" inputmode="decimal" placeholder="120"></div></div>'
-    +'<div class="ff"><label>Note <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="text" id="inv-note" placeholder="Garage, détails..."></div>'
-    +'<button class="btn-submit blue" id="inv-btn" onclick="saveClientInvoice()">✓ Ajouter à mon historique</button>'
-    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">Annuler</button>';
-}
-function homeOpenInvoiceForm(){ homeOpenDrawerThen(function(){ openInvoiceForm(); }); }
+// D'où on est arrivé sur "Ajouter une facture" — ramène le bon écran au
+// clic sur "Annuler" ou après l'enregistrement : le tiroir "Mon espace"
+// normalement, ou l'onglet "Historique" quand on y a accédé depuis là.
+var _invReturnTo = 'account';
+function invoiceGoBack(){ if(_invReturnTo === 'history') renderHistoryView(); else renderAccount(); }
 
-function invoiceFilePreview(){
-  var f = document.getElementById('inv-file').files[0];
-  var el = document.getElementById('inv-file-name');
-  if(el) el.textContent = f ? ('✓ ' + f.name) : '';
+function openInvoiceForm(returnTo){
+  if(returnTo) _invReturnTo = returnTo;
+  document.getElementById('account-title').textContent = '📸 Ajouter une facture';
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="inv-scan-err"></div>'
+    +'<div style="background:var(--bluelt);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--blue2);line-height:1.5;margin-bottom:1.1rem">📷 Prends une photo de ta facture de réparation (ou choisis-en une) — on essaie de lire la date et le montant automatiquement. Vérifie toujours avant d\'enregistrer, ça peut se tromper.</div>'
+    +'<input type="file" id="inv-scan-file" accept="image/*" capture="environment" style="display:block;width:100%;padding:16px;border:1.5px dashed var(--line);border-radius:12px;font-size:13px;text-align:center" onchange="startInvoiceScan()">'
+    +'<div id="inv-scan-status" style="font-size:12.5px;color:var(--faint);margin-top:10px;text-align:center"></div>'
+    +'<div class="exp-manual-link" onclick="openManualInvoiceForm()">Ou ajouter manuellement — sans photo, ou pour une facture en PDF</div>'
+    +'<button class="btn-book" style="margin-top:1.1rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="invoiceGoBack()">Annuler</button>';
 }
+function homeOpenInvoiceForm(){ homeOpenDrawerThen(function(){ openInvoiceForm('account'); }); }
 
 function uploadClientFacture(file, uid){
   return uploadViaFunction(file, 'client_facture', uid);
 }
 
-async function saveClientInvoice(){
+/* Même lecture automatique (Tesseract.js, dans le téléphone, gratuite) que
+   pour "Mes dépenses" — on devine la date et le montant, le titre ("qu'est-ce
+   qui a été fait") reste à préciser par le client, l'OCR ne peut pas deviner
+   ça de façon fiable. */
+async function startInvoiceScan(){
+  var file = document.getElementById('inv-scan-file').files[0];
+  var statusEl = document.getElementById('inv-scan-status');
+  var errEl = document.getElementById('inv-scan-err');
+  if(!file) return;
+  statusEl.textContent = '📤 Envoi et lecture de la facture...';
+  errEl.style.display = 'none';
+  var uploadPromise = uploadClientFacture(file, clientUser.uid).catch(function(e){ console.log('Photo facture:', e); return null; });
+  var ocrPromise = runReceiptOcr(file, function(pct){ statusEl.textContent = '🔎 Lecture de la facture... '+pct+'%'; }).catch(function(e){ console.log('OCR facture:', e); return null; });
+  var results = await Promise.all([uploadPromise, ocrPromise]);
+  var up = results[0], text = results[1];
+  var photoUrl = up ? up.url : null;
+  var photoName = up ? up.name : null;
+  if(!up){
+    errEl.textContent = 'Erreur d\'envoi de la photo — tu peux continuer sans, ou réessayer.';
+    errEl.style.display = 'block';
+  }
+  var guessed = {};
+  if(text && text.trim()){
+    var parsed = parseReceiptText(text);
+    guessed = { date: parsed.date, cost: parsed.total, note: parsed.merchant||'', title: parsed.merchant ? ('Entretien chez '+parsed.merchant) : '' };
+  } else {
+    toast('Lecture automatique indisponible — remplis les champs manuellement 🙂', 'ok', 3600);
+  }
+  renderInvoiceConfirmForm(guessed, photoUrl, photoName);
+}
+
+function openManualInvoiceForm(){
+  renderInvoiceConfirmForm({}, null, null);
+}
+
+function renderInvoiceConfirmForm(data, photoUrl, photoName){
+  data = data || {};
+  var today = new Date().toISOString().slice(0,10);
+  document.getElementById('account-title').textContent = '🧾 Confirmer la facture';
+  document.getElementById('account-body').innerHTML =
+    '<div class="alert-err" id="inv-err"></div>'
+    + (photoUrl
+        ? '<img src="'+photoUrl+'" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:1rem">'
+        : '<div class="ff"><label>Photo ou PDF de la facture <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="file" id="inv-manual-file" accept="image/*,application/pdf" style="display:block;width:100%;padding:10px;border:1.5px dashed var(--line);border-radius:10px;font-size:13px"></div>')
+    +'<div class="ff"><label>Qu\'est-ce qui a été fait ? *</label><input type="text" id="inv-title" placeholder="Ex. Changement d\'huile, pneus d\'hiver..." value="'+(data.title?String(data.title).replace(/"/g,'&quot;'):'')+'"></div>'
+    +'<div class="ff2"><div class="ff"><label>Date *</label><input type="date" id="inv-date" value="'+(data.date||today)+'"></div>'
+    +'<div class="ff"><label>Montant payé <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="number" id="inv-cost" inputmode="decimal" placeholder="120" value="'+(data.cost!=null?data.cost:'')+'"></div></div>'
+    +'<div class="ff"><label>Note <span style="color:var(--faint);font-weight:400">(optionnel)</span></label><input type="text" id="inv-note" placeholder="Garage, détails..." value="'+(data.note?String(data.note).replace(/"/g,'&quot;'):'')+'"></div>'
+    +'<button class="btn-submit blue" id="inv-btn" onclick="saveClientInvoice('+(photoUrl?'\''+photoUrl.replace(/'/g,"\\'")+'\'':'null')+','+(photoName?'\''+photoName.replace(/'/g,"\\'")+'\'':'null')+')">✓ Ajouter à mon historique</button>'
+    +'<button class="btn-book" style="margin-top:.75rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="invoiceGoBack()">Annuler</button>';
+}
+
+async function saveClientInvoice(photoUrl, photoName){
   var errEl = document.getElementById('inv-err');
   var btn = document.getElementById('inv-btn');
   errEl.style.display = 'none';
-  var file = document.getElementById('inv-file').files[0] || null;
   var title = (document.getElementById('inv-title').value||'').trim();
   var date = document.getElementById('inv-date').value;
   var cost = document.getElementById('inv-cost').value;
   var note = (document.getElementById('inv-note').value||'').trim();
-  if(!file){ errEl.textContent = 'Ajoute une photo ou un PDF de ta facture.'; errEl.style.display='block'; return; }
+  var manualFileEl = document.getElementById('inv-manual-file');
+  var manualFile = manualFileEl ? (manualFileEl.files[0] || null) : null;
   if(!title || !date){ errEl.textContent = 'Le titre et la date sont obligatoires.'; errEl.style.display='block'; return; }
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Envoi de la facture...';
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Enregistrement...';
   var v0 = (clientData.vehicles && clientData.vehicles[0]) || {};
   var vehLabel = [v0.year,v0.make,v0.model].filter(Boolean).join(' ');
   try {
-    var facture = await uploadClientFacture(file, clientUser.uid);
+    if(manualFile){
+      var up = await uploadClientFacture(manualFile, clientUser.uid).catch(function(e){ console.log('Photo facture:', e); return null; });
+      if(up){ photoUrl = up.url; photoName = up.name; }
+    }
     await db.collection('service_history').add({
       client_uid: clientUser.uid,
       vehicle_label: vehLabel,
@@ -7128,15 +7198,15 @@ async function saveClientInvoice(){
       saved: 0,
       note: note,
       next_due_date: '',
-      facture_url: facture ? facture.url : null,
-      facture_name: facture ? facture.name : null,
+      facture_url: photoUrl || null,
+      facture_name: photoName || null,
       source: 'client',
       created_by: 'Client',
       created_at: firebase.firestore.FieldValue.serverTimestamp()
     });
-    renderAccount();
-    renderHomeDashboard();
     toast('📸 Facture ajoutée à ton historique ✓', 'ok', 2800);
+    invoiceGoBack();
+    renderHomeDashboard();
   } catch(e){
     errEl.textContent = 'Erreur : '+(e.message||e); errEl.style.display='block';
     btn.disabled = false; btn.innerHTML = '✓ Ajouter à mon historique';
@@ -7152,13 +7222,20 @@ async function saveClientInvoice(){
    véhicule par vehicle_id (stable), pas par position dans le tableau. */
 var _expState = { vehicleId:'', category:'all', year:String(new Date().getFullYear()), month:'all' };
 var _clientExpenses = [];
+// D'où on est arrivé sur "Mes dépenses" — pour que le bouton "Retour" (et
+// l'annulation des sous-écrans scan/manuel/confirmation) ramène au bon
+// endroit : le tiroir "Mon espace" normalement, ou l'onglet "Historique"
+// quand on y a accédé depuis là (scan rapide d'un plein d'essence).
+var _expReturnTo = 'account';
+function expensesGoBack(){ if(_expReturnTo === 'history') renderHistoryView(); else renderAccount(); }
 
 function expVehicleLabel(v){ return [v.year,v.make,v.model].filter(Boolean).join(' ') || 'Véhicule'; }
 function fmtMoney(n){ return Number(n||0).toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFractionDigits:2})+' $'; }
 function fmtExpDate(d){ try { return new Date(d+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short',year:'numeric'}); } catch(e){ return d||''; } }
 
-function openExpenses(){
+function openExpenses(returnTo){
   if(!clientData) return;
+  if(returnTo) _expReturnTo = returnTo;
   var vehicles = clientData.vehicles||[];
   if(!_expState.vehicleId && vehicles.length) _expState.vehicleId = vehicles[0].vehicle_id||'';
   document.getElementById('account-title').textContent = '🧾 Mes dépenses';
@@ -7185,7 +7262,7 @@ function openExpenses(){
     +'<div id="exp-tabs"></div>'
     +'<div id="exp-list"><div class="acc-loading">Chargement...</div></div>'
     +'<button class="btn-submit blue" style="margin-top:1.4rem" onclick="generateExpenseReport()">📄 Générer mon rapport de dépenses</button>'
-    +'<button class="btn-book" style="margin-top:.6rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="renderAccount()">← Retour à Mon espace</button>';
+    +'<button class="btn-book" style="margin-top:.6rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="expensesGoBack()">← Retour</button>';
 
   loadClientExpenses();
 }
@@ -7405,7 +7482,8 @@ function parseReceiptText(text){
   return out;
 }
 
-function openScanExpenseForm(){
+function openScanExpenseForm(returnTo){
+  if(returnTo) _expReturnTo = returnTo;
   document.getElementById('account-title').textContent = '📸 Ajouter une facture';
   document.getElementById('account-body').innerHTML =
     '<div class="alert-err" id="exp-scan-err"></div>'
@@ -7632,6 +7710,55 @@ async function downloadExpenseReportPdf(){
     if(errEl){ errEl.textContent = 'Erreur de génération du PDF — réessaie, ou utilise "Imprimer" à la place.'; errEl.style.display = 'block'; }
   }
   if(btn){ btn.disabled = false; btn.innerHTML = '📄 Télécharger le PDF'; }
+}
+
+/* ── Export PDF de l'historique d'entretien (service_history) — même
+   approche que le rapport de dépenses ci-dessus (jsPDF, gratuit, chargé
+   seulement au besoin). Accessible depuis l'onglet "Historique". ── */
+async function downloadServiceHistoryPdf(){
+  var btn = document.getElementById('hist-pdf-btn');
+  if(btn){ btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Préparation du PDF...'; }
+  try {
+    var snap = await db.collection('service_history').where('client_uid','==',clientUser.uid).get();
+    var list = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
+      .sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+    await loadJsPdfScript();
+    var JsPdfCtor = window.jspdf.jsPDF;
+    var doc = new JsPdfCtor();
+    var y = 18;
+    doc.setFontSize(16); doc.text('Greaz — Historique d\'entretien', 14, y); y+=7;
+    doc.setFontSize(10); doc.setTextColor(110);
+    doc.text('Généré le '+new Date().toLocaleDateString('fr-CA'), 14, y); y+=10;
+    doc.setTextColor(20);
+    doc.setFontSize(9);
+    if(!list.length){ doc.text('Aucun entretien enregistré.', 14, y); y+=6; }
+    list.forEach(function(r){
+      if(y > 272){ doc.addPage(); y = 18; }
+      var dateStr = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      doc.setFont(undefined,'bold'); doc.text(r.title||'Entretien', 14, y);
+      doc.setFont(undefined,'normal');
+      doc.text(r.cost ? Number(r.cost).toLocaleString('fr-CA',{style:'currency',currency:'CAD'}) : '', 196, y, { align:'right' });
+      y+=5;
+      var sub = [dateStr, r.vehicle_label, (r.mechanic_name||r.location)].filter(Boolean).join('  ·  ');
+      if(sub){ doc.setFontSize(8); doc.setTextColor(120); doc.text(sub, 14, y); doc.setTextColor(20); doc.setFontSize(9); y+=5; }
+      if(r.note){
+        doc.setFontSize(8); doc.setTextColor(120);
+        doc.text(doc.splitTextToSize(r.note, 180), 14, y);
+        doc.setTextColor(20); doc.setFontSize(9); y+=5;
+      }
+      y+=3;
+    });
+    y += 5;
+    if(y > 280){ doc.addPage(); y = 18; }
+    doc.setFontSize(8); doc.setTextColor(140);
+    doc.text('Document généré automatiquement par Greaz à partir de ton historique d\'entretien.', 14, y);
+    doc.save('historique-entretien-greaz.pdf');
+    toast('📄 PDF téléchargé ✓', 'ok', 2400);
+  } catch(e){
+    console.log('PDF historique:', e);
+    toast('Erreur de génération du PDF — réessaie plus tard.', 'err', 3200);
+  }
+  if(btn){ btn.disabled = false; btn.innerHTML = '📄 Télécharger mon historique (PDF)'; }
 }
 
 /* ══════════ TRANSFERT DE VÉHICULE ══════════
