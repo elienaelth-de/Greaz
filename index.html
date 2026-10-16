@@ -1314,7 +1314,7 @@ body.logged-in .hero-scroll{display:none}
 
   /* Le nav du haut perd ses liens en mobile → on les remplace par une barre
      d'onglets fixée en bas (pattern app mobile, comme Airbnb/Uber), sinon
-     "Carte" et "Programme" deviennent introuvables sur téléphone. */
+     "Rendez-vous" et "Historique" deviennent introuvables sur téléphone. */
   .mobile-tabbar{display:flex;position:fixed;top:auto;left:0;right:0;bottom:0;z-index:95;height:auto;
     background:rgba(255,255,255,.94);backdrop-filter:blur(20px) saturate(1.6);
     border-top:1px solid rgba(23,26,32,.08);
@@ -1469,7 +1469,7 @@ body.logged-in .hero-scroll{display:none}
   <div class="logo">Gre<span>az</span></div>
   <div class="nav-links">
     <button class="nav-link" onclick="ccRevealMap('')">Carte</button>
-    <button class="nav-link" onclick="document.getElementById('membership').scrollIntoView({behavior:'smooth'})">Programme</button>
+    <button class="nav-link" onclick="ccScrollToForm()">Prendre rendez-vous</button>
     <a class="nav-link" href="greaz-entretien.html">🔧 Vérifier mon auto</a>
   </div>
   <div class="nav-right">
@@ -1493,13 +1493,13 @@ body.logged-in .hero-scroll{display:none}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
     Accueil
   </button>
-  <button class="mtab-btn" id="mtab-map" onclick="mtabGo('map')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-    Carte
+  <button class="mtab-btn" id="mtab-rdv" onclick="mtabGo('rdv')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M12 14v4M10 16h4"/></svg>
+    Rendez-vous
   </button>
-  <button class="mtab-btn" id="mtab-perks" onclick="mtabGo('perks')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3.17A3 3 0 1 0 12 4a3 3 0 1 0-4.83 3H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z"/><path d="M4 11v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8"/><path d="M12 7v13"/></svg>
-    Programme
+  <button class="mtab-btn" id="mtab-hist" onclick="mtabGo('hist')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 3"/></svg>
+    Historique
   </button>
   <button class="mtab-btn" id="mtab-account" onclick="mtabGo('account')">
     <span class="mtab-alert-badge" id="mtab-alert-badge"></span>
@@ -1677,44 +1677,6 @@ body.logged-in .hero-scroll{display:none}
     <div class="stat-item"><div class="stat-num orange">+5</div><div class="stat-label">Garages comparés pour toi</div></div>
   </div>
 </div>
-
-<section class="membership" id="membership">
-  <div class="mb-glow"></div>
-  <div class="mb-inner">
-    <div class="mb-left reveal">
-      <div class="section-label" style="color:var(--gold)">Programme Greaz</div>
-      <h2 class="mb-title">Chaque visite<br><span class="mb-hl">te rapporte.</span></h2>
-      <p class="mb-sub">Crée ton compte gratuit. Enregistre tes véhicules, suis tes rendez-vous, et accumule des points échangeables contre des rabais chez nos pros certifiés.</p>
-      <div class="mb-perks">
-        <div class="mb-perk"><span>🚗</span><div><b>Tes véhicules enregistrés</b><small>Réserve en 2 clics, sans tout retaper</small></div></div>
-        <div class="mb-perk"><span>📋</span><div><b>Ton historique d'entretien</b><small>Tous tes rendez-vous au même endroit</small></div></div>
-        <div class="mb-perk"><span>🎁</span><div><b>10 points par réservation</b><small>200 points = 10 $ de rabais</small></div></div>
-      </div>
-      <button class="mb-cta" onclick="openAccount();renderAuth('signup')">Créer mon compte gratuit →</button>
-    </div>
-    <div class="mb-right reveal reveal-d1">
-      <div class="mb-card">
-        <div class="mb-card-shine"></div>
-        <div class="mb-card-top">
-          <div class="mb-card-logo">Gre<span>az</span></div>
-          <div class="mb-card-tier">🥇 Or</div>
-        </div>
-        <div class="mb-card-pts">520</div>
-        <div class="mb-card-lbl">Points Greaz</div>
-        <div class="mb-card-bar"><div class="mb-card-fill"></div></div>
-        <div class="mb-card-foot">
-          <span>MEMBRE DEPUIS 2026</span>
-          <span>✦✦✦</span>
-        </div>
-      </div>
-      <div class="mb-tiers">
-        <div class="mb-tier"><span>🥉</span><b>Bronze</b><small>0 pt</small></div>
-        <div class="mb-tier"><span>🥈</span><b>Argent</b><small>150 pts</small></div>
-        <div class="mb-tier act"><span>🥇</span><b>Or</b><small>500 pts</small></div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ═══════════ VÉRIFICATEUR DE PRIX (déplacé en bas) ═══════════ -->
 <section class="verifier-sec" id="verifier">
@@ -2760,7 +2722,7 @@ function ccRevealMap(address){
 
 /* Barre d'onglets mobile (remplace le nav du haut, caché sous 640px) */
 function mtabSetActive(id){
-  ['mtab-home','mtab-map','mtab-perks','mtab-account'].forEach(function(bid){
+  ['mtab-home','mtab-rdv','mtab-hist','mtab-account'].forEach(function(bid){
     var el = document.getElementById(bid);
     if(el) el.classList.toggle('active', bid === id);
   });
@@ -2769,13 +2731,15 @@ function mtabGo(target){
   if(target === 'home'){
     mtabSetActive('mtab-home');
     window.scrollTo({ top:0, behavior:'smooth' });
-  } else if(target === 'map'){
-    mtabSetActive('mtab-map');
-    ccRevealMap('');
-  } else if(target === 'perks'){
-    mtabSetActive('mtab-perks');
-    var m = document.getElementById('membership');
-    if(m) m.scrollIntoView({ behavior:'smooth' });
+  } else if(target === 'rdv'){
+    mtabSetActive('mtab-rdv');
+    ccScrollToForm();
+  } else if(target === 'hist'){
+    mtabSetActive('mtab-hist');
+    document.getElementById('overlay-account').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if(clientUser && clientData) renderHistoryView();
+    else renderAuth('login');
   } else if(target === 'account'){
     mtabSetActive('mtab-account');
     openAccount();
@@ -5912,6 +5876,12 @@ function renderAccount(){
 
     + (vehicles.length ? '<div class="acc-section">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection() : '')
 
+    +'<div class="acc-join" onclick="openRentalForm()" style="margin-top:12px;background:linear-gradient(135deg,var(--green),#00875A);box-shadow:0 6px 20px rgba(0,168,98,.28)">'
+    +'<div class="acc-join-l"><div class="acc-join-t">💰 Loue ton auto — jusqu\'à 50$/jour</div>'
+    +'<div class="acc-join-d">Sois client Greaz, suis ta fréquence d\'entretien, fais de l\'argent avec ton char</div></div>'
+    +'<div class="acc-join-btn" style="color:#00875A">Ça m\'intéresse →</div>'
+    +'</div>'
+
     + (vehicles.length ? '<div class="acc-section">🧾 Mes dépenses <button class="acc-add" onclick="openExpenses()">Ouvrir →</button></div>'
         + '<div class="acc-empty" style="cursor:pointer;padding:1.1rem 1.25rem" onclick="openExpenses()">'
         + '<div class="acc-empty-t">⛽ 🛢️ 🅿️ 🛡️ — suis toutes tes dépenses auto</div>'
@@ -5925,6 +5895,29 @@ function renderAccount(){
     + renderRewards(pts)
 
     +'<button class="btn-book" style="margin-top:2rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="clientLogout()">Me déconnecter</button>';
+
+  loadClientDemandes();
+  loadClientRdvs();
+  loadClientServiceHistory();
+}
+
+/* ── Onglet "Historique" (barre d'onglets mobile) : version allégée de
+   "Mon espace" qui ne montre QUE les réparations à venir (demandes en
+   cours + rendez-vous confirmés) et l'historique/factures — rien d'autre
+   (pas de profil, pas de véhicules, pas de calendrier d'entretien, pas de
+   récompenses). ── */
+function renderHistoryView(){
+  if(!clientData){ renderAuth('login'); return; }
+  document.getElementById('account-title').textContent = '🛠️ Historique';
+  document.getElementById('account-body').innerHTML =
+    '<div class="acc-section" style="margin-top:0">📅 Réparations à venir</div>'
+    +'<div id="acc-demandes"><div class="acc-loading">Chargement...</div></div>'
+    +'<div id="acc-rdvs"><div class="acc-loading">Chargement...</div></div>'
+
+    +'<div class="acc-section">🛠️ Historique & économies <button class="acc-add" onclick="openInvoiceForm()">📸 Ajouter une facture</button></div>'
+    +'<div id="acc-history"><div class="acc-loading">Chargement...</div></div>'
+
+    +'<div class="acc-claim-link" onclick="renderAccount()">→ Voir tout Mon espace</div>';
 
   loadClientDemandes();
   loadClientRdvs();
@@ -6083,13 +6076,11 @@ function renderHomeDashboard(){
       + (isApp ? renderHealthGrid(vehicles) : '')
       + (isApp ? '<div class="trouble-banner" onclick="ccScrollToForm()"><span class="trouble-ic">⚠️</span><div style="flex:1"><div class="trouble-t">Un problème avec ton auto ?</div><div class="trouble-s">Bruit, voyant, pneu, démarrage... on est là.</div></div><span class="trouble-arrow">→</span></div>' : '');
 
-  // "Mon profil" et "Mes récompenses" (explications des points) ne sont
-  // affichés QUE dans le tiroir "Mon espace" (renderAccount) — pas ici sur
-  // l'accueil, pour garder l'accueil concentré sur le véhicule et l'action.
-  var leftCol =
-      (vehicles.length ? '<div class="acc-section" style="margin-top:0">📅 Calendrier d\'entretien</div>' + renderMaintenanceSection(true) : '');
-
-  var rightCol =
+  // "Mon profil", "Mes récompenses" (explications des points), le calendrier
+  // d'entretien et "Loue ton auto" ne sont affichés QUE dans le tiroir "Mon
+  // espace" (renderAccount) — pas ici sur l'accueil, pour garder l'accueil
+  // concentré sur le véhicule et l'action.
+  var dashCol =
       (isApp ? '<div id="home-spend-card"></div>' : '')
       +'<div class="chat-cta" onclick="openChatDrawer()">'
       +'<span class="chat-cta-ic">💬<span class="chat-cta-online"></span></span>'
@@ -6098,11 +6089,6 @@ function renderHomeDashboard(){
       +'<div style="font-size:11.5px;color:var(--faint);margin-top:2px">Une question sur ton char ? Écris-nous ici</div></div>'
       +'<span id="home-chat-badge"></span>'
       +'<span class="chat-cta-arrow">→</span>'
-      +'</div>'
-      +'<div class="acc-join" onclick="homeOpenRentalForm()" style="margin-top:12px;background:linear-gradient(135deg,var(--green),#00875A);box-shadow:0 6px 20px rgba(0,168,98,.28)">'
-      +'<div class="acc-join-l"><div class="acc-join-t">💰 Loue ton auto — jusqu\'à 50$/jour</div>'
-      +'<div class="acc-join-d">Sois client Greaz, suis ta fréquence d\'entretien, fais de l\'argent avec ton char</div></div>'
-      +'<div class="acc-join-btn" style="color:#00875A">Ça m\'intéresse →</div>'
       +'</div>'
       + (isMember() ? '' : '<div class="acc-join" onclick="goToSubscribe()" style="margin-top:1.5rem">'
         + '<div class="acc-join-l"><div class="acc-join-t">🛡️ Deviens membre Greaz</div>'
@@ -6119,10 +6105,7 @@ function renderHomeDashboard(){
     + vehTopHtml
     +'<div class="ticker-wrap" id="home-ticker-wrap"></div>'
     +'<div id="home-value-wrap"></div>'
-    +'<div class="home-dash-grid">'
-    +'<div class="home-dash-col">'+leftCol+'</div>'
-    +'<div class="home-dash-col">'+rightCol+'</div>'
-    +'</div>'
+    + dashCol
     +'<button class="btn-book" style="margin-top:1.5rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="clientLogout()">Me déconnecter</button>';
 
   loadClientServiceHistory('home-acc-history');
