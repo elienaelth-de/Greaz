@@ -829,6 +829,16 @@ body.map-is-active .map-lock-btn{display:flex}
 .chip-btn:active{transform:scale(.95)}
 .chip-btn.sel{background:var(--bluelt);border-color:var(--blue)}
 .chip-btn .chip-ic{margin-right:5px}
+/* ── NIV (décodage gratuit) + question historique du wizard d'inscription ── */
+.vin-row{display:flex;gap:8px;align-items:stretch}
+.vin-row input{flex:1}
+.vin-btn{flex-shrink:0;background:var(--white);color:#fff;border:none;padding:0 16px;border-radius:var(--r);font-family:var(--body);font-weight:700;font-size:12.5px;cursor:pointer;transition:opacity .2s}
+.vin-btn:disabled{opacity:.6;cursor:default}
+.niv-msg-wiz{font-size:11.5px;margin-top:7px;padding:8px 10px;border-radius:var(--r);display:none;line-height:1.5}
+.niv-msg-wiz.ok{display:block;background:#E4F7EE;color:#065F46}
+.niv-msg-wiz.err{display:block;background:#FCEBEE;color:#B3261E}
+.hist-detail{width:100%;margin-top:8px;padding:10px 12px;background:#F4F4F4;border:1.5px solid transparent;border-radius:var(--r);font-family:var(--body);font-size:13.5px;color:var(--white);resize:vertical;min-height:44px;outline:none}
+.hist-detail:focus{border-color:var(--blue);background:#fff}
 .assist-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F4F4F4;border-radius:var(--r2);padding:12px 14px;margin-bottom:1rem;cursor:pointer}
 .assist-toggle-t{font-size:12.5px;font-weight:700;color:var(--white)}
 .assist-toggle-d{font-size:11px;color:var(--faint);margin-top:2px}
@@ -5109,7 +5119,50 @@ var _signupStep = 1;
 var _signupData = {};
 var SIGNUP_TOTAL_STEPS = 4;
 var SIGNUP_BONUS_PTS = 20;
-var CAR_BRANDS = ['Toyota','Honda','Ford','Chevrolet','Hyundai','Kia','Mazda','Nissan','BMW','Mercedes','Volkswagen','Subaru','Autre'];
+// Même liste de marques que le Plan d'entretien (greaz-entretien.html) — harmonisée ici pour
+// que les deux outils se comprennent pareil, et que le véhicule enregistré à l'inscription
+// profite des mêmes suggestions de modèles et de la même détection électrique/hybride.
+var CAR_BRANDS = ['Acura','Alfa Romeo','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Fiat','Ford','Genesis','GMC','Honda','Hyundai','Infiniti','Jaguar','Jeep','Kia','Land Rover','Lexus','Lincoln','Mazda','Mercedes-Benz','Mini','Mitsubishi','Nissan','Pontiac','Porsche','RAM','Saab','Scion','Subaru','Suzuki','Tesla','Toyota','Volkswagen','Volvo','Autre'];
+var MODELS_BY_MAKE = {
+  'Toyota':['Corolla','Camry','RAV4','RAV4 Prime 🔋','Prius 🔋','Highlander','4Runner','Tacoma','Tundra','Sienna','Corolla Cross','C-HR','Venza','GR86','bZ4X ⚡'],
+  'Honda':['Civic','Accord','CR-V','HR-V','Pilot','Odyssey','Ridgeline','Passport','Prologue ⚡'],
+  'Mazda':['Mazda3','CX-30','CX-5','CX-50','CX-70','CX-90','MX-5 Miata','MX-30 ⚡'],
+  'Nissan':['Versa','Sentra','Altima','Kicks','Rogue','Murano','Pathfinder','Frontier','Titan','Leaf ⚡','Ariya ⚡'],
+  'Hyundai':['Elantra','Sonata','Venue','Kona','Kona Electric ⚡','Tucson','Santa Fe','Palisade','Ioniq 5 ⚡','Ioniq 6 ⚡'],
+  'Kia':['Rio','Forte','K5','Soul','Seltos','Sportage','Sorento','Telluride','Carnival','Niro','EV6 ⚡','EV9 ⚡'],
+  'Subaru':['Impreza','Legacy','Crosstrek','Forester','Outback','Ascent','WRX','BRZ','Solterra ⚡'],
+  'Ford':['Fiesta','Focus','Fusion','Escape','Edge','Explorer','Expedition','Bronco','Bronco Sport','Ranger','Maverick','F-150','F-150 Lightning ⚡','Mustang','Mustang Mach-E ⚡'],
+  'Chevrolet':['Spark','Malibu','Trax','Trailblazer','Equinox','Equinox EV ⚡','Blazer','Blazer EV ⚡','Traverse','Colorado','Silverado','Camaro','Corvette','Bolt EV ⚡'],
+  'GMC':['Terrain','Acadia','Yukon','Canyon','Sierra','Hummer EV ⚡'],
+  'Dodge':['Charger','Challenger','Durango','Hornet'],
+  'Jeep':['Renegade','Compass','Cherokee','Grand Cherokee','Wrangler','Wrangler 4xe 🔋','Gladiator','Wagoneer'],
+  'RAM':['1500','2500','3500','ProMaster'],
+  'Volkswagen':['Jetta','Golf','GTI','Passat','Taos','Tiguan','Atlas','Atlas Cross Sport','ID.4 ⚡'],
+  'BMW':['Série 2','Série 3','Série 4','Série 5','Série 7','X1','X3','X4','X5','X6','X7','Z4','i4 ⚡','iX ⚡'],
+  'Mercedes-Benz':['Classe A','Classe C','Classe E','Classe S','GLA','GLB','GLC','GLE','GLS','EQB ⚡','EQE ⚡','EQS ⚡'],
+  'Audi':['A3','A4','A5','A6','A7','Q3','Q5','Q7','Q8','e-tron ⚡','Q4 e-tron ⚡'],
+  'Lexus':['IS','ES','LS','UX','NX','RX','GX','LX','RZ ⚡'],
+  'Acura':['Integra','TLX','RDX','MDX','ZDX ⚡'],
+  'Volvo':['S60','S90','V60','XC40','XC60','XC90','C40 Recharge ⚡','EX30 ⚡'],
+  'Tesla':['Model 3 ⚡','Model Y ⚡','Model S ⚡','Model X ⚡','Cybertruck ⚡'],
+  'Mitsubishi':['Mirage','RVR','Eclipse Cross','Outlander','Outlander PHEV 🔋'],
+  'Chrysler':['300','Pacifica','Grand Caravan'],
+  'Buick':['Encore GX','Envista','Envision','Enclave'],
+  'Cadillac':['CT4','CT5','XT4','XT5','XT6','Escalade','Lyriq ⚡'],
+  'Lincoln':['Corsair','Nautilus','Aviator','Navigator'],
+  'Infiniti':['Q50','QX50','QX55','QX60','QX80'],
+  'Mini':['Cooper','Cooper S','Cooper SE ⚡','Countryman','Countryman SE ALL4 🔋','Clubman','Cabriolet','John Cooper Works'],
+  'Genesis':['G70','G80','G90','GV60 ⚡','GV70','GV80'],
+  'Porsche':['718 Cayman','718 Boxster','911','Macan','Cayenne','Panamera','Taycan ⚡'],
+  'Land Rover':['Defender','Discovery','Discovery Sport','Range Rover','Range Rover Sport','Range Rover Evoque','Range Rover Velar'],
+  'Jaguar':['XE','XF','F-Type','E-Pace','F-Pace','I-Pace ⚡'],
+  'Alfa Romeo':['Giulia','Stelvio','Tonale'],
+  'Fiat':['500','500X','500L'],
+  'Scion':['tC','xB','xD','iQ','FR-S'],
+  'Saab':['9-3','9-5','9-2X','9-4X'],
+  'Pontiac':['G5','G6','Vibe','Torrent','Solstice','Grand Prix'],
+  'Suzuki':['Swift+','SX4','Grand Vitara','Kizashi'],
+};
 var INSURERS = ['Intact','Desjardins','Belairdirect','TD Assurance','CAA','Promutuel','Beneva','Economical','Autre'];
 var INSURER_DURATIONS = ["Moins d'1 an","1 à 3 ans","3 à 5 ans","5 ans et plus"];
 
@@ -5298,7 +5351,7 @@ function updateMaintenanceAlertBadge(){
 }
 
 function startSignupWizard(){
-  _signupStep = 1; _signupData = {};
+  _signupStep = 1; _signupData = {}; _signupDetectedFuel = '';
   renderSignupStep(1);
 }
 
@@ -5349,12 +5402,17 @@ function renderSignupStep(step){
     html += '<div class="wiz-step-lbl">Étape 3 sur '+SIGNUP_TOTAL_STEPS+'</div>'
       +'<div class="wiz-title">Parle-nous de ton char 🚗</div>'
       +'<div class="wiz-sub">Comme ça on prépare déjà tes prochaines demandes.</div>'
-      +'<div class="ff"><label>Marque</label>'+wizChips('wiz-brand', CAR_BRANDS, _signupData.veh_make)+'</div>'
-      +'<div class="ff2"><div class="ff"><label>Modèle</label><input type="text" id="s-vmodel" placeholder="Corolla" value="'+(_signupData.veh_model||'')+'"></div>'
+      +'<div class="ff"><label>NIV (optionnel, mais ça aide pas mal)</label>'
+      +'<div class="vin-row"><input type="text" id="s-vin" placeholder="17 caractères, sur ton enregistrement" maxlength="17" style="text-transform:uppercase" value="'+(_signupData.niv||'')+'"><button type="button" class="vin-btn" id="s-vin-btn" onclick="decodeSignupNiv()">Décoder</button></div>'
+      +'<div class="niv-msg-wiz" id="s-vin-msg"></div></div>'
+      +'<div class="ff"><label>Marque</label><select id="s-vmake" onchange="fillVehModelSuggestions()">'+vehMakeOptions(_signupData.veh_make)+'</select></div>'
+      +'<div class="ff2"><div class="ff"><label>Modèle</label><input type="text" id="s-vmodel" list="s-vmodel-list" placeholder="Corolla" value="'+(_signupData.veh_model||'')+'"><datalist id="s-vmodel-list"></datalist></div>'
       +'<div class="ff"><label>Année</label><select id="s-vyear">'+yearOptions(_signupData.veh_year)+'</select></div></div>'
+      +'<div class="ff"><label>Ton dernier rendez-vous sur ce véhicule, c\'était quand ?</label><select id="s-last-visit">'+lastVisitOptions(_signupData.last_visit_timeframe)+'</select></div>'
       +'<div class="ff"><label>Comptant ou financé ?</label>'+wizChips('wiz-financed', ['Comptant','Financé / Crédit'], _signupData.veh_financed, {'Comptant':'💵','Financé / Crédit':'🏦'})+'</div>'
       +'<div class="ff"><label>Tu t\'en sers pour...</label>'+wizChips('wiz-usage', ['Usage personnel','Livraison','Taxi / VTC (Uber...)','Autre usage commercial'], _signupData.veh_usage, {'Usage personnel':'🏠','Livraison':'📦','Taxi / VTC (Uber...)':'🚕','Autre usage commercial':'💼'})+'</div>'
       +'<div class="wiz-nav"><button type="button" class="wiz-back" onclick="signupBack()">← Retour</button><button class="btn-submit blue" id="wiz-btn" onclick="signupNext()">Continuer →</button></div>';
+    setTimeout(fillVehModelSuggestions, 0);
   } else if(step===4){
     html += '<div class="wiz-step-lbl">Étape 4 sur '+SIGNUP_TOTAL_STEPS+' · Dernière !</div>'
       +'<div class="wiz-title">Ton assurance 🛡️</div>'
@@ -5371,6 +5429,149 @@ function yearOptions(sel){
   var o = '<option value="">Année</option>';
   for(var y=2026;y>=1990;y--){ o+='<option'+(String(sel)===String(y)?' selected':'')+'>'+y+'</option>'; }
   return o;
+}
+function vehMakeOptions(sel){
+  var o = '<option value="">Choisis ta marque...</option>';
+  CAR_BRANDS.forEach(function(m){ o += '<option'+(sel===m?' selected':'')+'>'+m+'</option>'; });
+  return o;
+}
+function lastVisitOptions(sel){
+  var opts = [
+    ['', 'Optionnel — choisis si tu sais'],
+    ['Moins de 3 mois', 'Il y a moins de 3 mois'],
+    ['3 à 6 mois', 'Il y a 3 à 6 mois'],
+    ['6 à 12 mois', 'Il y a 6 à 12 mois'],
+    ["Plus d'un an", "Il y a plus d'un an"],
+    ['Je ne me souviens pas', 'Je m\'en souviens pas'],
+  ];
+  return opts.map(function(o){ return '<option value="'+o[0]+'"'+(sel===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
+}
+// Remplit les suggestions de modèle (datalist) selon la marque choisie — un champ texte avec
+// suggestions plutôt qu'un menu fermé, pour que "Autre" (ou une marque pas dans la liste) puisse
+// quand même taper un modèle librement.
+function fillVehModelSuggestions(){
+  var makeSel = document.getElementById('s-vmake');
+  var dl = document.getElementById('s-vmodel-list');
+  if(!makeSel || !dl) return;
+  var list = MODELS_BY_MAKE[makeSel.value] || [];
+  dl.innerHTML = list.map(function(m){ return '<option value="'+m+'">'; }).join('');
+}
+
+/* ── NIV (décodage gratuit, même service NHTSA que le Plan d'entretien) ── */
+async function fetchJsonReliable(url, timeoutMs){
+  var attempts = 0, lastErr = null;
+  while(attempts < 2){
+    attempts++;
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = controller ? setTimeout(function(){ controller.abort(); }, timeoutMs || 8000) : null;
+    try {
+      var res = await fetch(url, controller ? {signal:controller.signal} : {});
+      if(timer) clearTimeout(timer);
+      if(!res.ok) throw new Error('http '+res.status);
+      return await res.json();
+    } catch(e){
+      if(timer) clearTimeout(timer);
+      lastErr = e;
+      if(attempts < 2){ await new Promise(function(r){ setTimeout(r, 500); }); }
+    }
+  }
+  throw lastErr;
+}
+var _signupDetectedFuel = ''; // rempli par le NIV si dispo, sinon deviné via le suffixe ⚡/🔋 du modèle
+async function decodeSignupNiv(){
+  var input = document.getElementById('s-vin');
+  var vin = input.value.trim().toUpperCase();
+  var msg = document.getElementById('s-vin-msg');
+  var btn = document.getElementById('s-vin-btn');
+  msg.className = 'niv-msg-wiz';
+  if(vin.length !== 17){
+    msg.textContent = 'Un NIV a 17 caractères (t\'en as entré '+vin.length+'). Vérifie sur ton enregistrement ou dans le coin du pare-brise.';
+    msg.className = 'niv-msg-wiz err';
+    return;
+  }
+  btn.disabled = true;
+  var oldTxt = btn.textContent;
+  btn.textContent = '...';
+  try {
+    var data = await fetchJsonReliable('https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/' + encodeURIComponent(vin) + '?format=json', 8000);
+    var r = data.Results && data.Results[0];
+    if(!r || !r.Make){
+      msg.textContent = 'On a pas réussi à décoder ce NIV. Vérifie-le, ou entre les infos à la main en dessous.';
+      msg.className = 'niv-msg-wiz err';
+      return;
+    }
+    var applied = applySignupDecodedVehicle(r);
+    if(applied.length){
+      msg.textContent = '✓ Rempli automatiquement : ' + applied.join(' · ') + '. Vérifie pis corrige au besoin en dessous.';
+      msg.className = 'niv-msg-wiz ok';
+    } else {
+      msg.textContent = 'Le NIV a été lu, mais on a rien pu remplir automatiquement. Entre les infos à la main en dessous.';
+      msg.className = 'niv-msg-wiz err';
+    }
+  } catch(e){
+    var isTimeout = e && (e.name === 'AbortError');
+    msg.textContent = isTimeout
+      ? 'Le service de décodage prend trop de temps à répondre. Entre les infos à la main en dessous — c\'est aussi rapide.'
+      : 'Impossible de joindre le service de décodage en ce moment. Entre les infos à la main en dessous.';
+    msg.className = 'niv-msg-wiz err';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldTxt;
+  }
+}
+function applySignupDecodedVehicle(r){
+  var applied = [];
+  var decMake = (r.Make || '').trim();
+  var decModel = (r.Model || '').trim();
+  var decYear = parseInt(r.ModelYear, 10) || null;
+  var makeSel = document.getElementById('s-vmake');
+  var matchedMake = null;
+  if(decMake){
+    for(var i=0;i<CAR_BRANDS.length;i++){
+      if(CAR_BRANDS[i].toLowerCase() === decMake.toLowerCase()){ matchedMake = CAR_BRANDS[i]; break; }
+    }
+  }
+  if(matchedMake){
+    makeSel.value = matchedMake;
+    fillVehModelSuggestions();
+    applied.push(matchedMake);
+  } else if(decMake){
+    makeSel.value = 'Autre';
+    fillVehModelSuggestions();
+    applied.push(decMake + ' (marque pas dans notre liste — choisie comme "Autre")');
+  }
+  if(decModel){
+    document.getElementById('s-vmodel').value = decModel;
+    applied.push(decModel);
+  }
+  if(decYear){
+    var yearSel = document.getElementById('s-vyear');
+    var hasYear = false;
+    for(var k=0;k<yearSel.options.length;k++){ if(parseInt(yearSel.options[k].value, 10) === decYear){ hasYear = true; break; } }
+    if(hasYear){ yearSel.value = String(decYear); applied.push(String(decYear)); }
+  }
+  // Motorisation déduite du NIV — sert à adapter le ton des questions post-inscription,
+  // et à préremplir le carburant du véhicule sans faire deviner la personne.
+  var fuel = ((r.FuelTypePrimary || '') + ' ' + (r.FuelTypeSecondary || '') + ' ' + (r.ElectrificationLevel || '')).toLowerCase();
+  if(fuel.indexOf('electric') !== -1 && fuel.indexOf('hybrid') === -1 && fuel.indexOf('phev') === -1 && fuel.indexOf('mild') === -1){
+    _signupDetectedFuel = 'Électrique';
+  } else if(fuel.indexOf('hybrid') !== -1 || fuel.indexOf('phev') !== -1){
+    _signupDetectedFuel = 'Hybride';
+  } else if(fuel.indexOf('diesel') !== -1){
+    _signupDetectedFuel = 'Diesel';
+  } else if(fuel.indexOf('gasoline') !== -1 || fuel.indexOf('flex') !== -1 || fuel.indexOf('e85') !== -1){
+    _signupDetectedFuel = 'Essence';
+  }
+  return applied;
+}
+// Si pas de NIV, on devine la motorisation via le suffixe du modèle (⚡ = électrique, 🔋 = hybride
+// rechargeable) — même convention que le Plan d'entretien, pour rester cohérent.
+function guessSignupFuel(){
+  if(_signupDetectedFuel) return _signupDetectedFuel;
+  var model = (document.getElementById('s-vmodel').value||'');
+  if(model.indexOf('⚡') !== -1) return 'Électrique';
+  if(model.indexOf('🔋') !== -1) return 'Hybride';
+  return 'Essence';
 }
 
 /* ── Section d'assistance optionnelle (booking + demande rapide) ──
@@ -5455,11 +5656,14 @@ async function signupNext(){
     _signupStep=3; renderSignupStep(3); return;
   }
   if(_signupStep===3){
-    var brand=chipVal('wiz-brand'), financed=chipVal('wiz-financed');
+    var brand=val('s-vmake'), financed=chipVal('wiz-financed');
     if(!brand){ errEl.textContent='Choisis la marque de ton véhicule (ou "Autre").'; errEl.style.display='block'; return; }
     if(!financed){ errEl.textContent='Dis-nous si ton auto est comptant ou financée.'; errEl.style.display='block'; return; }
-    _signupData.veh_make=brand; _signupData.veh_model=val('s-vmodel'); _signupData.veh_year=val('s-vyear'); _signupData.veh_financed=financed;
+    _signupData.niv=val('s-vin');
+    _signupData.veh_make=brand; _signupData.veh_model=val('s-vmodel').replace(/[⚡🔋]/g,'').trim(); _signupData.veh_year=val('s-vyear'); _signupData.veh_financed=financed;
     _signupData.veh_usage=chipVal('wiz-usage');
+    _signupData.veh_fuel=guessSignupFuel();
+    _signupData.last_visit_timeframe=val('s-last-visit');
     _signupStep=4; renderSignupStep(4); return;
   }
   if(_signupStep===4){
@@ -5480,7 +5684,7 @@ async function finalizeSignup(){
     var cred = await firebase.auth().createUserWithEmailAndPassword(d.email, d.pass);
     var vehicles = [];
     if(d.veh_make){
-      vehicles.push({ vehicle_id:genVehicleId(), make:d.veh_make, model:d.veh_model||'', year:d.veh_year||'', financed:d.veh_financed||'', plate:'', km:'', color:'', fuel:'', vin:'', usage:d.veh_usage||'' });
+      vehicles.push({ vehicle_id:genVehicleId(), make:d.veh_make, model:d.veh_model||'', year:d.veh_year||'', financed:d.veh_financed||'', plate:'', km:'', color:'', fuel:d.veh_fuel||'', vin:d.niv||'', usage:d.veh_usage||'', last_visit_timeframe:d.last_visit_timeframe||'' });
     }
     await db.collection('clients').doc(cred.user.uid).set({
       prenom: d.prenom, nom: d.nom||'', email: d.email, phone: d.phone,
@@ -5492,7 +5696,10 @@ async function finalizeSignup(){
       created_at: firebase.firestore.FieldValue.serverTimestamp(),
     });
     await loadClientProfile(cred.user);
-    renderAccount();
+    // On a le compte pis le char — plutôt que de foncer direct sur le tableau de bord, on propose
+    // (sans obliger) les 7 questions sur l'historique d'entretien : c'est ce qui rend nos rappels
+    // et nos recommandations vraiment justes pour CE véhicule-là, pas des moyennes génériques.
+    if(vehicles.length){ renderVehicleHistoryPrompt(); } else { renderAccount(); }
     setTimeout(function(){ spawnConfetti(document.querySelector('#overlay-account .drawer')); }, 150);
     toast('🎉 Bienvenue dans la famille Greaz, '+d.prenom+' ! +'+SIGNUP_BONUS_PTS+' points pour ton profil complet.', 'ok', 4500);
   } catch(e){
@@ -5504,6 +5711,114 @@ async function finalizeSignup(){
     errEl.textContent = msg; errEl.style.display='block';
     btn.disabled=false; btn.innerHTML='🎉 Créer mon compte';
   }
+}
+
+/* ── Questions sur l'historique d'entretien, proposées juste après la création du compte ──
+   Jamais obligatoire (la personne peut "Passer"), mais présenté avec l'importance que ça a
+   réellement : plus on connaît l'historique réel du véhicule, plus nos rappels et nos
+   recommandations sont justes pour CE véhicule-là, pas des moyennes génériques par kilométrage. */
+var HIST_Q2_OPTIONS = ['Vidange','Pneus','Freins','Autre','Inconnu'];
+function wizPickChipMulti(groupId, idx, exclusive){
+  var wrap = document.getElementById(groupId); if(!wrap) return;
+  var btns = wrap.querySelectorAll('.chip-btn');
+  var picked = btns[idx];
+  if(!picked) return;
+  if(exclusive){
+    btns.forEach(function(b){ b.classList.remove('sel'); });
+    picked.classList.add('sel');
+  } else {
+    btns.forEach(function(b){ if(b.dataset.exclusive==='1') b.classList.remove('sel'); });
+    picked.classList.toggle('sel');
+  }
+  var selected = [];
+  btns.forEach(function(b){ if(b.classList.contains('sel')) selected.push(b.getAttribute('data-val')); });
+  wrap.dataset.value = JSON.stringify(selected);
+}
+function histMultiChips(groupId, options, exclusiveOption){
+  return '<div class="chip-grid" id="'+groupId+'" data-value="[]">'+options.map(function(o,i){
+    var excl = (o === exclusiveOption) ? ' data-exclusive="1"' : '';
+    return '<button type="button" class="chip-btn" data-val="'+o+'"'+excl+' onclick="wizPickChipMulti(\''+groupId+'\','+i+','+(o===exclusiveOption)+')">'+o+'</button>';
+  }).join('')+'</div>';
+}
+function getHistChipVal(groupId){ var e=document.getElementById(groupId); return e ? (e.dataset.value||'') : ''; }
+function getHistChipMulti(groupId){ var e=document.getElementById(groupId); try { return e ? (JSON.parse(e.dataset.value||'[]')) : []; } catch(err){ return []; } }
+function toggleHistDetail(id, show){
+  var t = document.getElementById(id); if(!t) return;
+  if(show) t.style.display='block'; else { t.style.display='none'; t.value=''; }
+}
+function toggleHistUnknown(){
+  var btn = document.getElementById('h-date-unknown');
+  var dateInp = document.getElementById('h-date');
+  var nowSel = !btn.classList.contains('sel');
+  btn.classList.toggle('sel', nowSel);
+  dateInp.disabled = nowSel;
+  if(nowSel) dateInp.value = '';
+}
+function renderVehicleHistoryPrompt(){
+  document.getElementById('account-title').textContent = 'Mieux connaître ton auto';
+  var v0 = (clientData && clientData.vehicles && clientData.vehicles[0]) || {};
+  var vehTxt = [v0.year, v0.make, v0.model].filter(Boolean).join(' ');
+  var introTxt = v0.fuel === 'Électrique'
+    ? 'Ta '+(vehTxt||'auto')+' est électrique — quelques questions adaptées pour mieux la suivre.'
+    : (v0.fuel === 'Hybride'
+      ? 'Ta '+(vehTxt||'auto')+' est hybride — on ajuste nos questions en conséquence.'
+      : (vehTxt ? 'Selon ta '+vehTxt+', voici quelques questions pour qu\'on te suive comme du monde.' : 'Voici quelques questions pour qu\'on te suive comme du monde.'));
+  document.getElementById('account-body').innerHTML =
+    '<div class="wiz-bonus">🔧 <span><b>Pourquoi on demande ça :</b> plus on connaît l\'historique réel de ton char, plus nos rappels d\'entretien pis nos recommandations sont justes pour TOI — pas des moyennes génériques basées juste sur le kilométrage. Ça prend 2 minutes.</span></div>'
+    +'<div class="wiz-title">On veut mieux te connaître 🔧</div>'
+    +'<div class="wiz-sub">'+introTxt+'</div>'
+
+    +'<div class="ff"><label>Quand as-tu effectué ton dernier entretien ou ta dernière réparation ?</label>'
+    +'<div class="ff2"><input type="date" id="h-date"><button type="button" class="wiz-back" id="h-date-unknown" onclick="toggleHistUnknown()">Je sais pas</button></div></div>'
+
+    +'<div class="ff"><label>Qu\'est-ce qui a été fait lors de cette visite ?</label>'+histMultiChips('h-q2', HIST_Q2_OPTIONS, 'Inconnu')+'</div>'
+
+    +'<div class="ff"><label>As-tu une facture ou un rapport d\'entretien ?</label>'+wizChips('h-q3', ['Oui','Non','Partiellement'], '')+'</div>'
+
+    +'<div class="ff"><label>As-tu récemment fait inspecter l\'état général de ton véhicule ?</label>'+wizChips('h-q4', ['Oui','Non','Je ne sais pas'], '')+'</div>'
+
+    +'<div class="ff"><label>Le mécanicien a-t-il recommandé des travaux à effectuer ou des éléments à surveiller ?</label>'
+    +'<div class="chip-grid" id="h-q5" data-value=""><button type="button" class="chip-btn" data-val="Oui" onclick="wizPickChip(\'h-q5\',0);toggleHistDetail(\'h-q5-detail\',true)">Oui</button><button type="button" class="chip-btn" data-val="Non" onclick="wizPickChip(\'h-q5\',1);toggleHistDetail(\'h-q5-detail\',false)">Non</button><button type="button" class="chip-btn" data-val="Je ne sais pas" onclick="wizPickChip(\'h-q5\',2);toggleHistDetail(\'h-q5-detail\',false)">Je ne sais pas</button></div>'
+    +'<textarea class="hist-detail" id="h-q5-detail" placeholder="Précise si tu veux (optionnel)" style="display:none"></textarea></div>'
+
+    +'<div class="ff"><label>As-tu remarqué un bruit, une vibration, un voyant ou un changement de comportement ?</label>'
+    +'<div class="chip-grid" id="h-q6" data-value=""><button type="button" class="chip-btn" data-val="Non" onclick="wizPickChip(\'h-q6\',0);toggleHistDetail(\'h-q6-detail\',false)">Non</button><button type="button" class="chip-btn" data-val="Oui" onclick="wizPickChip(\'h-q6\',1);toggleHistDetail(\'h-q6-detail\',true)">Oui — préciser</button></div>'
+    +'<textarea class="hist-detail" id="h-q6-detail" placeholder="Décris ce que t\'as remarqué" style="display:none"></textarea></div>'
+
+    +'<div class="ff"><label>Veux-tu que Greaz te rappelle tes prochaines échéances d\'entretien ?</label>'+wizChips('h-q7', ['Oui','Non'], 'Oui')+'</div>'
+
+    +'<div class="wiz-nav"><button class="btn-submit blue" id="hist-btn" onclick="saveVehicleHistoryAnswers()">Terminer →</button></div>'
+    +'<div style="text-align:center;margin-top:12px"><span style="font-size:12.5px;color:var(--muted);cursor:pointer;text-decoration:underline" onclick="skipVehicleHistoryPrompt()">Passer pour l\'instant</span></div>';
+}
+async function saveVehicleHistoryAnswers(){
+  var btn = document.getElementById('hist-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Un instant...';
+  var dateUnknown = document.getElementById('h-date-unknown').classList.contains('sel');
+  var answers = {
+    last_service_date: dateUnknown ? '' : (document.getElementById('h-date').value||''),
+    last_service_unknown: dateUnknown,
+    last_service_type: getHistChipMulti('h-q2'),
+    has_invoice: getHistChipVal('h-q3'),
+    recent_inspection: getHistChipVal('h-q4'),
+    mechanic_recommendation: getHistChipVal('h-q5'),
+    mechanic_recommendation_detail: (document.getElementById('h-q5-detail').value||'').trim(),
+    noise_issue: getHistChipVal('h-q6'),
+    noise_issue_detail: (document.getElementById('h-q6-detail').value||'').trim(),
+  };
+  var wantsReminders = getHistChipVal('h-q7') !== 'Non';
+  try {
+    if(clientUser && clientData){
+      var vehicles = (clientData.vehicles||[]).slice();
+      if(vehicles.length){ vehicles[0] = Object.assign({}, vehicles[0], answers); }
+      await db.collection('clients').doc(clientUser.uid).update({ vehicles: vehicles, wants_maintenance_reminders: wantsReminders });
+      clientData.vehicles = vehicles; clientData.wants_maintenance_reminders = wantsReminders;
+    }
+  } catch(e){ console.log('Sauvegarde historique véhicule:', e); }
+  toast('Merci ! On va s\'en servir pour mieux te suivre. 🔧', 'ok', 4000);
+  renderAccount();
+}
+function skipVehicleHistoryPrompt(){
+  renderAccount();
 }
 
 function resetPass(){
