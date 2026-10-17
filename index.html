@@ -1763,6 +1763,11 @@ body.logged-in .hero-scroll{display:none}
   <div class="footer-logo">Gre<span>az</span></div>
   <p style="margin-bottom:.6rem">La plateforme automobile au Québec</p>
   <p>© 2026 Greaz — Tous droits réservés</p>
+  <p style="margin-top:.5rem;font-size:11px">
+    <span style="text-decoration:underline;cursor:pointer" onclick="openLegalPage('terms')">Conditions d'utilisation</span>
+    <span style="opacity:.5"> · </span>
+    <span style="text-decoration:underline;cursor:pointer" onclick="openLegalPage('privacy')">Politique de confidentialité</span>
+  </p>
 </footer>
 
 <!-- FAB : retour rapide à l'annuaire quand on a défilé loin -->
@@ -5907,11 +5912,132 @@ function renderAccount(){
     +'<div class="acc-section">🎁 Mes récompenses</div>'
     + renderRewards(pts)
 
-    +'<button class="btn-book" style="margin-top:2rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="clientLogout()">Me déconnecter</button>';
+    +'<button class="btn-book" style="margin-top:2rem;background:#F4F4F4;border:1px solid var(--line);color:#5C5E62" onclick="clientLogout()">Me déconnecter</button>'
+
+    +'<p style="margin-top:1.1rem;text-align:center;font-size:11px;color:var(--faint)">'
+    +'<span style="text-decoration:underline;cursor:pointer" onclick="openLegalPage(\'terms\')">Conditions d\'utilisation</span>'
+    +'<span style="opacity:.5"> · </span>'
+    +'<span style="text-decoration:underline;cursor:pointer" onclick="openLegalPage(\'privacy\')">Politique de confidentialité</span>'
+    +'</p>';
 
   loadClientDemandes();
   loadClientRdvs();
   loadClientServiceHistory();
+}
+
+/* ══════════ CONDITIONS D'UTILISATION + POLITIQUE DE CONFIDENTIALITÉ ══════════
+   Accessibles depuis le pied de page (visiteur anonyme) et depuis "Mon espace"
+   (client connecté) — lien discret, pas de pop-up qui dérange personne, mais
+   toujours accessible en 1 clic, ce qui est nécessaire pour qu'ils soient
+   légalement valides.
+
+   ⚠️ IMPORTANT : les crochets [comme ceci] sont des informations que SEUL toi
+   tu peux fournir (nom légal exact de l'entreprise, adresse, courriel de
+   contact). Remplace-les avant de considérer ce texte comme final. Ce texte
+   est écrit pour être solide et conforme à la Loi 25 du Québec (protection
+   des renseignements personnels), mais je suis pas avocat — pour un vrai
+   blindage légal, fais-le valider par un juriste avant de t'y fier à 100%,
+   surtout la section sur l'hébergement des données hors Québec (à confirmer
+   selon où Firebase stocke vraiment tes données). */
+function legalTermsHtml(){
+  var S = 'font-weight:700;color:var(--white);font-size:14px;margin:1.3rem 0 .5rem';
+  var P = 'font-size:12.5px;color:var(--chrome);line-height:1.65;margin-bottom:.5rem';
+  return '<div style="'+P+';color:var(--faint)">Dernière mise à jour : 17 octobre 2026.</div>'
+
+    +'<div style="'+S+'">1. Objet</div>'
+    +'<div style="'+P+'">Greaz ("nous", "Greaz") est une plateforme québécoise qui met en relation les automobilistes ("tu", "l\'usager") avec des garages et mécaniciens partenaires indépendants, et qui offre des outils pour suivre l\'entretien, les dépenses et l\'historique d\'un véhicule. En utilisant le site ou l\'application Greaz, tu acceptes les présentes conditions.</div>'
+
+    +'<div style="'+S+'">2. Qui peut utiliser Greaz</div>'
+    +'<div style="'+P+'">Tu dois avoir au moins 18 ans et fournir des renseignements exacts (identité, véhicule, coordonnées). Tu es responsable de garder tes identifiants de connexion confidentiels et de toute activité faite depuis ton compte.</div>'
+
+    +'<div style="'+S+'">3. La nature du service — Greaz est un intermédiaire</div>'
+    +'<div style="'+P+'">Les garages, mécaniciens et autres professionnels présentés sur Greaz sont des entreprises indépendantes, pas des employés ni des mandataires de Greaz. Greaz facilite la mise en relation, la prise de rendez-vous et le suivi — mais n\'effectue pas elle-même les réparations et n\'est pas responsable de la qualité, du prix ou des délais du travail exécuté par un partenaire. En cas de problème avec un service reçu, le recours est contre le garage qui l\'a exécuté ; on reste toutefois disponible pour t\'aider à régler la situation.</div>'
+
+    +'<div style="'+S+'">4. Abonnement, points de fidélité et paiements</div>'
+    +'<div style="'+P+'">Certaines fonctionnalités (abonnement mensuel, programme de points) impliquent un paiement traité par notre fournisseur de paiement (Square). Greaz ne conserve jamais ton numéro de carte complet. Les modalités d\'annulation d\'un abonnement sont disponibles dans "Mon espace" ou en nous contactant.</div>'
+
+    +'<div style="'+S+'">5. "Loue ton auto"</div>'
+    +'<div style="'+P+'">Cette fonctionnalité met en relation des usagers entre eux pour la location d\'un véhicule. Greaz facilite la demande mais n\'est pas partie au contrat de location conclu entre les usagers, et n\'est pas responsable des dommages, assurances ou litiges liés à cette location.</div>'
+
+    +'<div style="'+S+'">6. Exactitude de tes informations</div>'
+    +'<div style="'+P+'">Le kilométrage, les factures et les informations de véhicule que tu entres (manuellement ou par photo/scan) servent à te donner des rappels d\'entretien et un historique justes. Tu es responsable de leur exactitude — Greaz ne vérifie pas chaque donnée entrée par les usagers.</div>'
+
+    +'<div style="'+S+'">7. Propriété intellectuelle</div>'
+    +'<div style="'+P+'">Le nom Greaz, le logo, le design, le code et le contenu du site/de l\'application appartiennent à Greaz. Toute reproduction, copie ou extraction automatisée (scraping) sans autorisation écrite est interdite.</div>'
+
+    +'<div style="'+S+'">8. Limitation de responsabilité</div>'
+    +'<div style="'+P+'">Dans la mesure permise par la loi, Greaz n\'est pas responsable des dommages indirects, interruptions de service, pertes de données, ou des actes d\'un garage/usager tiers. Le service est offert "tel quel".</div>'
+
+    +'<div style="'+S+'">9. Suspension ou résiliation</div>'
+    +'<div style="'+P+'">Greaz peut suspendre ou fermer un compte en cas d\'usage abusif, frauduleux ou contraire aux présentes conditions.</div>'
+
+    +'<div style="'+S+'">10. Modifications</div>'
+    +'<div style="'+P+'">On peut mettre à jour ces conditions ; la date ci-dessus indique la dernière version. En continuant d\'utiliser Greaz après un changement, tu acceptes la version à jour.</div>'
+
+    +'<div style="'+S+'">11. Droit applicable</div>'
+    +'<div style="'+P+'">Ces conditions sont régies par les lois du Québec et du Canada applicables.</div>'
+
+    +'<div style="'+S+'">12. Nous contacter</div>'
+    +'<div style="'+P+'">Contact@greaz.ca</div>';
+}
+function legalPrivacyHtml(){
+  var S = 'font-weight:700;color:var(--white);font-size:14px;margin:1.3rem 0 .5rem';
+  var P = 'font-size:12.5px;color:var(--chrome);line-height:1.65;margin-bottom:.5rem';
+  return '<div style="'+P+';color:var(--faint)">Dernière mise à jour : 17 octobre 2026.</div>'
+
+    +'<div style="'+P+'">Cette politique explique quelles données Greaz recueille, pourquoi, et quels sont tes droits — conformément à la Loi 25 du Québec sur la protection des renseignements personnels.</div>'
+
+    +'<div style="'+S+'">1. Qui est responsable de tes renseignements</div>'
+    +'<div style="'+P+'">Le/la responsable de la protection des renseignements personnels chez Greaz est le fondateur de Greaz, joignable à Contact@greaz.ca.</div>'
+
+    +'<div style="'+S+'">2. Ce qu\'on recueille</div>'
+    +'<div style="'+P+'"><b>Identité et contact :</b> prénom, nom, courriel, téléphone, adresse.<br>'
+    +'<b>Véhicule :</b> marque, modèle, année, kilométrage, immatriculation, NIV, type de carburant, photo.<br>'
+    +'<b>Historique et dépenses :</b> réparations, entretiens, photos de factures, montants, catégories de dépenses (carburant, stationnement, assurance, etc.) que tu ajoutes toi-même.<br>'
+    +'<b>Compte et usage :</b> demandes de service, rendez-vous, messages échangés avec Greaz, points de fidélité.<br>'
+    +'<b>Paiement :</b> traité directement par notre fournisseur de paiement (Square) — Greaz ne voit ni ne conserve ton numéro de carte complet.</div>'
+
+    +'<div style="'+S+'">3. Pourquoi on les recueille</div>'
+    +'<div style="'+P+'">Pour te mettre en relation avec un garage partenaire adapté à ta demande, personnaliser ton calendrier d\'entretien, garder ton historique de véhicule accessible, gérer ton compte et ton abonnement, et communiquer avec toi au sujet de tes demandes.</div>'
+
+    +'<div style="'+S+'">4. Ton consentement</div>'
+    +'<div style="'+P+'">En créant un compte, tu consens à la collecte décrite ici pour ces finalités. Tu peux retirer ton consentement en tout temps (voir section 7) — ça peut toutefois limiter certaines fonctionnalités.</div>'
+
+    +'<div style="'+S+'">5. Avec qui on les partage</div>'
+    +'<div style="'+P+'">• Le garage ou mécanicien partenaire que tu choisis ou qui te répond, pour les infos nécessaires à ta demande.<br>'
+    +'• Nos fournisseurs techniques qui hébergent et font fonctionner Greaz : Google Firebase (hébergement, base de données, authentification), Supabase (stockage des photos et fichiers), le service d\'envoi de courriels (EmailJS) et Square (paiements).<br>'
+    +'• Jamais vendues à des tiers à des fins publicitaires.<br>'
+    +'<span style="color:var(--faint)">Note : certains de ces fournisseurs peuvent stocker des données sur des serveurs situés hors Québec (ex. infrastructure Google). Ces serveurs sont probablement situés aux États-Unis (configuration par défaut de ces fournisseurs), ce qui reste à confirmer précisément dans les paramètres de notre hébergeur.</span></div>'
+
+    +'<div style="'+S+'">6. Lecture automatique de factures (OCR)</div>'
+    +'<div style="'+P+'">Quand tu scannes une facture, la lecture automatique du texte (date, montant) se fait directement dans ton navigateur — la photo n\'est pas envoyée à un service d\'intelligence artificielle externe pour cette étape. La photo elle-même est conservée sur nos serveurs pour que tu puisses la consulter plus tard, et tu peux toujours corriger ce qui a été lu avant de l\'enregistrer.</div>'
+
+    +'<div style="'+S+'">7. Tes droits</div>'
+    +'<div style="'+P+'">Tu peux en tout temps : consulter les renseignements qu\'on a sur toi, en demander la correction, retirer ton consentement, ou demander une copie dans un format réutilisable. Pour exercer un de ces droits, écris-nous à Contact@greaz.ca.</div>'
+
+    +'<div style="'+S+'">8. Combien de temps on les garde</div>'
+    +'<div style="'+P+'">Tant que ton compte est actif, puis 2 ans après sa fermeture, sauf obligation légale de les garder plus longtemps.</div>'
+
+    +'<div style="'+S+'">9. Sécurité</div>'
+    +'<div style="'+P+'">L\'accès à tes données est limité à l\'équipe Greaz qui en a besoin pour te servir, protégé par des règles de sécurité sur notre base de données et des connexions chiffrées.</div>'
+
+    +'<div style="'+S+'">10. Incidents de confidentialité</div>'
+    +'<div style="'+P+'">En cas d\'incident présentant un risque sérieux pour toi, on s\'engage à t\'en aviser ainsi que la Commission d\'accès à l\'information du Québec, conformément à la loi.</div>'
+
+    +'<div style="'+S+'">11. Âge minimum</div>'
+    +'<div style="'+P+'">Greaz s\'adresse aux personnes de 18 ans et plus.</div>'
+
+    +'<div style="'+S+'">12. Modifications</div>'
+    +'<div style="'+P+'">On peut mettre à jour cette politique ; la date en haut indique la dernière version.</div>'
+
+    +'<div style="'+S+'">13. Nous contacter</div>'
+    +'<div style="'+P+'">Contact@greaz.ca</div>';
+}
+function openLegalPage(type){
+  document.getElementById('account-title').textContent = type === 'privacy' ? 'Politique de confidentialité' : "Conditions d'utilisation";
+  document.getElementById('account-body').innerHTML = type === 'privacy' ? legalPrivacyHtml() : legalTermsHtml();
+  document.getElementById('overlay-account').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 /* ── Onglet "Historique" (barre d'onglets mobile) : version allégée de
