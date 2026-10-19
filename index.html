@@ -4390,8 +4390,8 @@ function renderClientForm(){
     '<div class="alert-err" id="client-err"></div>'
     +'<div class="form-section"><div class="form-section-title">Votre véhicule</div>'
     +'<div class="ff2"><div class="ff"><label>Type</label><select id="c_vtype"><option value="">— Choisir —</option><option>Voiture / VUS</option><option>Moto</option><option>Van / Minivan</option><option>VR / Motorisé</option><option>Bateau</option></select></div>'
-    +'<div class="ff"><label>Marque</label><select id="c_make"><option value="">— Marque —</option><option>Toyota</option><option>Honda</option><option>Ford</option><option>Chevrolet</option><option>BMW</option><option>Mercedes</option><option>Hyundai</option><option>Kia</option><option>Mazda</option><option>Subaru</option><option>Nissan</option><option>Autre</option></select></div></div>'
-    +'<div class="ff2"><div class="ff"><label>Modèle</label><input type="text" id="c_model" placeholder="ex. Corolla"></div>'
+    +'<div class="ff"><label>Marque</label><select id="c_make" onchange="updateCModelList()"><option value="">— Marque —</option>'+CAR_BRANDS.map(function(m){ return '<option>'+m+'</option>'; }).join('')+'</select></div></div>'
+    +'<div class="ff2"><div class="ff"><label>Modèle</label><input type="text" id="c_model" list="c_model_list" placeholder="ex. Corolla"><datalist id="c_model_list"></datalist></div>'
     +'<div class="ff"><label>Année</label><select id="c_year"><option value="">Année</option>'+yearsOpts+'</select></div></div></div>'
     +'<div class="form-section"><div class="form-section-title">Votre problème</div>'
     +'<div class="problem-grid">'+probCards+'</div>'
@@ -4498,6 +4498,17 @@ function renderClientRecap(editing){
   if(!addr) renderClientRecap(true);
 }
 
+/* Suggestions de modèles (datalist, non-restrictif) selon la marque choisie
+   dans le formulaire de demande — même table que l'inscription/Mes véhicules
+   (MODELS_BY_MAKE) pour rester cohérent partout sur le site. */
+function updateCModelList(){
+  var mk = document.getElementById('c_make');
+  var dl = document.getElementById('c_model_list');
+  if(!mk || !dl) return;
+  var models = MODELS_BY_MAKE[mk.value] || [];
+  dl.innerHTML = models.map(function(m){ return '<option value="'+m+'">'; }).join('');
+}
+
 function pickClientVehicle(idx){
   var v = (clientData.vehicles||[])[idx]; if(!v) return;
   var set = function(id,val){ var e=document.getElementById(id); if(e) e.value=val||''; };
@@ -4508,6 +4519,7 @@ function pickClientVehicle(idx){
     for(var i=0;i<mk.options.length;i++){ if(mk.options[i].value===v.make){ mk.value=v.make; found=true; break; } }
     if(!found){ var o=document.createElement('option'); o.value=v.make; o.textContent=v.make; mk.appendChild(o); mk.value=v.make; }
   }
+  updateCModelList();
 }
 
 async function submitClient(){
@@ -5104,7 +5116,7 @@ var SIGNUP_BONUS_PTS = 20;
 // Même liste de marques que le Plan d'entretien (greaz-entretien.html) — harmonisée ici pour
 // que les deux outils se comprennent pareil, et que le véhicule enregistré à l'inscription
 // profite des mêmes suggestions de modèles et de la même détection électrique/hybride.
-var CAR_BRANDS = ['Acura','Alfa Romeo','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Fiat','Ford','Genesis','GMC','Honda','Hyundai','Infiniti','Jaguar','Jeep','Kia','Land Rover','Lexus','Lincoln','Mazda','Mercedes-Benz','Mini','Mitsubishi','Nissan','Pontiac','Porsche','RAM','Saab','Scion','Subaru','Suzuki','Tesla','Toyota','Volkswagen','Volvo','Autre'];
+var CAR_BRANDS = ['Acura','Alfa Romeo','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Fiat','Ford','Genesis','GMC','Honda','Hyundai','Infiniti','Isuzu','Jaguar','Jeep','Kia','Land Rover','Lexus','Lincoln','Lucid','Mazda','Mercedes-Benz','Mini','Mitsubishi','Nissan','Polestar','Pontiac','Porsche','RAM','Rivian','Saab','Saturn','Scion','Smart','Subaru','Suzuki','Tesla','Toyota','Volkswagen','Volvo','Autre'];
 var MODELS_BY_MAKE = {
   'Toyota':['Corolla','Camry','RAV4','RAV4 Prime 🔋','Prius 🔋','Highlander','4Runner','Tacoma','Tundra','Sienna','Corolla Cross','C-HR','Venza','GR86','bZ4X ⚡'],
   'Honda':['Civic','Accord','CR-V','HR-V','Pilot','Odyssey','Ridgeline','Passport','Prologue ⚡'],
@@ -5144,6 +5156,12 @@ var MODELS_BY_MAKE = {
   'Saab':['9-3','9-5','9-2X','9-4X'],
   'Pontiac':['G5','G6','Vibe','Torrent','Solstice','Grand Prix'],
   'Suzuki':['Swift+','SX4','Grand Vitara','Kizashi'],
+  'Isuzu':['Rodeo','Trooper','Ascender'],
+  'Lucid':['Air ⚡','Gravity ⚡'],
+  'Polestar':['Polestar 2 ⚡','Polestar 3 ⚡','Polestar 4 ⚡'],
+  'Rivian':['R1T ⚡','R1S ⚡'],
+  'Saturn':['Ion','Vue','Outlook','Aura'],
+  'Smart':['Fortwo'],
 };
 var INSURERS = ['Intact','Desjardins','Belairdirect','TD Assurance','CAA','Promutuel','Beneva','Economical','Autre'];
 var INSURER_DURATIONS = ["Moins d'1 an","1 à 3 ans","3 à 5 ans","5 ans et plus"];
@@ -5171,7 +5189,7 @@ var MAINTENANCE = [
   { nom:'Vérification système haute tension', ic:'⚡', km:30000, imp:'recommande', t:['e'] },
   { nom:'Liquide de refroidissement (batterie)', ic:'🔋', km:100000, imp:'critique', t:['e'] },
 ];
-var MAINT_EV_KEYWORDS = ['mach-e','mach e','tesla','model 3','model y','model s','model x','bolt','leaf','ioniq 5','ioniq5','ioniq 6','ev6','id.4','id4','ariya','e-tron','etron','i4','ix','eqs','eqb','eqe','taycan','polestar','lyriq','blazer ev','equinox ev','lightning','solterra','bz4x','kona electric','niro ev','soul ev'];
+var MAINT_EV_KEYWORDS = ['mach-e','mach e','tesla','model 3','model y','model s','model x','bolt','leaf','ioniq 5','ioniq5','ioniq 6','ev6','id.4','id4','ariya','e-tron','etron','i4','ix','eqs','eqb','eqe','taycan','polestar','lyriq','blazer ev','equinox ev','lightning','solterra','bz4x','kona electric','niro ev','soul ev','rivian','r1t','r1s','lucid'];
 var MAINT_HYBRID_KEYWORDS = ['prius','hybrid','hybride','rav4 prime','phev'];
 
 function vehicleFuelCode(v){
