@@ -1514,7 +1514,7 @@ body.logged-in .hero-scroll{display:none}
   <div class="hero-content">
 
     <div id="hero-marketing">
-    <div class="hero-eyebrow">
+    <div class="hero-eyebrow" id="hero-eyebrow">
       <span class="hero-dot"></span>
       <span>Québec</span>
       <span class="eb-sep">·</span>
@@ -3276,6 +3276,11 @@ function loadDirectory(){
   }).catch(function(e){
     console.error('Firestore:', e);
     document.getElementById('cards-grid').innerHTML = '<div class="pro-empty"><div class="pro-empty-icon">⚠️</div>Erreur de chargement</div>';
+    // Si le compteur n'a jamais pu se mettre à jour (requête en échec), on cache
+    // la pastille "— pros au répertoire" au lieu de laisser le tiret affiché à
+    // tout le monde — un tiret visible donne l'impression d'une plateforme vide.
+    var eb = document.getElementById('hero-eyebrow');
+    if(eb) eb.style.display = 'none';
   });
 }
 
@@ -5972,7 +5977,7 @@ function legalTermsHtml(){
     +'<div style="'+P+'">Les garages, mécaniciens et autres professionnels présentés sur Greaz sont des entreprises indépendantes, pas des employés ni des mandataires de Greaz. Greaz facilite la mise en relation, la prise de rendez-vous et le suivi — mais n\'effectue pas elle-même les réparations et n\'est pas responsable de la qualité, du prix ou des délais du travail exécuté par un partenaire. En cas de problème avec un service reçu, le recours est contre le garage qui l\'a exécuté ; on reste toutefois disponible pour t\'aider à régler la situation.</div>'
 
     +'<div style="'+S+'">4. Abonnement, points de fidélité et paiements</div>'
-    +'<div style="'+P+'">Certaines fonctionnalités (abonnement mensuel, programme de points) impliquent un paiement traité par notre fournisseur de paiement (Square). Greaz ne conserve jamais ton numéro de carte complet. Les modalités d\'annulation d\'un abonnement sont disponibles dans "Mon espace" ou en nous contactant.</div>'
+    +'<div style="'+P+'">Certaines fonctionnalités (abonnement mensuel, programme de points) impliquent un paiement traité par notre fournisseur de paiement (Stripe). Greaz ne conserve jamais ton numéro de carte complet. Les modalités d\'annulation d\'un abonnement sont disponibles dans "Mon espace" ou en nous contactant.</div>'
 
     +'<div style="'+S+'">5. "Loue ton auto"</div>'
     +'<div style="'+P+'">Cette fonctionnalité met en relation des usagers entre eux pour la location d\'un véhicule. Greaz facilite la demande mais n\'est pas partie au contrat de location conclu entre les usagers, et n\'est pas responsable des dommages, assurances ou litiges liés à cette location.</div>'
@@ -6013,7 +6018,7 @@ function legalPrivacyHtml(){
     +'<b>Véhicule :</b> marque, modèle, année, kilométrage, immatriculation, NIV, type de carburant, photo.<br>'
     +'<b>Historique et dépenses :</b> réparations, entretiens, photos de factures, montants, catégories de dépenses (carburant, stationnement, assurance, etc.) que tu ajoutes toi-même.<br>'
     +'<b>Compte et usage :</b> demandes de service, rendez-vous, messages échangés avec Greaz, points de fidélité.<br>'
-    +'<b>Paiement :</b> traité directement par notre fournisseur de paiement (Square) — Greaz ne voit ni ne conserve ton numéro de carte complet.</div>'
+    +'<b>Paiement :</b> traité directement par notre fournisseur de paiement (Stripe) — Greaz ne voit ni ne conserve ton numéro de carte complet.</div>'
 
     +'<div style="'+S+'">3. Pourquoi on les recueille</div>'
     +'<div style="'+P+'">Pour te mettre en relation avec un garage partenaire adapté à ta demande, personnaliser ton calendrier d\'entretien, garder ton historique de véhicule accessible, gérer ton compte et ton abonnement, et communiquer avec toi au sujet de tes demandes.</div>'
@@ -6023,7 +6028,7 @@ function legalPrivacyHtml(){
 
     +'<div style="'+S+'">5. Avec qui on les partage</div>'
     +'<div style="'+P+'">• Le garage ou mécanicien partenaire que tu choisis ou qui te répond, pour les infos nécessaires à ta demande.<br>'
-    +'• Nos fournisseurs techniques qui hébergent et font fonctionner Greaz : Google Firebase (hébergement, base de données, authentification), Supabase (stockage des photos et fichiers), le service d\'envoi de courriels (EmailJS) et Square (paiements).<br>'
+    +'• Nos fournisseurs techniques qui hébergent et font fonctionner Greaz : Google Firebase (hébergement, base de données, authentification), Supabase (stockage des photos et fichiers), le service d\'envoi de courriels (EmailJS) et Stripe (paiements).<br>'
     +'• Jamais vendues à des tiers à des fins publicitaires.<br>'
     +'<span style="color:var(--faint)">Note : certains de ces fournisseurs peuvent stocker des données sur des serveurs situés hors Québec (ex. infrastructure Google). Ces serveurs sont probablement situés aux États-Unis (configuration par défaut de ces fournisseurs), ce qui reste à confirmer précisément dans les paramètres de notre hébergeur.</span></div>'
 
@@ -8224,16 +8229,24 @@ function initBookingProgress(){
 }
 
 window.addEventListener('DOMContentLoaded', function(){
-  captureReferral();
-  fillPriceCheckMenu();
-  initMap();
-  initMapGuards();
-  loadDirectory();
-  initReveal();
-  initScrollFx();
-  initDrawerSwipe();
-  initBookingProgress();
-  initLeadPopup();
+  // Chaque étape est isolée : si une seule plante (ex. la carte Leaflet qui ne
+  // charge pas sur un réseau lent ou avec un bloqueur de pub), les autres
+  // continuent quand même. Avant, une erreur ici empêchait loadDirectory()
+  // de tourner et le compteur "— pros au répertoire" restait coincé sur le
+  // tiret pour tout le monde, dès l'arrivée sur le site.
+  function safe(fn){
+    try{ fn(); }catch(e){ console.error('Init failed:', fn.name || fn, e); }
+  }
+  safe(captureReferral);
+  safe(fillPriceCheckMenu);
+  safe(initMap);
+  safe(initMapGuards);
+  safe(loadDirectory);
+  safe(initReveal);
+  safe(initScrollFx);
+  safe(initDrawerSwipe);
+  safe(initBookingProgress);
+  safe(initLeadPopup);
 });
 </script>
 <!-- Modal conditions d'abonnement -->
@@ -8279,7 +8292,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <h3>5. Obligations du membre</h3>
       <ul>
         <li>Fournir des informations exactes (nom, courriel, véhicule, adresse).</li>
-        <li>Utiliser le même courriel pour ton compte Greaz et ton paiement Square.</li>
+        <li>Utiliser le même courriel pour ton compte Greaz et ton paiement Stripe.</li>
         <li>Utiliser le service de bonne foi, pour un usage personnel.</li>
       </ul>
 
